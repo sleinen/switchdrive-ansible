@@ -1,0 +1,60 @@
+---
+
+- name: Install the NFS server
+  action: apt name={{item}}
+  with_items:
+    - rpcbind
+    - nfs-kernel-server
+    - xfsprogs
+    - rsnapshot
+
+- name: portmap lockdown
+  lineinfile: "dest=/etc/hosts.deny line='rpcbind mountd nfsd statd lockd rquotad : ALL'"
+  tags:
+    - config
+
+- name: portmap allow
+  template: src=hosts.allow.j2 dest=/etc/hosts.allow
+  tags:
+    - config
+
+- name: don't run updatedb on mounted directories
+  lineinfile:
+    dest=/etc/updatedb.conf
+    regexp='PRUNEPATHS'
+    line='PRUNEPATHS="/tmp /var/spool /media /home/.ecryptfs /mnt"'
+  tags:
+    - config
+
+- name: increase ulimits
+  copy: src=limits.d/{{item}} dest=/etc/security/limits.d/{{item}} owner=root mode=644
+  with_items:
+    - root.conf
+    - sshd.conf
+  tags:
+    - config
+
+- name: restart iptables-persistent server
+  service: name=iptables-persistent state=restarted
+  tags:
+    - config
+    
+- name: start nfs-kernel-server
+  service: name=nfs-kernel-server state=started
+
+- name: collectd nfsv4 plugin
+  copy: src=collectd_nfsv4.conf dest=/etc/collectd/collectd.conf.d/nfsv4.conf
+  notify: restart collectd
+  tags:
+    - collectd
+
+
+- name: sysctl
+  copy: src="{{item}}" dest="/etc/sysctl.d/60-{{item}}" owner=root mode=644
+  with_items:
+    - "dirty_ratio.conf"
+  notify: sysctl
+  tags:
+    - config
+    - sysctl
+

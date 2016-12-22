@@ -1,0 +1,40 @@
+---
+
+elk_elasticsearch:
+  version: 1.7
+  pid_file: /var/run/elasticsearch/elasticsearch.pid
+  http:
+    port: 9200
+
+elk_logstash:
+  version: 1.5
+  pid_file: /var/run/logstash.pid
+  configs:
+    - { src: logstash.conf.j2, dest: logstash.conf }
+    - { src: logstash.syslog-stats.conf.j2, dest: logstash.syslog-stats.conf }
+    - { src: logstash.lumberjack.conf.j2, dest: logstash.lumberjack.conf }
+    - { src: logstash.nginx.conf.j2, dest: logstash.nginx.conf }
+    - { src: logstash.apache.conf.j2, dest: logstash.apache.conf }
+    - { src: logstash.postgres.conf.j2, dest: logstash.postgres.conf }
+    - { src: logstash.owncloud.conf.j2, dest: logstash.owncloud.conf }
+    - { src: logstash.ansible.conf.j2, dest: logstash.ansible.conf }
+    - { src: logstash.logspout.conf.j2, dest: logstash.logspout.conf }
+  patterns:
+    - { src: apache.j2, dest: apache }
+    - { src: nginx.j2, dest: nginx }
+    - { src: ansible.j2, dest: ansible }
+    - { src: owncloud.j2, dest: owncloud }
+    - { src: postgres.j2, dest: postgres }
+
+elk_kibana:
+  version: 4.1.2-linux-x64
+  path: /opt/kibana
+  port: 5601
+  user: "{{vault_kibana_user}}" # optional; if unset, kibana does not require authentication
+  password: "{{vault_kibana_password}}" # optional; if unset, kibana does not require authentication
+  allowed_addresses:
+    - 127.0.0.1
+
+elk_nginx:
+  port: 80
+  user: nginx

@@ -1,0 +1,54 @@
+heat_template_version: 2013-05-23
+  
+################################
+parameters:  
+  name_prefix:
+    type: string
+    description: "Resources Name Prefix"
+  hostname:
+    type: string
+  domainname:
+    type: string
+    default: drive.switch.ch
+
+  ssh_key:
+    type: string
+    label: "Key name"
+    default: Christian-Schnidrig
+  admin_pass:
+    type: string
+    label: "ubuntu user password (console login only)"
+    default: "csrp14"
+    hidden: "true"  
+
+  flavor:
+    type: string
+    default: m1.small
+  root_volume_id:
+    type: string
+  networks:
+    type: json  
+
+################################
+resources:
+
+  server:
+    type: server_base.yaml
+    properties:
+      name_prefix: { get_param: name_prefix }
+      hostname: { get_param: hostname }
+      domainname: { get_param: domainname }
+      ssh_key: { get_param: ssh_key }
+      admin_pass: { get_param: admin_pass }
+      flavor: { get_param: flavor }
+      networks: { get_param: networks }
+      block_device_mapping:
+        map:
+          - device_name: vda
+            volume_id: { get_param: root_volume_id }
+            
+################################
+outputs:
+  server_id:
+    value: { get_attr: [server, server_id] }
+

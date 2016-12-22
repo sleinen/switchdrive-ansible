@@ -1,0 +1,15 @@
+---
+
+- name: disable TCPtime stamps
+  lineinfile:
+    dest=/etc/sysctl.conf
+    regexp="\s*{{ item.name }}\s*=.*"
+    line="{{ item.name }} = {{ item.value }}"
+  with_items:
+    - { name: "vm.swappiness", value: "1" }
+  notify: reload sysctl
+  tags: 
+    - sysctl
+
+
+

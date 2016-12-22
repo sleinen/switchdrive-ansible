@@ -1,0 +1,10 @@
+dn: olcOverlay=syncprov,olcDatabase={1}hdb,cn=config
+changetype: add
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: syncprov
+# Sync Checkpoints every 20 changes or 1 hour
+olcSpCheckpoint: 20 60
+# Keep a fair number of operations in the log
+olcSpSessionlog: 1000
+

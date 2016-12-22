@@ -1,0 +1,76 @@
+#input { 
+#{% for port in elk_owncloud_ports %}
+#    syslog {
+#        port => {{port}}
+#        type => "owncloud"
+#    }
+#{% endfor %}
+#}
+
+filter {
+  if [type] == "owncloud" {
+    json {
+        source => "message"
+    }
+    mutate {
+        rename => { "host" => "logsource" }
+    }
+    date {
+        match => ["time", "UNIX"]
+        remove_field => ["time"]
+    }
+    if [app] == "admin_audit" {
+        grok {
+            match => { "message" => "%{OCLOGIN}|%{OCLOGOUT}|%{OCLOGINATTEMPT}|%{OCACTIONUSER}|%{OCACTIONIP}" }
+        }
+        if [action] == "into" {
+                mutate { replace => { action => "login" } }
+        } else if [action] == "attempted" {
+                mutate { replace => { action => "login_attempt" } }
+        } else if [action] == "out" {
+                mutate { replace => { action => "logout" } }
+        }
+        if ![owner] and [path] {
+            grok {
+                match => { "path" => "/%{OCUSERNAME:owner}/files/%{GREEDYDATA}" }
+            }
+        }
+        metrics {
+          meter => [ "logstash.%{logsource}.metric.owncloud.num_audit_log"]
+          add_tag => "metric"
+          flush_interval => 10
+          rates => []
+        }
+    } else if [app] == "sharing_log" {
+        grok {
+            match => {"message" => "%{OCSHARELINK}|%{OCSHAREUSER}|%{OCUNSHAREUSER}|%{OCUNSHARELINK}|%{OCUPDATESHARE}"}
+        }
+        if [action] == "shared" {
+            if [token] {
+                mutate { replace => { action => "share_by_link" } }
+            } else {
+                mutate { replace => { action => "share_with_user" } }
+            }
+        } else if [action] == "unshared" {
+                mutate { replace => { action => "unshare_with_user" } }
+        } else if [action] == "removed" {
+                mutate { replace => { action => "unshare_by_link" } }
+        } else if [action] == "updated" {
+                mutate { replace => { action => "update_share_permissions" } }
+        }
+        metrics {
+          meter => [ "logstash.%{logsource}.metric.owncloud.num_sharing_log"]
+          add_tag => "metric"
+          flush_interval => 10
+          rates => []
+        }
+    }
+  } else {
+    metrics {
+      meter => [ "logstash.%{logsource}.metric.owncloud.num_log_lines"]
+      add_tag => "metric"
+      flush_interval => 10
+      rates => []
+    }
+  }
+}

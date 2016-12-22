@@ -1,0 +1,43 @@
+---
+# handles the registration servers
+
+- hosts: monitoring
+  tasks:
+    - name: talk to monitoring servers to populate facts
+      command: /bin/true
+
+- hosts: reg
+  become: yes
+  tasks:
+    - name: prepare /opt
+      file:
+        dest=/opt/registerCloud
+        state=directory
+        owner=ubuntu
+  become: true
+
+
+- hosts: reg
+  become: no
+  tasks:
+  - name: pull git repository
+    git:
+      repo=gitosis@git.switch.ch:registerCloud.git
+      dest=/opt/registerCloud
+      accept_hostkey=yes
+    ignore_errors: yes
+  become: true
+
+- hosts: reg
+  vars:
+     node_type: reg
+  vars_files:
+    - ../vars/users.yml
+  roles:
+    - common
+    - nagios
+    - apache
+    - rbenv
+    - cloud_id
+  become: true
+

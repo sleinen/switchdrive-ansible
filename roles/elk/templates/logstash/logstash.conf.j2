@@ -1,0 +1,46 @@
+input { 
+    syslog {
+        port => {{elk_syslog_port}}
+        type => "syslog"
+    }
+}
+filter {
+}
+output {
+  if [type] == "owncloud"  and ([app] == "admin_audit" or [app] == "sharing_log") {
+      elasticsearch { 
+         host => ["localhost"]
+         embedded => false
+         workers => 10
+         protocol => transport
+         index => "logstash-audit-%{+YYYY.MM.dd}"
+         document_type => "events"
+      }
+  } else if [type] == "nginx-access" or [type] == "nginx-error" or [type] == "apache-access" or [type] == "apache-error" {
+      elasticsearch { 
+         host => ["localhost"]
+         embedded => false
+         workers => 10
+         protocol => transport
+         index => "logstash-nginx-%{+YYYY.MM.dd}"
+         document_type => "events"
+      }
+  } else {
+      elasticsearch { 
+         host => ["localhost"]
+         embedded => false
+         workers => 10
+         protocol => transport
+         index => "logstash-syslog-%{+YYYY.MM.dd}"
+      }
+  }
+  
+  if "metric" in [tags] {
+    #stdout { codec => rubydebug }
+    graphite {
+      host => "{{ hostvars[groups['graphite'][0]].inventory_hostname }}"
+      fields_are_metrics => true
+      include_metrics => [".*.count"]
+    }
+  }
+}

@@ -1,0 +1,6 @@
+---
+
+- include: maxscale.yml
+- include: maxscale_collectd_setup.yml
+
+

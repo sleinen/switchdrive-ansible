@@ -1,0 +1,8 @@
+---
+
+- name: restart dnsmasq
+  service: name=dnsmasq state=restarted
+
+- name: restart sshd
+  service: name=ssh state=restarted
+

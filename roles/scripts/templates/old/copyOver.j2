@@ -1,0 +1,36 @@
+#!/bin/bash
+
+if [ "x$1" == "x" ]; then 
+	echo "Usage: `basename $0` <dir_number>
+.      dir_number: two digits, set number to be copied. E.g. 02"
+	exit
+fi
+
+export LC_ALL="en_US.UTF-8"
+
+
+DIRNUMBER="$1"
+DEST_DIR="/mnt/1${DIRNUMBER}"
+SOURCE_DIR="/mnt/data"
+USER_LIST="/root/userlist/x${DIRNUMBER}"
+
+cd $SOURCE_DIR;
+
+COPIED=0
+SKIPPED=0
+
+for user in `cat ${USER_LIST}`; do
+	if [ -d $SOURCE_DIR/$user ] && ! [ -h $SOURCE_DIR/$user ] ; then
+		if ! [ -d ${DEST_DIR}/$user ] || [ `stat -c %U ${DEST_DIR}/$user` != "www-data" ]; then
+			echo Copying user $user
+			tar -cf - $user | tar -xf - -C ${DEST_DIR}
+			COPIED=$((COPIED+1))
+		else
+			echo Skipping $user
+			SKIPPED=$((SKIPPED+1))
+		fi
+	fi
+	echo "*******************************************"
+	echo Skipped: $SKIPPED
+	echo Copied: $COPIED
+done

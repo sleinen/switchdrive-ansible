@@ -1,0 +1,16 @@
+---
+
+- name: remove obsolete scripts
+  file: name=/root/{{ item }} state=absent
+  with_items:
+    - dummy
+  tags:
+    - scripts
+
+- name: install scripts
+  template: src=scripts/{{ item }}.j2 dest=/root/{{ item }} mode=0550
+  with_items:
+    - ha_update
+  tags:
+    - scripts
+

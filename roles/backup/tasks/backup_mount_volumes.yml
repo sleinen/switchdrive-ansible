@@ -1,0 +1,31 @@
+---
+
+- name: make filesystem
+  when: not main_site
+  command: mkfs.xfs /dev/{{ item.backup_dev }}
+  with_items: quobyte_volumes
+  ignore_errors: yes
+  tags:
+    - backupconf
+    - quobyte
+
+- name: create mountpoints
+  when: not main_site
+  file: dest=/mnt/{{ item.name }} state=directory
+  with_items: quobyte_volumes
+  tags:
+    - backupconf
+    - quobyte
+
+- name: mount volumes
+  when: not main_site
+  mount: 
+    name=/mnt/{{ item.name }}
+    src=/dev/{{ item.backup_dev }}
+    fstype=xfs
+    opts=noatime
+    state={{item.state}}
+  with_items: quobyte_volumes
+  tags:
+    - backupconf
+    - quobyte

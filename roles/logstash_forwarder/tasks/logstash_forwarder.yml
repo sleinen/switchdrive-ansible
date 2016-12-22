@@ -1,0 +1,74 @@
+---
+
+- name: ES apt GPG key
+  apt_key:
+    url='http://packages.elasticsearch.org/GPG-KEY-elasticsearch'
+  when: ansible_os_family == 'Debian'
+  become: yes
+  tags:
+    - logstash
+
+- name: Logstash forwarder apt repo
+  apt_repository:
+    repo="deb http://packages.elasticsearch.org/logstashforwarder/{{ ansible_os_family|lower }} stable main"
+    update_cache=yes
+  when: ansible_os_family == 'Debian'
+  become: yes
+  tags:
+    - logstash
+
+- name: Install logstash apt packages
+  apt: pkg={{ item }} state=present
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  with_items:
+   - logstash-forwarder
+  become: yes
+  when: ansible_os_family == 'Debian'
+  tags:
+    - logstash
+
+- name: Logstash forwarder certificate conf file
+  copy:
+    src=../../elk/files/{{internal_domain}}.{{item}}
+    dest=/etc/{{item}}
+    owner=root group=root mode=644
+  notify: Restart logstash_forwarder
+  with_items:
+     - lumberjack.crt
+  tags:
+    - lsconfig
+    - config
+    - logstash
+
+- name: check state of /etc/logstash-forwarder.conf
+  stat: path=/etc/logstash-forwarder.conf
+  register: logstash_conf
+  tags:
+    - logstash
+
+- file: path=/etc/logstash-forwarder.conf state=absent
+  when: (not logstash_conf.stat.isdir is defined) or not logstash_conf.stat.isdir
+  tags:
+    - logstash
+
+- name: Logstash conf directory
+  file:
+    path=/etc/logstash-forwarder.conf
+    owner=root group=root mode=644
+    state=directory
+  tags:
+    - logstash
+
+- name: Logstash-forwarder elk-server conf
+  template:
+    src={{item}}.j2
+    dest=/etc/logstash-forwarder.conf/{{item}}
+    owner=root group=root mode=644
+  notify: Restart logstash_forwarder
+  with_items:
+     - elk.conf
+  tags:
+    - lsconfig
+    - config
+    - logstash
+

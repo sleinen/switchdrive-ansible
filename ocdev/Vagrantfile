@@ -1,0 +1,74 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION = "2"
+
+begin
+  require_relative 'setup'
+  rescue LoadError
+  require_relative 'setup_sample'
+end
+require_relative 'nodedefs'
+require_relative 'ansible_setup'
+require 'ipaddr'
+
+def getIp (subnet)
+     subnet.split('/')[0]
+end
+
+def getMask (subnet)
+     ip_address, prefix = subnet.split('/')
+     return IPAddr.new('255.255.255.255').mask(prefix).to_s
+end
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.box_version = "14.04"
+  config.vm.box_check_update = false
+  
+  NODES.each do |host_name, nodeConfig|
+     config.vm.define "#{host_name}" do |box|
+
+        # add networks
+        nodeConfig[:nic].each do |subnet|
+          box.vm.network "private_network", ip: getIp(subnet), netmask: getMask(subnet)
+        end
+        
+        nodeConfig[:forwarded_ports].each do |guest_port, host_port|
+          box.vm.network "forwarded_port", guest: guest_port, host: host_port
+        end
+
+        box.ssh.forward_agent = true
+
+        box.vm.provider "virtualbox" do |vb|
+           # for debugging it may be useful to uncomment the following line...
+           #vb.gui = true
+           vb.name = "#{host_name}"
+           vb.customize ["modifyvm", :id, "--groups", VIRTUAL_BOX_GROUP]
+           vb.customize ["modifyvm", :id, "--memory", nodeConfig[:ram]]
+           vb.customize ["modifyvm", :id, "--cpus", nodeConfig[:cpu]]
+           vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+           for i in 2..nodeConfig[:nic].count+1
+             vb.customize ["modifyvm", :id, "--nicpromisc#{i}", "allow-all"]
+             # virtio causes the vms to hang
+             #vb.customize ["modifyvm", :id, "--nictype#{i}", "virtio"]
+           end
+           if DISKS[host_name]
+              vb.customize ['storagectl', :id, '--name', 'SATAController', '--portcount', DISKS[host_name].count+1]
+              DISKS[host_name].each do |config|
+                 file_name = "#{SET}/#{host_name}disk#{config[:port]}.vdi"
+                 vb.customize ['createhd', '--filename', file_name, '--size', config[:size]]
+                 vb.customize ['storageattach', :id, '--storagectl', 'SATAController', '--port', config[:port], '--device', 0, '--type', 'hdd', '--medium', file_name]
+              end 
+            end
+        end
+
+        box.vm.hostname="#{host_name}.#{SUB_DOMAIN}.#{DOMAIN}"
+box.vm.synced_folder "#{GIT_OWNCLOUD}", "/var/www/owncloud", owner: "www-data", group: "www-data"
+box.vm.synced_folder "#{GIT_SMASHBOX}", "/opt/smashbox", owner: "vagrant", group: "vagrant"
+        setup_ansible(box,host_name) 
+     end
+  end
+
+end

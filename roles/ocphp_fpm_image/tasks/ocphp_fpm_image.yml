@@ -1,0 +1,44 @@
+---
+
+- name: copy ocphp_fpm build instructions to remote host
+  synchronize:
+    src: ocphp_fpm
+    dest: /tmp
+    delete: yes
+  tags:
+    - ocphp_fpm
+
+
+- name: copy ocphp_fpm configs to remote host
+  template:
+    src={{item.name}}
+    dest=/tmp/ocphp_fpm/{{item.name}}
+    mode={{item.mode}}
+  with_items:
+    - { name: Dockerfile, mode: "0644" }
+    - { name: entrypoint.sh, mode: "0755" }
+    - { name: user.ini, mode: "0644" }
+  tags:
+    - ocphp_fpm
+
+
+- name: build ocphp_fpm
+  docker_image: 
+    path="/tmp/ocphp_fpm" 
+    name="{{ocphp_fpm_docker_name}}"
+    tag="{{ocphp_fpm_docker_tag}}"
+    dockerfile="Dockerfile"
+    state=build
+    tls_hostname=localhost
+    force=true
+  tags:
+    - ocphp_fpm
+
+- name: push ocphp_fpm image
+  shell: docker push "{{ocphp_fpm_docker_image}}"
+  tags:
+    - ocphp_fpm
+
+
+
+

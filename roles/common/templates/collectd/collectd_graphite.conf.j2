@@ -1,0 +1,18 @@
+## Write statistics to the Graphite server over TCP.
+##
+## Statistics from all nodes are collected on "graphite.xyz.cloud.switch.ch".
+
+LoadPlugin write_graphite
+ 
+<Plugin write_graphite>
+	<Node "example">
+		Host "{{ hostvars[groups['graphite'][0]].inventory_hostname }}"
+		Port "2003"
+		Protocol "tcp"
+		LogSendErrors true
+		#Prefix "drive."
+		StoreRates true
+		AlwaysAppendDS false
+		EscapeCharacter "_"
+	</Node>
+</Plugin>

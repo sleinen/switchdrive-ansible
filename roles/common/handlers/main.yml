@@ -1,0 +1,27 @@
+---
+# Handlers for common notifications
+
+- name: restart ntp
+  service: name=ntp state=restarted
+
+- name: restart iptables
+  service: name=iptables state=restarted
+
+- name: reload iptable-rules
+  shell: /sbin/iptables-restore < /etc/iptables/rules.v4
+
+- name: reload sysctl
+  command: sysctl -p
+  
+- name: kill collectd
+  command: pkill -9 collectd
+  ignore_errors: yes    
+  
+- name: restart collectd
+  command: service collectd restart
+
+- name: restart rsyslog
+  service: name=rsyslog state=restarted
+
+- name: restart dnsmasq
+  service: name=dnsmasq state=restarted

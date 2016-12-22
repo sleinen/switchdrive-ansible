@@ -1,0 +1,7 @@
+---
+# Variables for the web server configuration
+
+apply_common_iptables: false
+
+# elastic search
+elasticsearch_heap_size: 31g

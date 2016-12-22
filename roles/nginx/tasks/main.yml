@@ -1,0 +1,36 @@
+---
+# Install the Nginx server
+#
+
+- name: add nginx apt
+  apt_key: url=http://nginx.org/keys/nginx_signing.key state=present
+
+- name: add nginx repo
+  apt_repository: repo='deb http://nginx.org/packages/mainline/ubuntu/ trusty nginx' state=absent
+
+
+- name: Install the Nginx server
+  action: apt name={{item}} 
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+    state=latest
+  with_items:
+    - nginx
+
+- name: drop config file
+  template: src=nginx.conf.j2 dest=/etc/nginx/nginx.conf owner=root mode=644
+  notify: reload nginx
+  tags:
+    - config
+    - nginxconfig
+
+- name: start nginx service
+  service: name=nginx state=started enabled=true
+
+- name: drop collectd config for nginx
+  copy:
+     src=collectd_nginx.conf
+     dest=/etc/collectd/collectd.conf.d/collectd_nginx.conf
+  notify: restart collectd
+  tags:
+    - config
+    - collectd

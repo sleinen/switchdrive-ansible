@@ -1,0 +1,34 @@
+---
+- name: Restart monit
+  service:
+    name=monit
+    enabled=yes state=restarted
+
+- name: Restart elasticsearch
+  service: name=elasticsearch state=restarted
+  #monit:
+  #  name=elasticsearch
+  #  state=restarted
+
+- name: Restart logstash
+  service: name=logstash state=restarted
+  #monit:
+  #  name=logstash
+  #  state=restarted
+
+- name: Restart nginx
+  service: name=logstash state=restarted
+  #monit:
+  #  name=nginx
+  #  state=restarted
+
+- name: Restart supervisor
+  service:
+    name=supervisor
+    enabled=yes state=restarted
+
+- name: Restart kibana
+  supervisorctl:
+    name=kibana
+    state=restarted
+

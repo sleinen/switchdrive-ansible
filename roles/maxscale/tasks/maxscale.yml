@@ -1,0 +1,34 @@
+---
+
+- name: Copy maxscale configuration to /etc
+  template: 
+      src={{item}}.j2
+      dest=/etc/{{item}} 
+      mode=0644 owner=root group=root
+  notify:
+    - restart maxscale
+  with_items:
+    - maxscale.cnf
+  tags: maxscale
+
+
+- name: 'Create directory for MariaDB socket'
+  file: path=/run/mysqld state=directory owner=997 group=996 mode=0755
+  tags: maxscale
+
+
+- name: maxscale docker 
+  docker:
+    name: maxscale
+    image: "{{maxscale_docker_image}}"
+    restart_policy: always
+    state: reloaded
+    pull: always
+    net: host
+    volumes:
+      - "/etc/maxscale.cnf:/etc/maxscale.cnf"
+      - "/run/mysqld:/run/mysqld"
+      - "/run/systemd/journal/syslog:/dev/log"
+  tags:
+    - maxscale
+

@@ -1,0 +1,5 @@
+---
+
+- name: restart maxscale
+  shell: "docker stop maxscale; docker start maxscale"
+

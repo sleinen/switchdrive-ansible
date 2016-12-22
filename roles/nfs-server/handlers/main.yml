@@ -1,0 +1,11 @@
+---
+
+- name: reexport nfs
+  command: exportfs -ra
+
+- name: restart nfs server
+  service: name=nfs-kernel-server state=restarted
+
+- name: sysctl
+  command: "sysctl --system"
+

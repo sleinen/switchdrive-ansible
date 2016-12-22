@@ -1,0 +1,10 @@
+---
+
+- name: install ens3 cfg
+  template: src={{ item }}.j2 dest=/etc/network/interfaces.d/10-{{ item }} mode=0550
+  with_items:
+    - ens3.cfg
+  tags:
+    - config
+    - netconfig
+

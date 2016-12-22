@@ -1,0 +1,128 @@
+---
+
+- name: add collectd
+  apt: name=collectd state=present
+      update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  tags:
+    - collectd
+    
+- name: create collectd.conf.d directory
+  file: dest=/etc/collectd/collectd.conf.d state=directory
+  tags:
+    - collectd
+    - config
+
+- name: add collectd.conf
+  template:
+    src=collectd/collectd.conf.j2
+    dest=/etc/collectd/collectd.conf
+  notify: restart collectd
+  tags:
+    - collectd
+    - config
+    
+- name: add collectd_graphite.conf
+  template:
+    src=collectd/collectd_graphite.conf.j2
+    dest=/etc/collectd/collectd.conf.d/collectd_graphite.conf
+  notify: 
+    - kill collectd
+    - restart collectd
+  tags:
+    - collectd
+    - config
+ 
+- name: add collectd_influxdb.conf
+  template:
+    src=collectd/collectd_influxdb.conf.j2
+    dest=/etc/collectd/collectd.conf.d/collectd_influxdb.conf
+  notify: 
+    - kill collectd
+    - restart collectd
+  tags:
+    - collectd
+    - config
+
+- name: add collectd_processes.conf
+  template:
+    src=collectd/collectd_processes.conf.j2
+    dest=/etc/collectd/collectd.conf.d/collectd_processes.conf
+  notify: 
+    - kill collectd
+    - restart collectd
+  tags:
+    - collectd
+    - config
+  
+ 
+- name: create plugins directory
+  file: dest=/opt/collectd/collectd.plugins state=directory
+  tags:
+    - collectd
+    - config
+
+- name: add iostat
+  apt: name=sysstat state=present
+      update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  tags:
+    - collectd
+    
+- name: add iostat
+  apt: name=ruby1.9.3 state=present
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "14.04"
+  tags:
+    - collectd
+    
+- name: add iostat
+  apt: name=ruby state=present
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "16.04"
+  tags:
+    - collectd
+    
+- name: add iostat plugin
+  copy:
+    src=collectd/collectd.plugins/iostat/iostat_collectd_plugin.rb
+    dest=/opt/collectd/collectd.plugins/iostat_collectd_plugin.rb
+    mode=0555
+  tags:
+    - collectd
+    - config
+ 
+- name: add iostat config
+  template:
+    src=collectd/collectd_iostat.conf.j2
+    dest=/etc/collectd/collectd.conf.d/collectd_iostat.conf
+  notify: restart collectd
+  tags:
+    - collectd
+    - config
+ 
+- name: add nfsv4 plugin
+  copy:
+    src=collectd/collectd.plugins/nfs/nfsv4.py
+    dest=/opt/collectd/collectd.plugins/nfsv4.py
+    mode=0555
+  notify: restart collectd
+  tags:
+    - collectd
+    - config
+    
+- name: python procfs
+  action: apt name={{item}}
+  with_items:
+    - python-pip
+    - python-setuptools
+  tags:
+    - collectd
+    
+- name: fix pip upgrade bug
+  command: "pip install --upgrade pip"
+  tags:
+    - collectd
+
+- pip: name=procfs
+  tags:
+    - collectd
+

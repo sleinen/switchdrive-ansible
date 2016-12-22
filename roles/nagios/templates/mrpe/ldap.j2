@@ -1,0 +1,10 @@
+##
+# check_logfiles checks the log files as defined in the specified configuration file
+##
+L_check_ldap_server_logs sudo /home/nagios/plugins-static/check_logfiles -f /home/nagios/etc/check_logfiles.cfg
+
+
+##
+# L_check_slapd checks that at least one slapd process is up and running
+##
+L_check_slapd /usr/lib/nagios/plugins/check_procs -C slapd -c 1:

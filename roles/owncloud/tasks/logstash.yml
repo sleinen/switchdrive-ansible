@@ -1,0 +1,15 @@
+---
+
+- name: Logstash-forwarder conf directory
+  template:
+    src=logstash/{{item}}.j2
+    dest=/etc/logstash-forwarder.conf/{{item}}
+    owner=root group=root mode=644
+  notify: Restart logstash_forwarder
+  with_items:
+     - apache.conf
+     - owncloud.conf
+  tags:
+    - lsconfig
+    - config
+    - logstash

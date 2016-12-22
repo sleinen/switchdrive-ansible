@@ -1,0 +1,61 @@
+heat_template_version: 2013-05-23
+  
+################################
+parameters:  
+  name_prefix:
+    type: string
+    description: "Resources Name Prefix"
+  hostname:
+    type: string
+  domainname:
+    type: string
+    default: drive.switch.ch
+
+  ssh_key:
+    type: string
+    label: "Key name"
+    default: Christian-Schnidrig
+  admin_pass:
+    type: string
+    label: "ubuntu user password (console login only)"
+    default: "csrp14"
+    hidden: "true"
+
+  flavor:
+    type: string
+    default: m1.small
+  block_device_mapping:
+    type: json
+  networks:
+    type: json
+
+  ssh_user:
+    type: string
+    label: "Admin user"
+    default: ubuntu
+
+################################
+resources:
+  server:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: hostname }
+      admin_user: { get_param: ssh_user }
+      key_name: { get_param: ssh_key }
+      block_device_mapping: { "Fn::Select": ["map", {get_param: block_device_mapping}] }
+      flavor: { get_param: flavor }
+      networks: { "Fn::Select": ["map", {get_param: networks}] }
+      user_data_format: RAW
+      user_data: { get_attr: [server_config, vm_config]  }
+  server_config:
+          type: vm_config.yaml
+          properties:
+            hostname:   { get_param: hostname }
+            domainname: { get_param: domainname }
+            admin_pass: { get_param: admin_pass }
+
+################################
+outputs:
+  server_id:
+    value: { "Fn::Select": ["id", { get_attr: [server, show] }] }
+

@@ -1,0 +1,12 @@
+---
+
+- hosts: graphite
+  become: true
+  tasks:
+    - name: stop grafana
+      command: docker stop grafana
+    - name: copy over grafana.db
+      fetch: src=/mnt/data/grafana/data/grafana.db dest=backups fail_on_missing=yes
+    - name: start grafana
+      command: docker start grafana
+

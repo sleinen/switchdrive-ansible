@@ -1,0 +1,28 @@
+---
+
+# this will delete all data in /mnt/data/mariadb. 
+# start mariadb standalone -> initialize empty database
+# galera is turned off.
+
+# use mariadb_bootcluster to turn this db into a single node cluster.
+# Then new databases can be added to that cluster simply be running the mariadbservers playbook.
+
+- hosts: mariadb
+  become: true
+  vars_files:
+    - ../vars/users.yml
+  vars:
+    node_type: mariadb
+    mariadb_wsrep_on: OFF
+    mariadb_disable_plugins: "#"
+  pre_tasks:
+    - name: stop mariadb
+      command: docker stop mariadb
+    - name: delete old data
+      file: 
+        name="{{mariadb_mount_point}}" 
+        state=absent
+  roles:
+    - mariadb_base
+  post_tasks:
+    - include: tasks/wait_for_mariadb.yml

@@ -1,0 +1,28 @@
+---
+
+# install exim Mail Server
+
+- name: Install exim
+  apt: name={{ item }} state=present
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  with_items:
+  - exim4
+
+- name: Drop Exim Template file
+  copy: src=exim4.conf.template dest=/etc/exim4/exim4.conf.template owner=root mode=0644
+  notify: reconfigure exim
+  tags:
+    - exim4conf
+
+- name: enable exim service
+  service: name=exim4 state=started enabled=yes
+
+- name: "install email recipient for root"
+  lineinfile:
+    "line='{{item.user}}: {{item.email}}' dest='/etc/aliases' regexp='{{item.user}}\\s*:.*'"
+  with_items:
+    - { user: "root", email: "{{notification_mail}}" }
+  tags:
+    - config
+    - email
+

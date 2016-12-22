@@ -1,0 +1,41 @@
+---
+
+- name: copy apache build instructions to remote host
+  synchronize:
+    src: ocapache
+    dest: /tmp
+    delete: yes
+  tags:
+    - ocapache
+
+
+- name: copy apache configs to remote host
+  template:
+    src={{item.name}}
+    dest=/tmp/ocapache/{{item.name}}
+    mode={{item.mode}}
+  with_items:
+    - { name: Dockerfile, mode: "0644" }
+  tags:
+    - ocapache
+
+
+- name: build ocapache
+  docker_image: 
+    path="/tmp/ocapache" 
+    name="{{ocapache_docker_name}}"
+    tag="{{ocapache_docker_tag}}"
+    dockerfile="Dockerfile"
+    state=build
+    tls_hostname=localhost
+  tags:
+    - ocapache
+
+- name: push ocapache image
+  shell: docker push "{{ocapache_docker_image}}"
+  tags:
+    - ocapache
+
+
+
+

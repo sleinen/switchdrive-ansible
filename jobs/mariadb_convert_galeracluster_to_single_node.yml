@@ -1,0 +1,30 @@
+---
+
+
+# This job can be used to:
+#   1) convert a galera cluster into a single standalone db. (mariadb[0]).
+
+# monitor with: while (true) ; do /root/maxadmin list servers; sleep 1; done
+
+- hosts: mariadb:!mariadb[0]
+  become: true
+  vars_files:
+    - ../vars/users.yml
+  vars:
+    node_type: mariadb
+  tasks:
+    - name: stop mariadb
+      command: docker stop mariadb
+
+
+- hosts: mariadb[0]
+  become: true
+  vars_files:
+    - ../vars/users.yml
+  vars:
+    node_type: mariadb
+    mariadb_wsrep_on: OFF
+    mariadb_disable_plugins: "#"
+  roles:
+    - mariadb_base
+    

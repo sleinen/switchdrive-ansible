@@ -1,0 +1,9 @@
+SHARD=$1
+
+if [ "x$SHARD" == 'x' ]; then
+   echo "Usage: `basename $0` <shard_name> <regular-occ-options>"
+   exit 1
+fi
+
+shift
+docker exec -ti --user www-data php_fpm_{{OWNCLOUD_VERSION}} {{owncloud_webroot}}/${SHARD}/occ "$@"

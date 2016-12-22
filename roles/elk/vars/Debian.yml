@@ -1,0 +1,16 @@
+---
+elk_common_packages:
+    - python-apt
+    - python-pycurl
+    - python-pip
+    - supervisor
+    - monit
+    - git-core
+    - jq
+    - xfsprogs
+    - maven
+elk_java:
+  flavor: oracle
+  oracle:
+    - oracle-java8-installer
+    - oracle-java8-set-default

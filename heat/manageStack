@@ -1,0 +1,194 @@
+#!/usr/bin/env bash
+
+#################################
+# INIT
+BASEDIR=`dirname $0`
+. environment
+
+export INIFILE="$BASEDIR/$NAME_PREFIX.ini"
+
+#################################
+# USAGE
+
+export USAGE="Usage:
+$SCRIPTNAME <options> <resources>
+      options:
+            -h: help 
+            -d: delete (instead of create)
+            -r: recreate (implies w)
+            -w: wait for all stacks to finish before exiting
+            -v: also delete root volume
+     resources: coma-separated list of resources
+    possible rsc: networks jumpip jumphost jumphost" 
+WAIT=""
+
+#################################
+# GET-OPTS
+ACTIONS="create"
+DO_WAIT=true
+DELETE_ROOT_VOLUME=false
+
+while getopts ":h :c :d :w :r :v" opt; do
+ case $opt in
+        h)
+            printf '%s\n' "$USAGE"
+            exit
+            ;;
+        \?)
+            echo "Invalid option: -$OPTARG"
+            exit
+            ;;
+        :)
+            echo "missing argument to option -$OPTARG"
+            exit
+            ;;
+        d)
+            if [ $ACTIONS == "create" ]; then
+               ACTIONS="delete"
+            fi
+            ;;
+        r)
+            ACTIONS="delete create"
+            DO_WAIT=true
+            ;;  
+        w)
+            DO_WAIT=true
+            ;;
+        v)
+            DELETE_ROOT_VOLUME=true
+        esac
+done
+
+shift $((OPTIND-1))
+if [ $# -eq 0 ]; then
+    printf '%s\n' "$USAGE"
+    exit
+fi
+
+for ACTION in $ACTIONS; do
+	RESOURCES=`echo $1| tr "," " "`
+	
+#################################
+# wait for resource
+	function wait_complete {
+	    echo "Waiting for $ACTION $1"
+		STATUS="not yet run"
+		while [ "$STATUS" != "CREATE_COMPLETE" ] && [ "$STATUS" != "CREATE_FAILED" ] && [ "x$STATUS" != "x" ] ; do
+		    echo -n "."
+		    STATUS=`heat stack-list | awk "/ $1 / { print \\\$6 }"`
+	        sleep 1
+		done
+		if [ "$STATUS" != "CREATE_COMPLETE" ] && [ "x$STATUS" != "x" ]; then
+		    echo $STATUS
+		    exit 100
+	    fi
+		echo
+	}
+	
+#################################
+# main script
+	
+#set -x 
+	
+	GOT_NETWORKS=false
+	
+	for rsc in $RESOURCES; do
+		if [ $rsc == 'networks' ] || [ $rsc == 'jumpip' ]; then  
+			if [ $ACTION == 'create' ]; then
+				$HEAT stack-create -f $TEMPL_DIR/$rsc.yaml -P "$STACK_PARAMS_NETWORK" $NAME_PREFIX-$rsc || exit 1
+				wait_complete $NAME_PREFIX-$rsc
+				if [ $rsc == 'networks' ]; then 
+					NET=`heat output-show "$NAME_PREFIX-$rsc" network_drive`
+					$GIT config -f $INIFILE --replace-all default.driveNetworkId ${NET//\"/}
+					SUBNET=`heat output-show "$NAME_PREFIX-$rsc" subnet_drive`
+					$GIT config -f $INIFILE --replace-all default.driveSubnetId ${SUBNET//\"/}
+				else
+					NET=`heat output-show "$NAME_PREFIX-$rsc" floating_ip_address`
+					$GIT config -f $INIFILE --replace-all default.floatingIp ${NET//\"/}
+					SUBNET=`heat output-show "$NAME_PREFIX-$rsc" floating_ip_id`
+					$GIT config -f $INIFILE --replace-all default.floatingIpId ${SUBNET//\"/}
+										
+				fi
+			else
+				for rsc in $WAIT; do
+					wait_complete $rsc
+				done
+				$HEAT stack-delete -y $NAME_PREFIX-$rsc  || exit 2
+				WAIT="$NAME_PREFIX-$rsc"
+			fi
+		else
+			if [ $ACTION == 'create' ]; then
+				if [ $GOT_NETWORKS == false ]; then
+					. $RSC_DIR/networks.sh
+					GOT_NETWORKS=true
+				fi
+
+				# get template name
+				BASE_NAME=`echo $rsc | sed -e 's/[0-9]*$//'`
+				case $BASE_NAME in 
+					lb|reg|zabbix|ldap|reg|elk|redis|registry|maxscale)
+						TEMPLATE=server_frontend
+						;;
+					sync|web|dev|nfs|db|graphite|backup|mgmt|test)
+						TEMPLATE=server_backend
+						;;
+					*)
+						TEMPLATE=$BASE_NAME
+				esac
+
+				# get ip addresses
+				HOSTNUMBER=`echo $rsc | sed -e 's/[^0-9]*//'`
+				IP_VAR="IP_$BASE_NAME"
+				IP=${!IP_VAR}
+				if [ "x$HOSTNUMBER" != "x" ]; then
+					IP=$(expr $HOSTNUMBER - 1 + $IP)
+				fi
+				IP_ADDRESSES="drive_ip=${DRIVE_PREFIX}${IP};backbone_4_ip=${BACKBONE_4_PREFIX}${IP};backbone_6_ip=${BACKBONE_6_PREFIX}${IP}"
+
+				# get flavor 
+				FLAVOR_VAR="FLAVOR_$BASE_NAME"
+				FLAVOR=${!FLAVOR_VAR}
+
+				# get volume size 
+				VOLUME_SIZE_VAR="VOLUME_SIZE_$BASE_NAME"
+				VOLUME_SIZE=${!VOLUME_SIZE_VAR}
+
+				# create root volume if none registred in ini file
+				ROOT_VOLUME=`$GIT config -f $INIFILE --get default.${rsc}RootVolume`
+				if [ "x$ROOT_VOLUME" == "x" ]; then
+					$HEAT stack-create -f $TEMPL_DIR/root_volume.yaml -P "$STACK_PARAMS;hostname=$NAME_PREFIX-${rsc};volume_size=${VOLUME_SIZE};base_image=${BASE_IMAGE}" $NAME_PREFIX-${rsc}-root-volume || exit 3
+					wait_complete $rsc-root-volume
+					while [ "x$ROOT_VOLUME" == "x" ] ; do
+						ROOT_VOLUME=`heat output-show "$NAME_PREFIX-${rsc}-root-volume" volume_id`
+					done
+					ROOT_VOLUME="${ROOT_VOLUME//\"/}"
+					$GIT config -f $INIFILE --replace-all "default.${rsc}RootVolume" ${ROOT_VOLUME}
+				fi
+				
+				# create vm
+				$HEAT stack-create -f $TEMPL_DIR/${TEMPLATE}.yaml -P "$STACK_PARAMS;$RSC_NETWORKS;root_volume_id=$ROOT_VOLUME;hostname=$NAME_PREFIX-$rsc;$IP_ADDRESSES;flavor=$FLAVOR" $NAME_PREFIX-$rsc || exit 3
+			else
+				$HEAT stack-delete -y $NAME_PREFIX-$rsc
+				if [ $DELETE_ROOT_VOLUME == true ]; then
+					wait_complete $NAME_PREFIX-$rsc
+					$HEAT stack-delete -y $NAME_PREFIX-${rsc}-root-volume
+					WAIT="$WAIT $NAME_PREFIX-${rsc}-root-volume"
+					$GIT config -f $INIFILE --unset-all "default.${rsc}RootVolume"
+				fi
+			fi
+			WAIT="$WAIT $NAME_PREFIX-$rsc"
+		fi
+	done
+	
+	JUMP_IP=`$GIT config -f $INIFILE --get default.floatingIp`
+	
+	if [ $ACTION == create ]; then
+	    echo "The jump ip is: $JUMP_IP"
+	fi
+	
+	if [ $DO_WAIT == true ]; then
+	    for rsc in $WAIT; do 
+	        wait_complete $rsc
+	    done
+    fi
+done

@@ -1,0 +1,34 @@
+---
+
+- name: Create dirs
+  file: path="{{item}}" state=directory group=root owner=root
+  with_items:
+    - "/etc/letsencrypt"
+    - "/var/lib/letsencrypt"
+  tags:
+    - letsencrypt
+
+- name: letsencrypt
+  docker:
+    name: letsencrypt
+    image: quay.io/letsencrypt/letsencrypt
+    hostname: letsencrypt
+    state: present
+    volumes:
+      - "/etc/letsencrypt:/etc/letsencrypt"
+      - "/var/lib/letsencrypt:/var/lib/letsencrypt"
+      - "/var/log:/var/log"
+    expose:
+      - 80
+    ports:
+      - 8888:80
+    command: "certonly --standalone {{letsencrypt.domains[service_name]}} --agree-tos --email {{letsencrypt.email}} --standalone-supported-challenges http-01 --rsa-key-size 4096"
+  tags:
+     - letsencrypt
+
+- name: create cert for haproxy
+  shell: "cat /etc/letsencrypt/live/{{service_name}}/fullchain.pem /etc/letsencrypt/live/{{service_name}}/privkey.pem > /etc/haproxy/ssl/{{service_name}}.pem"
+  tags:
+     - letsencrypt
+
+

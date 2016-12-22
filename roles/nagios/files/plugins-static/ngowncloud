@@ -1,0 +1,91 @@
+#! /bin/bash
+#
+# Name: ngowncloud
+#
+# Checks OwnCloud activity.
+#
+# Author: jcfischer
+# Version for Nagios: Alessandro Usai
+#
+# Version: 1.0
+#
+# be sure to grant nagios access to the tables:
+# $ psql
+# > \c owncloud
+# > grant all privileges on oc_filecache to nagios;
+# > grant all privileges on oc_ldap_user_mapping to nagios;
+#
+
+ngpostver="0.1"
+rval=0
+sql=""
+
+case $1 in
+
+
+'users')
+        sql="select count(*) from oc_ldap_user_mapping;"
+        ;;
+
+'files')
+        sql="select count(*) from oc_filecache;"
+        ;;
+
+
+
+
+'ngpostver')
+        echo "$ngpostver"
+        exit $rval
+        ;;
+
+*)
+        echo "ngpost version: $ngpostver"
+        echo "usage:"
+        echo "    $0 users                  -- Check the number of ldap users."
+        echo "    $0 files                  -- Check the number of files on oc_filecache"
+
+        echo "    $0 ngpostver                   -- Version of this script."
+        exit $rval
+        ;;
+esac
+
+if [ "$sql" != "" ]; then
+
+        BLAH=$(psql -t owncloud -c "$sql" 2>&1 1>/dev/null)
+        rval1=$?
+        BLAH2=$(psql -t owncloud -c "$sql" 2>&1) 
+        rval2=$?
+        if [ "$BLAH2" != "" ];then
+            rval="$rval1"
+        else
+            rval=2
+        fi
+
+fi
+
+
+if [ "$rval" -eq 0 ]; then
+        echo "OK" `echo -n $BLAH2`  
+        exit $rval
+fi
+
+if [ "$rval" -eq 1 ]; then
+        echo  "WARNING:" `echo -n $BLAH`
+        exit $rval
+fi
+
+if [ "$rval" -eq 2 ]; then
+        echo "CRITICAL"  `echo -n $BLAH`
+        exit $rval
+fi
+
+if [ "$rval" -ge 3   ]; then
+        echo "UNKNOWN"  `echo -n $BLAH`
+        exit $rval
+fi
+
+exit $rval
+
+
+

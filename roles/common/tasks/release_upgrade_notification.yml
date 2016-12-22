@@ -1,0 +1,21 @@
+---
+
+# disable the useless release upgrade notification once and for all.
+- name: disable prompt
+  lineinfile:
+    dest=/etc/update-manager/release-upgrades
+    regexp="^\s*{{item.name}}\s*=.*"
+    line="{{item.name}}={{item.value}}"
+  with_items:
+    - {name: "Prompt", value: "never"}
+  tags:
+    - config
+    - upgrade_notification
+
+# get rid of already generated messages
+- name: delete upgrade available message
+  file: name="/var/lib/ubuntu-release-upgrader/release-upgrade-available"
+        state=absent
+  tags:
+    - upgrade_notification
+

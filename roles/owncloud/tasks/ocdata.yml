@@ -1,0 +1,10 @@
+---
+
+- name: create .ocdata file
+  copy: dest="/mnt/.ocdata"
+        content=""
+  tags:
+    - config
+    - ocdata
+
+

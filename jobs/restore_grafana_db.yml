@@ -1,0 +1,16 @@
+---
+
+- hosts: graphite
+  become: true
+  tasks:
+    - name: stop grafana
+      command: docker stop grafana
+    - copy: 
+        src=backups/{{ hostvars[groups['graphite'][0]].inventory_hostname }}/mnt/data/grafana/data/grafana.db 
+        dest=/mnt/data/grafana/data/grafana.db
+        owner=syslog
+        group=crontab
+        mode=0644
+    - name: start grafana
+      command: docker start grafana
+

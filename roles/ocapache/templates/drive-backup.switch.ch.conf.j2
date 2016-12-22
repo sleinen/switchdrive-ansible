@@ -1,0 +1,42 @@
+<VirtualHost *:80>
+        ServerName {{item.shard_name}}.{{ service_name }}
+        ServerAdmin switchdrive@switch.ch
+        DocumentRoot {{owncloud_webroot}}/{{item.shard_name}}
+        ErrorLog ${APACHE_LOG_DIR}/error-{{item.shard_name}}.log
+        LogLevel warn
+        CustomLog ${APACHE_LOG_DIR}/access-{{item.shard_name}}.log elk
+        BrowserMatch "MSIE [2-6]" \
+                nokeepalive ssl-unclean-shutdown \
+                downgrade-1.0 force-response-1.0
+        BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+        <Directory {{owncloud_webroot}}/{{item.shard_name}}>
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride All
+                Allow from all
+                Require all granted
+                <IfModule mod_dav.c>
+                    Dav off
+                </IfModule>
+                Satisfy Any
+                
+                # disabled in 9+
+                SetEnv MOD_X_SENDFILE_ENABLED 1
+                XSendFile On
+                XSendFilePath /mnt/
+
+                SetEnv HOME {{owncloud_webroot}}/{{item.shard_name}}
+                SetEnv HTTP_HOME {{owncloud_webroot}}/{{item.shard_name}}
+        </Directory>
+        <IfModule mod_fastcgi.c>
+                AddType application/x-httpd-fastphp5 .php
+                Action application/x-httpd-fastphp5 /php5-owncloud-fcgi
+                Alias /php5-owncloud-fcgi /usr/lib/cgi-bin/php5-owncloud-fcgi-{{item.shard_name}}
+                FastCgiExternalServer /usr/lib/cgi-bin/php5-owncloud-fcgi-{{item.shard_name}} -socket {{owncloud_webroot}}/{{item.shard_name}}.php-fpm.sock -pass-header Authorization -idle-timeout 300
+                <Directory /usr/lib/cgi-bin>
+                    Require all granted
+                </Directory>
+         </IfModule>
+         <IfModule mod_headers.c>
+            Header always set Strict-Transport-Security "max-age={{strict_transport_security_max_age[service_name]}}; includeSubDomains; preload"
+         </IfModule>
+</VirtualHost>

@@ -1,0 +1,35 @@
+<VirtualHost *:80>
+        ServerName {{ service_name }}
+        ServerAdmin switchdrive@switch.ch
+        RemoteIPHeader X-Forwarded-For
+        DocumentRoot /var/www/owncloud
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        LogLevel warn
+        CustomLog ${APACHE_LOG_DIR}/access.log elk
+        BrowserMatch "MSIE [2-6]" \
+                nokeepalive ssl-unclean-shutdown \
+                downgrade-1.0 force-response-1.0
+        BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+        <Directory /var/www/owncloud>
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride All
+                Allow from all
+                Require all granted
+                #Dav Off
+                Satisfy Any
+                
+                SetEnv MOD_X_SENDFILE_ENABLED 1
+                XSendFile On
+                XSendFilePath /mnt/
+        </Directory>
+        <IfModule mod_fastcgi.c>
+                AddType application/x-httpd-fastphp5 .php
+                Action application/x-httpd-fastphp5 /php5-fcgi
+                Alias /php5-fcgi /usr/lib/cgi-bin/php5-fcgi
+                FastCgiExternalServer /usr/lib/cgi-bin/php5-fcgi -idle-timeout 3000 -socket /var/run/php/php5.6-fpm.sock -pass-header Authorization
+                <Directory /usr/lib/cgi-bin>
+                    Require all granted
+                </Directory>
+         </IfModule>
+        
+</VirtualHost>

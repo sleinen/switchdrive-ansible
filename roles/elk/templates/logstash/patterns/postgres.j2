@@ -1,0 +1,9 @@
+PGLOCALHOST \[local\]
+PGIPORHOST  %{IPORHOST}|%{PGLOCALHOST}
+#PGPARAMS    %{WORD:log_type}:%{SPACE}parameters:%{SPACE}%{GREEDYDATA:params}
+PGPARAMS    %{WORD:log_type}:%{SPACE}parameters:%{SPACE}%{GREEDYDATA:query}
+PGQUERY     %{WORD:log_type}:%{SPACE}duration:%{SPACE}%{NUMBER:duration}%{SPACE}ms%{SPACE}%{GREEDYDATA:query}
+PGLOGDAT    %{PGQUERY}|%{PGPARAMS}
+
+
+PGLOG       \[%{POSINT:pocnum}-%{POSINT:line}\]%{SPACE}\[%{PGIPORHOST:app_server}\]%{SPACE}\[%{NOTSPACE:session_id}\];%{SPACE}%{PGLOGDAT}

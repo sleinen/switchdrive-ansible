@@ -1,0 +1,22 @@
+
+filter {
+  if [type] == "syslog" and "_grokparsefailure_sysloginput" in [tags] {
+    grok {
+      match => { "message" => "%{ANSIBLE}" }
+      remove_tag => ["_grokparsefailure_sysloginput", "_grokparsefailure"]
+      add_tag => ["ansible"]
+      overwrite => ["message", "priority", "facility", "severity"]
+    }
+    syslog_pri {
+        syslog_pri_field_name => "priority"
+    }
+    mutate {
+        rename => {
+            "syslog_facility" => "facility_label"
+            "syslog_facility_code" => "facility"
+            "syslog_severity" => "severity_label"
+            "syslog_severity_code" => "severity"
+        }
+    }
+  }
+}

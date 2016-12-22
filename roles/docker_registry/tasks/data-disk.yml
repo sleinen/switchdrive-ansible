@@ -1,0 +1,22 @@
+---
+
+- name: remove default mount point with ephemeral disks
+  mount: name=/mnt src=/dev/vdb fstype=auto state=absent
+  tags: 
+    - mount
+#  ignore_errors: yes
+
+- name: make filesystem
+  command: mkfs.xfs /dev/vdb
+  ignore_errors: yes
+
+- name: create mountpoint
+  file: dest={{ data_mount_point }} state=directory
+  tags: 
+    - mount
+
+- name: mount data volume
+  mount: name={{ data_mount_point }} src=/dev/vdb fstype=xfs state=mounted opts=noatime
+  tags: 
+    - mount
+

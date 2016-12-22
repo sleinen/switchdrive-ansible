@@ -1,0 +1,42 @@
+---
+
+- name: 'Create directory for prometheus'
+  file: path={{prometheus_mount_point}} state=directory owner=999 group=999 mode=0755
+  tags: prometheus
+
+- name: 'Create directory for prometheus configs'
+  file: path=/etc/prometheus state=directory owner=root group=root mode=0755
+  tags: prometheus
+
+- name: Copy included prometheus configuration to /etc/prometheus
+  template: 
+      src={{item}}.j2
+      dest=/etc/prometheus/{{item}} 
+      mode=0644 owner=root group=root
+  notify:
+    - restart prometheus
+  with_items:
+    - prometheus.yml
+  tags: prometheus
+
+# https://hub.docker.com/r/prom/prometheus/~/dockerfile/
+- name: prometheus docker 
+  docker:
+    name: prometheus
+    image: "prom/prometheus:{{prometheus_version}}"
+    #hostname: mariadb
+    state: reloaded
+    pull: always
+    net: host
+    #expose:
+    ports: 
+      - "9090:9090"
+    volumes:
+       - "/etc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+       - "{{prometheus_mount_point}}:/prometheus"
+    restart_policy: always
+    command: "-config.file=/etc/prometheus/prometheus.yml -storage.local.path=/prometheus -web.console.libraries=/etc/prometheus/console_libraries -web.console.templates=/etc/prometheus/consoles -storage.local.retention=2400h0m0s -storage.local.series-file-shrink-ratio=0.3" 
+  become: true
+  tags:
+    - prometheus
+

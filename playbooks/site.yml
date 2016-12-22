@@ -1,0 +1,23 @@
+---
+
+- include: jumphost.yml
+- include: mariadbservers.yml
+- include: nfsservers.yml
+
+- include: webservers.yml
+- include: syncservers.yml
+- include: mgmtservers.yml
+- include: devservers.yml
+
+- include: graphiteservers.yml
+- include: elkservers.yml
+
+- include: redisservers.yml
+
+- include: ldapservers.yml
+- include: lbservers.yml
+- include: testservers.yml
+
+#- include: registryserver.yml
+#- include: regservers.yml
+#- include: snapshotservers.yml

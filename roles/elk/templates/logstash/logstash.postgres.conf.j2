@@ -1,0 +1,30 @@
+
+input { 
+    syslog {
+        port => {{elk_postgres_port}}
+        type => "postgres"
+    }
+}
+filter {
+  if [type] == "postgres" {
+    grok {
+      match => { "message" => "%{PGLOG}" }
+      #remove_tag => ["_grokparsefailure_sysloginput", "_grokparsefailure"]
+      add_tag => ["postgres"]
+      #overwrite => ["message", "priority", "facility", "severity"]
+    }
+    mutate {
+        convert => {
+            "[duration]" => "float"
+            "[line]" => "float"
+            "[procnum]" => "float"
+        }
+    }
+    metrics {
+      meter => [ "logstash.%{logsource}.metric.postgres.num_log_lines"]
+      add_tag => "metric"
+      flush_interval => 10
+      rates => []
+    }
+  }
+}

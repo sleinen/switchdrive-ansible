@@ -1,0 +1,33 @@
+---
+
+- name: ldap | ldap packages
+  apt: pkg="{{item}}" state=installed
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  with_items:
+    - libnet-ldap-perl
+  tags:
+    - collectd
+
+- name: add collectd_ldap.conf
+  template:
+    src=collectd_ldap.conf.j2
+    dest=/etc/collectd/collectd.conf.d/collectd_ldap.conf
+  notify: 
+    - kill collectd
+    - restart collectd
+  tags:
+    - collectd
+    - config
+
+- name: add LDAP.pm
+  template:
+    src=LDAP.pm
+    dest=/opt/collectd/collectd.plugins/LDAP.pm
+  notify: 
+    - kill collectd
+    - restart collectd
+  tags:
+    - collectd
+    - config
+
+

@@ -1,0 +1,11 @@
+---
+
+- hosts: registry
+  vars_files:
+    - ../vars/users.yml
+  roles:
+    - common
+    - docker
+    - docker_registry
+  become: true
+

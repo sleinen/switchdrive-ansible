@@ -1,0 +1,15 @@
+---
+
+- hosts: ldap
+  vars:
+    node_type: ldap
+  vars_files:
+    - ../vars/users.yml
+  roles:
+    - common
+    - nagios
+    - exim
+    - ldap
+    - scripts
+  become: true
+

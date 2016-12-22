@@ -1,0 +1,10 @@
+---
+
+- include: haproxy.yml
+- include: collectd.yml
+- include: network.yml
+
+
+- include: install_scripts.yml
+
+

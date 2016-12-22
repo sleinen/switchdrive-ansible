@@ -1,0 +1,183 @@
+LoadPlugin dbi
+<Plugin dbi>
+
+    <Query numberUsers >
+         Statement "select count(*) AS numberUsers from oc_storages where id like 'home::%';"
+         <Result>
+             Type gauge
+             InstancePrefix "numberUsers"
+             ValuesFrom "numberUsers"
+         </Result>
+    </Query>
+    
+    <Query numberFiles >
+         Statement "select count(*) AS numberFiles from oc_filecache ;"
+         <Result>
+             Type gauge
+             InstancePrefix "numberFiles"
+             ValuesFrom "numberFiles"
+         </Result>
+    </Query>
+    
+    <Query filesSize >
+         Statement "select sum(size) AS filesSize from oc_filecache where mimetype <> 2;"
+         <Result>
+             Type gauge
+             InstancePrefix "filesSize"
+             ValuesFrom "filesSize"
+         </Result>
+    </Query>
+    <Query filesSizeCache >
+         Statement "select sum(size) AS filesSize from oc_filecache where path = 'cache';"
+         <Result>
+             Type gauge
+             InstancePrefix "filesSizeCache"
+             ValuesFrom "filesSize"
+         </Result>
+    </Query>
+    <Query filesSizeFiles >
+         Statement "select sum(size) AS filesSize from oc_filecache where path = 'files';"
+         <Result>
+             Type gauge
+             InstancePrefix "filesSizeFiles"
+             ValuesFrom "filesSize"
+         </Result>
+    </Query>
+    <Query filesSizeTrashbin >
+         Statement "select sum(size) AS filesSize from oc_filecache where path = 'files_trashbin';"
+         <Result>
+             Type gauge
+             InstancePrefix "filesSizeTrashbin"
+             ValuesFrom "filesSize"
+         </Result>
+    </Query>
+    <Query filesSizeVersions >
+         Statement "select sum(size) AS filesSize from oc_filecache where path = 'files_versions';"
+         <Result>
+             Type gauge
+             InstancePrefix "filesSizeVersions"
+             ValuesFrom "filesSize"
+         </Result>
+    </Query>
+    <Query filesSizeGallery >
+         Statement "select sum(size) AS filesSize from oc_filecache where path = 'gallery';"
+         <Result>
+             Type gauge
+             InstancePrefix "filesSizeGallery"
+             ValuesFrom "filesSize"
+         </Result>
+    </Query>
+    <Query filesSizeThumbnails >
+         Statement "select sum(size) AS filesSize from oc_filecache where path = 'thumbnails';"
+         <Result>
+             Type gauge
+             InstancePrefix "filesSizeThumbnails"
+             ValuesFrom "filesSize"
+         </Result>
+    </Query>
+
+    <Query numberTrashFiles >
+         Statement "select count(*) as numberTrashFiles from oc_files_trash ;"
+         <Result>
+             Type gauge
+             InstancePrefix "numberTrashFiles"
+             ValuesFrom "numberTrashFiles"
+         </Result>
+    </Query>
+    
+    <Query numDistinctUserLogins1min >
+         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-60) ;"
+         <Result>
+             Type gauge
+             InstancePrefix "numDistinctUserLogins1min"
+             ValuesFrom "num_logins"
+         </Result>
+    </Query>
+    
+    <Query numDistinctUserLogins1h >
+         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-3600) ;"
+         <Result>
+             Type gauge
+             InstancePrefix "numDistinctUserLogins1h"
+             ValuesFrom "num_logins"
+         </Result>
+    </Query>
+    
+    <Query numDistinctUserLogins1d >
+         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-86400) ;"
+         <Result>
+             Type gauge
+             InstancePrefix "numDistinctUserLogins1d"
+             ValuesFrom "num_logins"
+         </Result>
+    </Query>
+    
+    <Query numDistinctUserLogins1w >
+         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-604800) ;"
+         <Result>
+             Type gauge
+             InstancePrefix "numDistinctUserLogins1w"
+             ValuesFrom "num_logins"
+         </Result>
+    </Query>
+    <Query numDistinctUserLogins1m >
+         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-2592000) ;"
+         <Result>
+             Type gauge
+             InstancePrefix "numDistinctUserLogins1m"
+             ValuesFrom "num_logins"
+         </Result>
+    </Query>
+    <Query numDistinctUserLogins6m >
+         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-5184000) ;"
+         <Result>
+             Type gauge
+             InstancePrefix "numDistinctUserLogins6m"
+             ValuesFrom "num_logins"
+         </Result>
+    </Query>
+    <Query numDistinctUserLogins1y >
+         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-31104000) ;"
+         <Result>
+             Type gauge
+             InstancePrefix "numDistinctUserLogins1y"
+             ValuesFrom "num_logins"
+         </Result>
+    </Query>
+
+
+
+  <Database "owncloud">
+    Driver "mysql" 
+    #DriverOption "host" "localhost"
+    # You may connect via socket as well:
+    DriverOption "mysql_unix_socket" "/var/run/mysqld/mysqld.sock"
+    
+    DriverOption "username" "{{mariadb_user}}"
+    DriverOption "password" "{{mariadb_passwd}}"
+    DriverOption "dbname" "{{mariadb_database}}"
+    SelectDB "{{mariadb_database}}"
+    
+        Query numberUsers
+        Query numberFiles
+        Query filesSize
+        Query filesSizeCache
+        Query filesSizeFiles
+        Query filesSizeTrashbin
+        Query filesSizeVersions
+        Query filesSizeGallery
+        Query filesSizeThumbnails
+        Query numberTrashFiles
+        
+        Query numDistinctUserLogins1min
+        Query numDistinctUserLogins1h
+        Query numDistinctUserLogins1d
+        Query numDistinctUserLogins1w
+        Query numDistinctUserLogins1m
+        Query numDistinctUserLogins6m
+        Query numDistinctUserLogins1y
+
+  </Database>
+  
+</Plugin>
+

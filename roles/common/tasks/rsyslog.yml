@@ -1,0 +1,49 @@
+---
+
+- name: add rsyslog v8 ppa
+  apt_repository: repo='ppa:adiscon/v8-stable' update_cache=yes state=present
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "14.04"
+  tags:
+    - syslog
+    
+- name: install rsyslog
+  #apt: name={{item}} state=latest
+  apt: name={{item}} state=present
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  with_items:
+    - rsyslog
+    #- rsyslog-elasticsearch
+    - rsyslog-mmutf8fix
+  when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "14.04"
+  tags:
+    - syslog
+
+- file: path=/etc/rsyslog.d/{{item}}.conf state=absent
+  with_items:
+    - 99-splunk
+    - 25-rsyslogstats
+  tags:
+    - syslog
+
+- name: install global rsyslog config
+  template:
+     src=syslog/rsyslog.conf
+     dest=/etc/rsyslog.conf
+  notify: restart rsyslog
+  tags:
+    - config
+    - syslog
+
+- name: configure remote logging
+  template: 
+    src=syslog/{{item.name}}.conf.j2
+    dest=/etc/rsyslog.d/{{item.prio}}-{{item.name}}.conf
+  notify: restart rsyslog
+  tags:
+    - config
+    - syslog
+  with_items:
+     - { name: remotesyslog, prio: 30 }
+     - { name: rsyslogstats, prio: 01 }
+     - { name: spam, prio: 10 }
+

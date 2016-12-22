@@ -1,0 +1,23 @@
+---
+
+# This job can be used to:
+#   1) convert a standalone db into a single node galera cluster.
+
+# it is assumed, that mariadb[0] is the node with the most advanced db
+# check grastate.dat file to find out which node is most advanced:
+#
+# https://www.percona.com/blog/2014/09/01/galera-replication-how-to-recover-a-pxc-cluster/
+#
+
+- hosts: mariadb[0]
+  become: true
+  vars_files:
+    - ../vars/users.yml
+  vars:
+    node_type: mariadb
+    mariadb_cmdline_options: "{{mariadb_cmdline_base_options}} --wsrep-new-cluster"
+  roles:
+    - mariadb_base
+  post_tasks:
+    - include: tasks/wait_for_mariadb.yml
+

@@ -1,0 +1,12 @@
+
+
+snapshot_auth_url: 'https://keystone.cloud.switch.ch:5000/v2.0'
+snapshot_tenant_id: "{{vault_snapshot_project_id}}"
+snapshot_username: "{{vault_snapshot_user}}"
+snapshot_password: "{{vault_snapshot_user_password}}"
+
+
+snapshot_user_name: peta
+snapshot_user_key: '{{vault_snapshot_user_ssh_pub_key}}'
+snapshot_user_private_key: "{{vault_snapshot_user_ssh_private_key}}"
+

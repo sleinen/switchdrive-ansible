@@ -1,0 +1,33 @@
+---
+
+
+- name: Create dirs
+  file: path="{{item}}" state=directory group=root owner=root
+  with_items:
+    - "{{owncloud_webroot}}/root"
+  tags:
+    - root_site
+
+
+- name: install root site files
+  template:
+    src: "root_site/{{item.name}}"
+    dest: "{{owncloud_webroot}}/root/{{item.name}}"
+    mode: "{{item.mode}}"
+  with_items:
+    - { name: foo.php, mode: "0644" }
+    - { name: index.php, mode: "0644" }
+    - { name: remote.php, mode: "0644" }
+    - { name: status.php, mode: "0644" }
+  tags:
+    - root_site
+
+- name: php_fpm link
+  file: 
+    state: link
+    path: "{{owncloud_webroot}}/root.php-fpm.sock"
+    src: "/var/run/php/php-fpm.{{php_version_root_site}}.sock"
+    force: true
+  tags:
+    - root_site
+    

@@ -1,0 +1,219 @@
+global
+    log         {{ hostvars[groups['elk'][0]].inventory_hostname }} local1
+
+    chroot      /var/lib/haproxy
+    pidfile     /var/run/haproxy.pid
+    maxconn     6000
+    user        root
+    group       root
+    daemon
+
+    server-state-file /tmp/haproxy_state
+    
+    # turn on stats unix socket
+    stats socket /var/lib/haproxy/stats level admin
+    
+    #ssl-default-bind-ciphers AES128+AESGCM+EECDH+SHA256:AES128+EECDH:AES128+AESGCM+DHE:AES128+EDH:AES256+AESGCM+EECDH:AES256+EECDH:AES256+AESGCM+EDH:AES256+EDH:-SHA:AES128+AESGCM+EECDH+SHA256:AES128+EECDH:AES128+AESGCM+DHE:AES128+EDH:AES256+AESGCM+EECDH:AES256+EECDH:AES256+AESGCM+EDH:AES256+EDH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!3DES:!DSS
+    ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AES:RSA+3DES:!ADH:!AECDH:!MD5:!DSS
+    ssl-default-bind-options no-sslv3 no-tls-tickets
+    tune.ssl.default-dh-param 2048
+
+defaults
+    mode                    {{ mode }}
+    log                     global
+    option                  httplog
+    option                  dontlognull
+
+
+    option http-server-close
+    option                  redispatch
+    retries                 3
+    timeout http-request    20s
+    timeout queue           10m
+    timeout connect         20s
+    timeout client          1m
+    timeout server          10m
+    timeout http-keep-alive 10s
+    timeout check           20s
+    maxconn                 5000
+
+    errorfile 503 /etc/haproxy/503maintenance.html
+
+
+frontend stats
+    bind 0.0.0.0:8443 ssl crt /etc/haproxy/ssl/{{ service_name }}.pem
+    stats                   enable
+    stats                   auth {{ HAPROXY_USER }}:{{ HAPROXY_PASSWORD }}
+
+frontend internstats
+    bind 0.0.0.0:8080
+    stats                   enable
+    stats                   auth {{ HAPROXY_USER }}:{{ HAPROXY_PASSWORD }}
+
+
+
+frontend http
+    bind 0.0.0.0:80
+    acl letsencrypt-acl path_beg /.well-known/acme-challenge/
+    http-request redirect scheme https if ! letsencrypt-acl ! { ssl_fc }
+    use_backend letsencrypt
+
+frontend ldaps
+    mode                  tcp
+    option                tcplog
+    bind                  0.0.0.0:636 ssl crt /etc/haproxy/ssl/{{ service_name }}.pem
+    description           LDAP Service
+    option                socket-stats
+    option                tcpka
+    timeout client        5s
+    default_backend       ldap_backend
+
+frontend ldap
+    mode                  tcp
+    option                tcplog
+    bind                  0.0.0.0:389
+    description           LDAP Service
+    option                socket-stats
+    option                tcpka
+    timeout client        5s
+    default_backend       ldap_backend
+
+backend ldap_backend
+    {% for host in groups['ldap'] %}
+    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:389 check fall 1 rise 1 inter 2s
+    {% endfor %}
+
+    load-server-state-from-file global
+
+    mode                  tcp
+    balance               roundrobin
+    option                tcpka
+    option                ldap-check
+    timeout server        2s
+    timeout connect       1s
+
+frontend ssl
+    bind 0.0.0.0:443 ssl crt /etc/haproxy/ssl/{{service_name}}.pem
+
+    http-request del-header Proxy
+
+    acl mirall hdr_reg(User-Agent) mirall
+    acl deprecated_clients hdr_reg(User-Agent) /1.1 /1.2 /1.3 /1.4 /1.5 /1.6
+    http-request deny if mirall deprecated_clients
+
+    reqadd X-Forwarded-Proto:\ https
+
+    # check for desktop or sync clients and send them to their own server group
+    acl acl_syncclient hdr_reg(User-Agent) mirall csyncoC
+    # acl switch src 130.59.0.0/16
+
+    # use_backend owncloud if !acl_syncclient !switch
+    use_backend sync if acl_syncclient  #  switch
+
+    # block if !switch acl_syncclient
+
+    default_backend owncloud
+    mode http
+    # option httpclose
+    option forwardfor
+
+    #rspirep ^(set-cookie:.*)  "\1; Domain={{ service_name }};"
+
+    acl is_cookie_a01 hdr_sub(cookie) shard=a01
+    acl is_cookie_a02 hdr_sub(cookie) shard=a02
+    acl is_cookie_a03 hdr_sub(cookie) shard=a03
+    acl is_cookie_a04 hdr_sub(cookie) shard=a04
+    acl is_cookie_a05 hdr_sub(cookie) shard=a05
+    http-request set-header Host a01.{{ service_name }} if is_cookie_a01
+    http-request set-header Host a02.{{ service_name }} if is_cookie_a02
+    http-request set-header Host a03.{{ service_name }} if is_cookie_a03
+    http-request set-header Host a04.{{ service_name }} if is_cookie_a04
+    http-request set-header Host a05.{{ service_name }} if is_cookie_a05
+
+frontend ssl_dev
+    bind 0.0.0.0:4443 ssl crt /etc/haproxy/ssl/{{ service_name }}.pem
+    reqadd X-Forwarded-Proto:\ https
+
+    default_backend owncloud_dev
+    mode http
+    option forwardfor
+
+
+backend owncloud
+    mode http
+    {% for host in groups['lb'] %}
+    # listen {{ daemonname }} {{ hostvars[host].inventory_hostname }}:{{ listenport }}
+    {% endfor %}
+    balance     roundrobin
+    # cookie SRVNAME insert
+    option httpchk GET /foo.php
+
+    load-server-state-from-file global
+
+    # http://comments.gmane.org/gmane.comp.web.haproxy/14720, closes
+    # NVT: Missing Secure Attribute SSL Cookie Information Disclosure Vulnerability (OID: 1.3.6.1.4.1.25623.1.0.902661)
+    acl secure res.hdr(Set-Cookie),lower -m sub secure
+    rspirep ^(Set-cookie:.*) \1;\ Secure if ! secure
+
+    {% for host in groups['web'] %}
+    {% if hostvars[host].active -%}
+    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check on-error mark-down fastinter 1500ms  # @zabbix_server({{hostvars[host].ansible_hostname}})
+    {% endif -%}
+    {% endfor %}
+
+backend owncloud_dev
+    mode http
+    balance     roundrobin
+    # cookie SRVNAME insert
+    option httpchk GET /foo.php
+
+    acl secure res.hdr(Set-Cookie),lower -m sub secure
+    rspirep ^(Set-cookie:.*) \1;\ Secure if ! secure
+
+    load-server-state-from-file global
+
+    {% for host in groups['dev'] %}
+    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check on-error mark-down fastinter 1500ms  # @zabbix_server({{hostvars[host].ansible_hostname}})
+    {% endfor %}
+
+backend sync
+    mode http
+    {% for host in groups['lb'] -%}
+    # listen {{ daemonname }} {{ hostvars[host].inventory_hostname }}:{{ listenport }}
+    {% endfor -%}
+    balance     roundrobin
+    # cookie SRVNAME insert
+    option httpchk GET /foo.php
+
+    # http://comments.gmane.org/gmane.comp.web.haproxy/14720, closes
+    # NVT: Missing Secure Attribute SSL Cookie Information Disclosure Vulnerability (OID: 1.3.6.1.4.1.25623.1.0.902661)
+    acl secure res.hdr(Set-Cookie),lower -m sub secure
+    rspirep ^(Set-cookie:.*) \1;\ Secure if ! secure
+
+    # Default server options:
+    #
+    # "inter" is normal check interval for each server
+    # "downinter" is check interval for server marked down
+    # "fastinter" is check interval for a server in transition between up/down
+    # "rise 4" means consider owncloud up after 4 successful health checks
+    # "fall 2" means consider owncloud instance down after two failed health checks
+    # "on-error mark-down error-limit 5" means after 5 connection errors,
+    #     immediately mark node as down and enter fastinter state for checks.
+
+    load-server-state-from-file global
+
+    # fullconn should be a bit less than number of server * maxconn
+    fullconn 700
+    #fullconn 1300
+    # maxconn depends on {php_config.max_php_processes}
+    #default-server inter 3000 downinter 20000 fastinter 1000 rise 4 fall 10 on-error mark-down error-limit 5 minconn 10 maxconn 150
+    default-server inter 3000 downinter 20000 fastinter 1000 rise 4 fall 10 on-error mark-down error-limit 5 minconn 10 maxconn 80
+
+    {% for host in groups['sync'] %}
+    {% if hostvars[host].active -%}
+    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check # @zabbix_server({{hostvars[host].ansible_hostname}})
+    {% endif -%}
+    {% endfor %}
+
+backend letsencrypt
+    server localhost localhost:8888

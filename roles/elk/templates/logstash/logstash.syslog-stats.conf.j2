@@ -1,0 +1,102 @@
+filter {
+  if [facility] == 6 {
+      grok {
+        match => {
+            "message" => "^@cee:%{SPACE}%{GREEDYDATA:message}|.*"
+        }
+        overwrite => [ "message" ]
+      }
+      json {
+        source => "message"
+        target => "@metadata"
+      }
+      mutate {
+        gsub => [
+            "[@metadata][name]", " ", "_"
+        ]
+      }
+      if [@metadata][origin] == "core.queue" {
+          mutate {
+            convert => {
+                "[@metadata][size]" => "integer"
+                "[@metadata][enqueued]" => "integer"
+                "[@metadata][full]" => "integer"
+                "[@metadata][discarded.full]" => "integer"
+                "[@metadata][discarded.nf]" => "integer"
+                "[@metadata][maxqsize]" => "integer"
+            }
+          }
+      }
+      if [@metadata][origin] == "core.action" {
+          mutate {
+            convert => {
+                "[@metadata][processed]" => "integer"
+                "[@metadata][failed]" => "integer"
+                "[@metadata][suspended]" => "integer"
+                "[@metadata][resumed]" => "integer"
+                "[@metadata][suspended.duration]" => "integer"
+            }
+          }
+      }
+      if [@metadata][origin] == "omelasticsearch" {
+          mutate {
+            convert => {
+                "[@metadata][submitted]" => "integer"
+                "[@metadata][failed.http]" => "integer"
+                "[@metadata][failed.httprequests]" => "integer"
+                "[@metadata][failed.es]" => "integer"
+            }
+          }
+      }
+  }
+}
+
+output {
+  if [facility] == 6 {
+     if [@metadata][origin] == "core.queue" {
+          #stdout { codec => rubydebug }
+          graphite {
+             host => "{{ hostvars[groups['graphite'][0]].inventory_hostname }}"
+             metrics_format => "logstash.*"
+             metrics => {
+                "%{logsource}/syslog/queue/%{[@metadata][name]}/size" => "%{[@metadata][size]}"
+                "%{logsource}/syslog/queue/%{[@metadata][name]}/enqueued" => "%{[@metadata][enqueued]}"
+                "%{logsource}/syslog/queue/%{[@metadata][name]}/full" => "%{[@metadata][full]}"
+                "%{logsource}/syslog/queue/%{[@metadata][name]}/discarded_full" => "%{[@metadata][discarded.full]}"
+                "%{logsource}/syslog/queue/%{[@metadata][name]}/discarded_nf" => "%{[@metadata][discarded.nf]}"
+                "%{logsource}/syslog/queue/%{[@metadata][name]}/maxqsize" => "%{[@metadata][maxqsize]}"
+             }
+          }
+          #if [logsource] == "drive-sync5" and [@metadata][name] == "owncloud-elk_queue"{
+          #  stdout { codec => rubydebug { metadata => true } }
+          #}
+     }
+     if [@metadata][origin] == "core.action" {
+          #stdout { codec => rubydebug }
+          graphite {
+             host => "{{ hostvars[groups['graphite'][0]].inventory_hostname }}"
+             metrics_format => "logstash.*"
+             metrics => {
+                "%{logsource}/syslog/action/%{[@metadata][name]}/processed" => "%{[@metadata][processed]}"
+                "%{logsource}/syslog/action/%{[@metadata][name]}/failed" => "%{[@metadata][failed]}"
+                "%{logsource}/syslog/action/%{[@metadata][name]}/suspended" => "%{[@metadata][suspended]}"
+                "%{logsource}/syslog/action/%{[@metadata][name]}/suspended_duration" => "%{[@metadata][suspended.duration]}"
+                "%{logsource}/syslog/action/%{[@metadata][name]}/resumed" => "%{[@metadata][resumed]}"
+             }
+          }
+     }
+     if [@metadata][origin] == "omelasticsearch" {
+          #stdout { codec => rubydebug }
+          graphite {
+             host => "{{ hostvars[groups['graphite'][0]].inventory_hostname }}"
+             metrics_format => "logstash.*"
+             metrics => {
+                "%{logsource}/syslog/es/%{[@metadata][name]}/submitted" => "%{[@metadata][submitted]}"
+                "%{logsource}/syslog/es/%{[@metadata][name]}/failed_http" => "%{[@metadata][failed.http]}"
+                "%{logsource}/syslog/es/%{[@metadata][name]}/failed_httprequests" => "%{[@metadata][failed.httprequests]}"
+                "%{logsource}/syslog/es/%{[@metadata][name]}/failed_es" => "%{[@metadata][failed.es]}"
+             }
+          }
+     }
+  }
+}

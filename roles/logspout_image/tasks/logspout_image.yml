@@ -1,0 +1,29 @@
+---
+
+- name: copy logspout build instructions to remote host
+  synchronize:
+    src: logspout
+    dest: /tmp
+    delete: yes
+  tags:
+    - logspout
+
+- name: build logspout
+  docker_image: 
+    path="/tmp/logspout" 
+    name="{{logspout_docker_name}}"
+    tag="{{logspout_docker_tag}}"
+    dockerfile="Dockerfile"
+    state=present
+    tls_hostname=localhost
+    state=build
+    #state=present
+    #force=true
+  tags:
+    - logspout
+
+- name: push logspout image
+  shell: docker push "{{logspout_docker_image}}"
+  tags:
+    - logspout
+

@@ -1,0 +1,29 @@
+---
+
+- name: mountpoints
+  action: file dest="/mnt/{{item.name}}" state=directory owner=elasticsearch group=elasticsearch mode=755
+  with_items: vols
+  tags:
+    - mount
+
+#- name: make filesystem vdb
+#  command: mkfs.xfs /dev/vdb
+#  ignore_errors: yes
+
+- name: mount volumes
+  mount: 
+    name=/mnt/{{ item.name }}
+    src={{ item.src }}
+    fstype=xfs
+    opts=noatime
+    state=mounted
+  with_items: vols
+  tags:
+    - mount
+
+- name: set ownership
+  file: path=/mnt/{{ item.name }} state=directory owner=elasticsearch group=elasticsearch mode=755
+  with_items: vols
+  tags:
+    - mount
+

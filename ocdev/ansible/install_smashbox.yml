@@ -1,0 +1,34 @@
+---
+
+- name: ensure packages are installed
+  action: apt name={{item}} update_cache=yes
+  with_items:
+    - git
+    - python-pip
+    - libxml2-utils
+  tags:
+    - smashbox
+
+- name: clone pyocclient.git
+  git: repo=https://github.com/owncloud/pyocclient.git dest=/opt/pyocclient
+  tags:
+    - smashbox
+
+- name: install config
+  template: src=smashbox.conf.j2 dest=/opt/smashbox/etc/smashbox.conf owner=ubuntu group=ubuntu
+  tags:
+    - smashbox
+
+- name: set PYTHONPATH
+  lineinfile: dest=/etc/environment regexp="^export PYTHONPATH.*" line="export PYTHONPATH=/opt/pyocclient"
+  tags:
+    - smashbox
+
+- name: pip install
+  pip: name=requests
+  tags:
+    - smashbox
+    - wget
+
+
+

@@ -1,0 +1,2 @@
+cd /opt/smashbox
+python -m pydevd --port 5678 --client 10.254.0.1 --file /opt/smashbox/bin/smash "$*"

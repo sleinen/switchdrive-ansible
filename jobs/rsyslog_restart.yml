@@ -1,0 +1,9 @@
+---
+
+- hosts: 
+    - web
+    - sync
+  gather_facts: no
+  tasks:
+    - service: name=rsyslog state=restarted
+

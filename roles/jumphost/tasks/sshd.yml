@@ -1,0 +1,18 @@
+---
+
+
+- name: update sshd config
+  lineinfile:
+    dest=/etc/ssh/sshd_config
+    regexp="(^\s*#\s*{{item.param}}\s+[^#]+$)|(^\s*{{item.param}}\s+)"
+    insertafter="^\s*#\s*{{item.param}}\s+.*"
+    line="{{item.comment_out}}{{item.param}} {{item.value}}"
+  with_items: 
+    #- { param: "MaxStartups", value: "100:1:101", comment_out: "" }
+    - { param: "MaxSessions", value: "100", comment_out: "" }
+    #- { param: "PubkeyAcceptedKeyTypes", value: "+ssh-dss", comment_out: "" }
+  tags:
+    - sshdconfig
+    - config
+  notify: restart sshd
+

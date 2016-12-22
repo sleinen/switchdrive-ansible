@@ -1,0 +1,3 @@
+---
+
+- include: graphite_image.yml

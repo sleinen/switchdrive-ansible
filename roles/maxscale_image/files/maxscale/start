@@ -1,0 +1,10 @@
+#!/usr/bin/bash
+
+# rm pid file that may be left over after a crash
+/bin/rm /var/run/maxscale/maxscale.pid
+
+/bin/chown -R maxscale:maxscale /var/run/mysqld
+
+exec /usr/bin/maxscale -d --user=maxscale --syslog=yes --maxlog=no
+
+

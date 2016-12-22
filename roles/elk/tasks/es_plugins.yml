@@ -1,0 +1,50 @@
+---
+
+- name: kopf plugin
+  shell: /usr/share/elasticsearch/bin/plugin -i lmenezes/elasticsearch-kopf
+  args:
+    creates: /usr/share/elasticsearch/plugins/kopf
+  tags:
+    - esplugins
+
+- name: head plugin
+  shell: /usr/share/elasticsearch/bin/plugin -i mobz/elasticsearch-head
+  args:
+    creates: /usr/share/elasticsearch/plugins/head
+  tags:
+    - esplugins
+
+- name: bigdesk plugin
+  shell: /usr/share/elasticsearch/bin/plugin -i lukas-vlcek/bigdesk
+  args:
+    creates: /usr/share/elasticsearch/plugins/head
+  tags:
+    - esplugins
+
+- name: bigdesk HQ
+  shell: /usr/share/elasticsearch/bin/plugin -i royrusso/elasticsearch-HQ
+  args:
+    creates: /usr/share/elasticsearch/plugins/head
+  tags:
+    - esplugins
+
+- name: download graphite plugin
+  git: repo=https://github.com/spinscale/elasticsearch-graphite-plugin dest=/home/ubuntu/elasticsearch-graphite-plugin
+  tags:
+    - esplugins
+
+- name: compile graphite plugin
+  shell: mvn package
+  args: 
+    chdir: /home/ubuntu/elasticsearch-graphite-plugin
+    creates: /home/ubuntu/elasticsearch-graphite-plugin/target/releases/elasticsearch-plugin-graphite-0.2-SNAPSHOT.zip
+  tags:
+    - esplugins
+
+- name: install graphite plugin
+  shell: /usr/share/elasticsearch/bin/plugin -i graphite -url file:///home/ubuntu/elasticsearch-graphite-plugin/target/releases/elasticsearch-plugin-graphite-0.2-SNAPSHOT.zip
+  args:
+    creates: /usr/share/elasticsearch/plugins/graphite
+  tags:
+    - esplugins
+

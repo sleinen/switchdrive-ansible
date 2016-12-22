@@ -1,0 +1,99 @@
+---
+- name: Logstash apt repo
+  apt_repository:
+    repo="deb http://packages.elasticsearch.org/logstash/{{ elk_logstash.version }}/{{ ansible_os_family|lower }} stable main"
+    update_cache=yes
+  when: ansible_os_family == 'Debian'
+
+- name: Install logstash apt packages
+  apt: pkg={{ item }} state=present
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  with_items:
+   - logstash
+   - libjna-java
+  when: ansible_os_family == 'Debian'
+  notify: Restart logstash
+
+# certificates created with: "openssl req -subj '/CN=elk.drive' -days 12000 -x509 -batch -nodes -newkey rsa:2048 -keyout lumberjack.key -out lumberjack.crt"
+- name: Logstash forwarder certificate conf file
+  copy:
+    src={{item.domain}}.{{item.file}}
+    dest=/etc/logstash/{{item.file}}
+    owner=root group=root mode=644
+  notify: Restart logstash
+  with_items:
+     - {domain: "{{internal_domain}}", file: "lumberjack.crt"}
+     - {domain: "{{internal_domain}}", file: "lumberjack.key"}
+  tags:
+    - lsconfig
+    - config
+    - logstash
+
+
+- name: Logstash default file
+  template:
+    src=logstash/default_logstash.conf.j2
+    dest=/etc/default/logstash
+    owner=root group=root mode=644
+  notify: Restart logstash
+  tags:
+    - lsconfig
+    - config
+
+- name: Logstash conf files
+  template:
+    src=logstash/{{ item.src }}
+    dest=/etc/logstash/conf.d/{{ item.dest }}
+    owner=root group=root mode=644
+  with_items: '{{elk_logstash.configs}}'
+  notify: Restart logstash
+  tags:
+    - lsconfig
+    - config
+
+- file: path=/opt/logstash/patterns state=directory
+  tags:
+    - lsconfig
+    - config
+
+- name: Logstash pattern files
+  template:
+    src=logstash/patterns/{{ item.src }}
+    dest=/opt/logstash/patterns/{{ item.dest }}
+    owner=root group=root mode=644
+  with_items: '{{elk_logstash.patterns}}'
+  when: elk_logstash.patterns is defined
+  notify: Restart logstash
+  tags:
+    - lsconfig
+    - config
+
+- name: Make monit to look after Logstash
+  template:
+    src=monitor/logstash.monitrc.conf.j2
+    dest=/etc/monit/conf.d/logstash.monitrc.conf
+    owner=root group=root mode=644
+  notify: Restart monit
+  tags:
+    - lsconfig
+    - config
+
+
+- stat: path=/etc/logstash/GeoLiteCity.dat
+  register: geoLiteStats
+  tags:
+    - lsconfig
+    - config
+- name: install geoip data file
+  when: not geoLiteStats.stat.exists
+  get_url: url="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz" dest=/etc/logstash/GeoLiteCity.dat.gz
+  tags:
+    - lsconfig
+    - config
+- when: not geoLiteStats.stat.exists
+  shell: gunzip -d /etc/logstash/GeoLiteCity.dat.gz
+  tags:
+    - lsconfig
+    - config
+
+

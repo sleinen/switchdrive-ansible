@@ -1,0 +1,20 @@
+---
+
+slapd_key:
+   "drive.switch.ch": "{{vault_slapd_drive_key}}"
+   "drive-stage.switch.ch": "{{vault_slapd_drive_stage_key}}"
+
+slapd_cert:
+   "drive.switch.ch": "{{vault_slapd_drive_cert}}"
+   "drive-stage.switch.ch": "{{vault_slapd_drive_stage_cert}}"
+
+service_cert:
+   "drive.switch.ch": "{{vault_service_drive_cert}}"
+   "drive-stage.switch.ch": "{{vault_service_drive_stage_cert}}"
+   "drive-backup.switch.ch": "{{vault_service_drive_backup_cert}}"
+
+docker_cert:
+   drive.switch.ch: 
+        crt: "{{vault_service_drive_cert}}"
+        key: "{{vault_service_docker_cert_key}}"
+

@@ -1,0 +1,5 @@
+---
+
+- include: install_octest_global.yml
+- include: install_octest_script.yml
+

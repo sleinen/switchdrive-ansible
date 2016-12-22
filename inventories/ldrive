@@ -1,0 +1,83 @@
+[db]
+
+[dbslave]
+
+[nfs]
+
+[web]
+
+[sync]
+
+[mgmt]
+
+[lb]
+
+
+[ldap]
+
+[monitoring]
+
+[syslog]
+
+[reg]
+
+[jumphost]
+86.119.31.185 ansible_ssh_user=ubuntu
+
+[engines]
+
+[graphite]
+10.0.24.6 ansible_ssh_user=ubuntu
+
+[backup]
+10.0.24.9 ansible_ssh_user=ubuntu
+
+[test]
+10.0.24.181 ansible_ssh_user=ubuntu
+
+[production:children]
+db
+dbslave
+nfs
+web
+sync
+lb
+ldap
+monitoring
+syslog
+engines
+graphite
+backup
+test
+mgmt
+
+jumphost
+
+[production:vars]
+jumphost_internal=10.0.24.5
+internal_domain=ldrive
+reverse_dns_domain=24.0.10.in-addr.arpa
+backbone_ipv4_prefix=10.2.49
+backbone_ipv4_network=10.2.0.0/16
+backbone_ipv4_gateway=10.2.49.1
+backbone_ipv6_prefix=2001:620:5ca1:231:
+
+main_site=False
+remote_backup_host=[2001:620:5ca1:131::9]
+service_name=drive.switch.ch
+
+nfs1_ip=10.0.23.7
+OWNCLOUD_VERSION='7.0.10'
+enterprise=true
+stage_or_test_system=False
+rails_environment=production
+
+# servers mails to root (cronjobs) are sent to this address
+notification_mail=drive-operations@switch.ch
+
+# Set the list of users that have access to these servers
+admin_users={{ production_users }}
+
+graphite_host_floating_ip=grafana.drive.switch.ch
+
+volumes_inventory_name=production

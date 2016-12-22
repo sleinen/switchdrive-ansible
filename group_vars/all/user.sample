@@ -1,0 +1,11 @@
+---
+
+# Copy this file to "./user"
+# uncomment the following line and change the values:
+
+#vault_ansible_become_pass: 'mySuperSecretPassword'
+
+#vault_os_username: 'myOSUsername'
+#vault_os_password: 'IWontTellYou'
+#vault_os_tenant: 'projectXYZ'
+

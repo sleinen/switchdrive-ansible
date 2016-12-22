@@ -1,0 +1,14 @@
+---
+
+- hosts: 
+    - sync
+    - web
+  tasks:
+    - name: grep for owncloud in syslog
+      shell: 'grep "{{ansible_hostname }} ownCloud" /var/log/syslog > /tmp/owncloud.log'
+    - name: get owncloud.log
+      fetch: src=/tmp/owncloud.log dest=log/{{ansible_hostname }}.log flat=yes
+    - name: clean up
+      command: rm /tmp/owncloud.log
+      
+      

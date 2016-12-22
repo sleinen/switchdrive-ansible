@@ -1,0 +1,40 @@
+---
+
+- name: copy grafana build instructions to remote host
+  synchronize:
+    src: grafana
+    dest: /tmp
+    delete: yes
+  tags:
+    - grafana
+
+- name: copy grafana configs to remote host
+  template:
+    src={{item.name}}
+    dest=/tmp/grafana/{{item.name}}
+    mode={{item.mode}}
+  with_items:
+    - { name: Dockerfile, mode: "0644" }
+  tags:
+    - grafana
+
+
+- name: build grafana
+  docker_image: 
+    path="/tmp/grafana" 
+    name="{{grafana_docker_name}}"
+    tag="{{grafana_docker_tag}}"
+    dockerfile="Dockerfile"
+    state=build
+    tls_hostname=localhost
+  tags:
+    - grafana
+
+- name: push grafana image
+  shell: docker push "{{grafana_docker_image}}"
+  tags:
+    - grafana
+
+
+
+

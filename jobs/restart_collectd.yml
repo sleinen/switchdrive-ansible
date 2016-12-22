@@ -1,0 +1,9 @@
+---
+
+- hosts: all
+  become: true
+  gather_facts: no
+  tasks:
+    - command: pkill -9 collectd
+    - service: name=collectd state=started
+  

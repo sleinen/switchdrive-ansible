@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+USER=$1
+/usr/bin/time -p owncloudcmd -u $USER -p oc$USER $USER https://drive.switch.ch/ > log/$USER.`date "+%Y.%m.%d-%H:%M"`.log 2>&1 &

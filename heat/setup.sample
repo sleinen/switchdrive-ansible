@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+SSH_KEY='Christian-Schnidrig'
+
+# use the following names for 
+#   production: drive, ldrive, bdrive
+#   staging: szdrive, sldrive
+#...test: tzdrive, tldrive
+
+NAME_PREFIX=drive
+

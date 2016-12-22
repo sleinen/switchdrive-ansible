@@ -1,0 +1,5 @@
+---
+
+- name: restart logspout
+  shell: "docker stop logspout; docker start logspout"
+

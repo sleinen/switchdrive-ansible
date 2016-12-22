@@ -1,0 +1,30 @@
+##
+# check_logfiles checks the log files as defined in the specified configuration file
+##
+#L_check_syslog_server_logs sudo /home/nagios/plugins-static/check_logfiles -f /home/nagios/etc/check_logfiles.cfg
+
+#L_check_syslog_owncloud /home/nagios/plugins-static/check_logfiles --tag=ownCloud --logfile=/var/log/owncloud.log -criticalpattern="CRITICAL"
+##
+# L_check_syslog_haproxy checks the /var/log/haproxy_1.log file for any CRITICAL error messages.
+# Notice that --tag is a unique identifier for this logfile/pattern combination.
+# You _must_ use it if you plan to call check_logfiles with more than one of these combinations. Usage is optional but strongly recommended.
+##
+#L_check_syslog_haproxy /home/nagios/plugins-static/check_logfiles --tag=haproxy --logfile=/var/log/haproxy_1.log -criticalpattern="CRITICAL"
+##
+# L_check_syslog_CLOUDINIT checks the /var/log/cloud-init.log file for any CRITICAL error messages.
+# Notice that --tag is a unique identifier for this logfile/pattern combination.
+# You _must_ use it if you plan to call check_logfiles with more than one of these combinations. Usage is optional but strongly recommended.
+##
+#L_check_syslog_CLOUDINIT /home/nagios/plugins-static/check_logfiles --tag=CLOUDINIT --logfile=/var/log/cloud-init.log -criticalpattern="CRITICAL"
+##
+# L_check_syslog checks the /var/log/syslog file for any CRITICAL error messages. 
+# Notice that --tag is a unique identifier for this logfile/pattern combination. 
+# You _must_ use it if you plan to call check_logfiles with more than one of these combinations. Usage is optional but strongly recommended. 
+##
+#L_check_syslog /home/nagios/plugins-static/check_logfiles --tag=check_syslog --logfile=/var/log/syslog -criticalpattern="CRITICAL"
+
+
+##
+# L_check_rsyslogd checks that at least one rsyslogd process is up and running.
+##
+L_check_rsyslogd /usr/lib/nagios/plugins/check_procs -C rsyslogd -c 1:

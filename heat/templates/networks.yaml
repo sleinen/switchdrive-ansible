@@ -1,0 +1,48 @@
+heat_template_version: 2013-05-23
+
+description: |
+  This template creates the minimal netork-setup needed for owncloud
+
+##################
+parameters:
+  name_prefix:
+    type: string
+    default: staging
+    description: "Resources Name Prefix"
+  region:
+    type: string
+    label: "SWITCHengines region: LS or ZH"
+  cidr:
+    type: string
+  gateway_ip:
+    type: string
+  pool_start:
+    type: string
+  pool_end:
+    type: string
+
+##################
+resources:
+
+
+  ##################
+  # drive network
+  drive_network:
+    type: types/network_with_router.yaml
+    properties:
+      region: { get_param: region }
+      name: drive
+      name_prefix: { get_param: name_prefix }
+      cidr: { get_param: cidr }
+      gateway_ip: { get_param: gateway_ip }
+      pool_start: { get_param: pool_start }
+      pool_end: { get_param: pool_end }
+
+##################
+# Outputs
+outputs:
+  network_drive:
+    value: { get_attr: [drive_network, network_id]  }
+  subnet_drive:
+    value: { get_attr: [drive_network, subnet_id]  }
+

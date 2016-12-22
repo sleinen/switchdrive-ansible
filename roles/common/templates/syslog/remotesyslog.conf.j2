@@ -1,0 +1,19 @@
+*.info;mail.none;authpriv.none;cron.none          action(
+    name="syslog-elk"
+    action.resumeRetryCount="-1"
+    action.resumeInterval="1"
+    action.reportSuspension="on"
+    action.reportSuspensionContinuation="on"
+    type="omfwd" 
+    template="RSYSLOG_ForwardFormat"
+    target="{{ hostvars[groups['elk'][0]].inventory_hostname }}"
+    port="{{elk_syslog_port}}"
+    protocol="tcp"
+    queue.size="10000" 
+    queue.type="FixedArray" 
+    queue.discardmark="9000" 
+    queue.discardseverity="6" 
+    queue.timeoutenqueue="0"
+    )
+
+lpr.info     stop # syslog stats

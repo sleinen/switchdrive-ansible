@@ -1,0 +1,136 @@
+#!/bin/bash
+
+if [ "x$2" == "x" ]; then 
+	echo "Usage: `basename $0` <source_dir> <dest_dirs>
+.      source_dir: directory from where users are move away. E.g. /mnt/data
+.      dest_dirs: list of absolute paths. E.g. '/mnt/101 /mnt/102'"
+	exit
+fi
+
+
+export LC_ALL="en_US.UTF-8"
+
+DEST_DIR_LIST="$2"
+SOURCE_DIR="$1"
+MOVED_USER_DIR="${SOURCE_DIR}/_moved/"
+`mkdir -p $MOVED_USER_DIR`
+
+SOURCE_HOST=`mount | grep ${SOURCE_DIR} | sed -e 's/:.*//'`
+if [ `echo $SOURCE_HOST | grep "quobyte@" | wc -l ` == 1 ]; then
+	SOURCE_HOST=localhost
+fi
+mkdir -p ${MOVED_USER_DIR}
+
+DONE=0
+MOVED=0
+FAILED=0
+while ((! $DONE)) ; do
+	SKIPPED=0
+	for DEST_DIR in $DEST_DIR_LIST; do
+		echo "*******************************************"
+		echo "*******************************************"
+		echo Directory: $DEST_DIR
+		DEST_HOST=`mount | grep ${DEST_DIR} | sed -e 's/:.*//'`
+		for user in `/bin/ls $DEST_DIR`; do 
+			if [ -d $SOURCE_DIR/$user ] && ! [ -h $SOURCE_DIR/$user ] ; then 
+				if [ `stat -c %U $DEST_DIR/$user` == "www-data" ]; then
+					echo "*******************************************"
+					echo Preparing $user;
+					#ETAG=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+					ETAG=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+					if [ $? -ne 0 ] ; then
+						ok=false
+						while ( ! $ok ); do 
+							echo could not access database. Retrying..
+							sleep 30
+							ETAG=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+							if [ $? -eq 0 ] ; then
+								ok=true;
+							fi
+						done
+					fi
+					NOW=`date "+%s"`
+					echo synching...
+					if [ "x${SOURCE_HOST}" == "x${DEST_HOST}" ]; then
+						echo ssh ${SOURCE_HOST} rsync -axS --delete --stats ${SOURCE_DIR}/$user/ ${DEST_DIR}/$user
+						ssh ${SOURCE_HOST} rsync -axS --delete --stats ${SOURCE_DIR}/$user/ ${DEST_DIR}/$user
+					else
+						echo ssh ${SOURCE_HOST} rsync -axS --delete --stats ${SOURCE_DIR}/$user/ ${DEST_HOST}:${DEST_DIR}/$user
+						ssh ${SOURCE_HOST} rsync -axS --delete --stats ${SOURCE_DIR}/$user/ ${DEST_HOST}:${DEST_DIR}/$user
+					fi
+					if [ $? -ne 0 ] ; then
+						echo Could not rsync, skipping $user
+						SKIPPED=$((SKIPPED+1))
+					else
+						#ETAG2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+						ETAG2=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+						if [ $? -ne 0 ] ; then
+							ok=false
+							while ( ! $ok ); do 
+								echo could not access database. Retrying..
+								sleep 30
+								ETAG2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+								if [ $? -eq 0 ] ; then
+									ok=true;
+								fi
+							done
+						fi
+						OK=0
+						if [ "$ETAG" != "$ETAG2" ]; then
+							if [ "x$ETAG2" = "x" ]; then
+								NUM_FILES=`sudo find ${SOURCE_DIR}/$user/ | wc -l`
+								if [ "$NUM_FILES" = "2" ]; then
+									OK=1
+								fi
+							fi
+						else
+							OK=1
+						fi
+						if [ "$OK" = "0" ]; then
+							echo user was active, skipping
+							SKIPPED=$((SKIPPED+1))
+						else
+							echo Moving now: $user
+							mv $SOURCE_DIR/$user $MOVED_USER_DIR
+							ln -s $DEST_DIR/$user $SOURCE_DIR
+							if [ $? -ne 0 ] ; then
+								echo failed to move, retrying...
+								echo $user >> $DEST_DIR/_check
+								mv $SOURCE_DIR/$user $MOVED_USER_DIR/$user2
+								ln -s $DEST_DIR/$user $SOURCE_DIR
+								if [ $? -ne 0 ] ; then
+									echo failed again, giving up
+									echo $user >> $DEST_DIR/_failed
+									FAILED=$((FAILED+1))
+								else
+									MOVED=$((MOVED+1))
+								fi
+							else
+								MOVED=$((MOVED+1))
+							fi
+						fi
+					fi
+				else
+					echo "User $user is not ready yet. Skipping..."
+					SKIPPED=$((SKIPPED+1))
+				fi
+			fi
+		done
+	done
+	echo "*******************************************"
+	echo Skipped: $SKIPPED
+	echo Moved: $MOVED
+	echo Failed: $FAILED
+	
+	if (( $FAILED != 0 )) ; then 
+		exit 
+	fi
+	DONE=$((SKIPPED==0))
+	if ((! $DONE )) ; then
+		echo "Sleeping ...."
+		sleep 300;
+	fi
+done
+	
+
+

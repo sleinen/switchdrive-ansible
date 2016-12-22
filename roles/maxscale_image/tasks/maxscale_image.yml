@@ -1,0 +1,28 @@
+---
+
+- name: copy maxscale build instructions to remote host
+  synchronize:
+    src: maxscale
+    dest: /tmp
+    delete: yes
+  tags:
+    - maxscale
+
+- name: build maxscale
+  docker_image: 
+    path="/tmp/maxscale" 
+    name="{{maxscale_docker_name}}"
+    tag="{{maxscale_docker_tag}}"
+    dockerfile="Dockerfile"
+    tls_hostname=localhost
+    state=build
+    #state=present
+    #force=true
+  tags:
+    - maxscale
+
+- name: push maxscale image
+  shell: docker push "{{maxscale_docker_image}}"
+  tags:
+    - maxscale
+

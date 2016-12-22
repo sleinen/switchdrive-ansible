@@ -1,0 +1,56 @@
+---
+
+- apt: name=php5-xdebug
+  tags:
+    - xdebug
+- lineinfile: dest=/etc/php5/apache2/php.ini line=zend_extension="/usr/lib/php5/20121212/xdebug.so" insertafter="\[PHP\]"
+  tags:
+    - xdebug
+- lineinfile: dest=/etc/php5/apache2/php.ini line=[debug]
+  tags:
+    - xdebug
+
+
+- name: update php5-fpm config
+  lineinfile:
+    dest=/etc/php5/apache2/php.ini
+    regexp="(^\s*#\s*{{item.param}}\s*=[^#]+$)|(^\s*{{item.param}}\s*=)"
+    insertafter="^\s*#\s*{{item.param}}\s*=.*"
+    line="{{item.comment_out}}{{item.param}} = {{item.value}}"
+  with_items:
+    - { param: "xdebug.remote_autostart",            value: "off",       comment_out: '' }
+    - { param: "xdebug.remote_enable",               value: "on",        comment_out: '' }
+    - { param: "xdebug.remote_handler",              value: "dbgp",      comment_out: '' }
+    - { param: "xdebug.remote_mode",                 value: "req",       comment_out: '' }
+    - { param: "xdebug.remote_connect_back",         value: "on",       comment_out: '' }
+    - { param: "xdebug.remote_port",                 value: "9000",      comment_out: '' }
+  tags:
+    - xdebug
+    - xdebugconfig
+  notify: restart apache2
+
+
+- lineinfile: dest=/etc/php5/cli/php.ini line=zend_extension="/usr/lib/php/20121212/xdebug.so" insertafter="\[PHP\]"
+  tags:
+    - xdebug
+- lineinfile: dest=/etc/php5/cli/php.ini line=[debug]
+  tags:
+    - xdebug
+- name: update php5-cli config
+  lineinfile:
+    dest=/etc/php5/cli/php.ini
+    regexp="(^\s*#\s*{{item.param}}\s*=[^#]+$)|(^\s*{{item.param}}\s*=)"
+    insertafter="^\s*#\s*{{item.param}}\s*=.*"
+    line="{{item.comment_out}}{{item.param}} = {{item.value}}"
+  with_items:
+    - { param: "xdebug.remote_autostart",            value: "on",       comment_out: '' }
+    - { param: "xdebug.remote_enable",               value: "on",        comment_out: '' }
+    - { param: "xdebug.remote_handler",              value: "dbgp",      comment_out: '' }
+    - { param: "xdebug.remote_mode",                 value: "req",       comment_out: '' }
+    - { param: "xdebug.remote_connect_back",         value: "off",       comment_out: '' }
+    - { param: "xdebug.remote_port",                 value: "9000",      comment_out: '' }
+    - { param: "xdebug.remote_host",                 value: "10.254.0.1", comment_out: '' }
+  tags:
+    - xdebug
+    - xdebugconfig
+  

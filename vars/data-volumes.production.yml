@@ -1,0 +1,148 @@
+---
+quobyte_volume_base_url: "10.1.0.106:7861,10.1.0.107:7861,10.1.0.120:7861"
+quobyte_volumes:
+   - { name: "001", id: "03d59149-2257-429e-b634-08895eb74b99", backup_dev: vdb, state: absent} # state: mounted
+
+
+# volumes to rsync to lausanne
+rsync_volumes:
+   - { name: "001", hour: 0, minute: 0, state: absent } # state: present
+
+# which ceph volumes to snapshot
+snapshot_volumes:
+   # quobyte
+   - { name: "001", hour: 6, minute: 0, region_name: "LS", volume_id: "96cafbfa-53fe-424e-8d25-be758f5c6036", state: absent }
+   # nfs1
+   - { name: "000", hour: 2, minute: 0, region_name: "ZH", volume_id: "82f37a75-6bc2-46a2-ae5e-669541fa112b", state: present }
+   - { name: "101", hour: 3, minute: 1, region_name: "ZH", volume_id: "1d20d74f-567b-42d7-ab19-32d8a9386f63", state: present }
+   - { name: "102", hour: 4, minute: 2, region_name: "ZH", volume_id: "f38829ec-a279-4422-9e3b-c74e8f974070", state: present }
+   - { name: "103", hour: 2, minute: 3, region_name: "ZH", volume_id: "4c0ad366-0209-44f3-adfc-9f5d58378f43", state: present }
+   - { name: "104", hour: 3, minute: 4, region_name: "ZH", volume_id: "e50ba48f-27bc-4066-8ab7-29ff42f8d5ce", state: present }
+   - { name: "105", hour: 4, minute: 5, region_name: "ZH", volume_id: "28cccd69-64a7-4ef6-bd00-72488a2958bf", state: present }
+   - { name: "106", hour: 2, minute: 6, region_name: "ZH", volume_id: "c404ea0e-e234-4359-8241-605b8ee6f024", state: present }
+
+   - { name: "131", hour: 3, minute: 31, region_name: "ZH", volume_id: "1e2f8316-5874-435b-b979-dcb73866332a", state: present }
+   - { name: "132", hour: 4, minute: 32, region_name: "ZH", volume_id: "21eb21a7-416e-49be-80e6-8f0d12bdb149", state: present }
+   - { name: "133", hour: 2, minute: 33, region_name: "ZH", volume_id: "479ad654-622b-4f3e-a3cb-263ea49b56ab", state: present }
+   - { name: "134", hour: 3, minute: 34, region_name: "ZH", volume_id: "a047be35-2118-40fe-946a-ce5e1b7fbfd6", state: present }
+   - { name: "135", hour: 4, minute: 35, region_name: "ZH", volume_id: "fd1b98da-d562-4cde-8fdf-04763f8fdc44", state: present }
+   - { name: "136", hour: 2, minute: 36, region_name: "ZH", volume_id: "e6c7ae62-b756-4534-bd3a-37afbeaf8c2d", state: present }
+   # nfs2
+   - { name: "107", hour: 3, minute: 7, region_name: "ZH", volume_id: "5a89ad6b-0a87-411c-8325-e73d97fe8a8d", state: present }
+   - { name: "108", hour: 4, minute: 8, region_name: "ZH", volume_id: "878f14a3-54f9-4560-9358-51b7edb48cdc", state: present }
+   - { name: "109", hour: 2, minute: 9, region_name: "ZH", volume_id: "89c82858-3257-4ab6-aa12-3d3e5b6a273c", state: present }
+   - { name: "110", hour: 3, minute: 10, region_name: "ZH", volume_id: "1c9b8694-084f-4b43-adf4-db56622f9b32", state: present }
+   - { name: "111", hour: 4, minute: 11, region_name: "ZH", volume_id: "08fb2d03-5fe9-4177-b467-130437ffb5a3", state: present }
+   - { name: "112", hour: 2, minute: 12, region_name: "ZH", volume_id: "ce909d2a-ed66-4e9b-9a90-1d1720f1bfe5", state: present }
+
+   - { name: "137", hour: 3, minute: 37, region_name: "ZH", volume_id: "d00f2ea4-0d67-44e4-8aea-d0cfcf4cb7ad", state: present }
+   - { name: "138", hour: 4, minute: 38, region_name: "ZH", volume_id: "55ff6fc8-5909-43d2-ba5f-acf504616cc4", state: present }
+   - { name: "139", hour: 2, minute: 39, region_name: "ZH", volume_id: "df121bb4-59f8-49ab-aeea-b142bf48134c", state: present }
+   - { name: "140", hour: 3, minute: 40, region_name: "ZH", volume_id: "4995dc00-b27d-4ef5-855f-18451e9011e0", state: present }
+   - { name: "141", hour: 4, minute: 41, region_name: "ZH", volume_id: "917834b5-830f-4fd5-b6b2-337c00613176", state: present }
+   - { name: "142", hour: 2, minute: 42, region_name: "ZH", volume_id: "ec2665f8-0625-447b-977b-4ad2958a415d", state: present }
+   # nfs3
+   - { name: "113", hour: 3, minute: 13, region_name: "ZH", volume_id: "2e4bdb5f-3658-48c6-aad9-c036d8505fe2", state: present }
+   - { name: "114", hour: 4, minute: 14, region_name: "ZH", volume_id: "b5d9c6d7-793c-450f-b145-83b3144bfa6d", state: present }
+   - { name: "115", hour: 2, minute: 15, region_name: "ZH", volume_id: "c4334ab5-81bd-4e3d-a31b-01618141bea4", state: present }
+   - { name: "116", hour: 3, minute: 16, region_name: "ZH", volume_id: "dc7dbc9b-73d5-442d-8f04-bd4ef3ca87ea", state: present }
+   - { name: "117", hour: 4, minute: 17, region_name: "ZH", volume_id: "f373c7a9-9568-4b52-bb70-a2765f874f9a", state: present }
+   - { name: "118", hour: 2, minute: 18, region_name: "ZH", volume_id: "7359af7d-379b-4a12-bb19-f721a2bb403e", state: present }
+   # nfs4
+   - { name: "119", hour: 3, minute: 19, region_name: "ZH", volume_id: "0edf097d-e77d-4bee-9a20-313db2089f63", state: present }
+   - { name: "120", hour: 4, minute: 20, region_name: "ZH", volume_id: "9fb7274e-e6a9-4378-bd41-0f9ec76a4313", state: present }
+   - { name: "121", hour: 2, minute: 21, region_name: "ZH", volume_id: "6302e194-5e5f-48c7-a614-1880855592d8", state: present }
+   - { name: "122", hour: 3, minute: 22, region_name: "ZH", volume_id: "2eb872cd-a464-4448-9440-b151c7639169", state: present }
+   - { name: "123", hour: 4, minute: 23, region_name: "ZH", volume_id: "42f50f61-8944-4a11-9f60-86aeab7adbe1", state: present }
+   - { name: "124", hour: 2, minute: 24, region_name: "ZH", volume_id: "3d4305aa-a02d-4f56-b7fd-b9921e17ae0f", state: present }
+   # nfs5
+   - { name: "125", hour: 3, minute: 25, region_name: "ZH", volume_id: "b3c7d7c1-89e5-4926-aaaf-2e8f5151514c", state: present }
+   - { name: "126", hour: 4, minute: 26, region_name: "ZH", volume_id: "d1470c95-2f08-4638-8d25-341cca407e93", state: present }
+   - { name: "127", hour: 2, minute: 27, region_name: "ZH", volume_id: "9087e808-d9c7-452a-baf4-f8fd0aae9a69", state: present }
+   - { name: "128", hour: 3, minute: 28, region_name: "ZH", volume_id: "b577024c-4462-4677-ad5c-02711ff25480", state: present }
+   - { name: "129", hour: 4, minute: 29, region_name: "ZH", volume_id: "e32796aa-fefb-4589-8a9b-1b5e68cb1c4e", state: present }
+   - { name: "130", hour: 2, minute: 30, region_name: "ZH", volume_id: "34d9a7a5-0383-4e59-8293-e9f9d4989490", state: present }
+
+# manually format the volumes like this: "mkfs.xfs -L "109" /dev/vdk"
+
+volumes_nfs1:
+     - { name: "data", src: "LABEL=000", state: "mounted", ocdata_link: "101" }
+     - { name: "101", src: "LABEL=101", state: "mounted", ocdata_link: "102" }
+     - { name: "102", src: "LABEL=102", state: "mounted", ocdata_link: "103" }
+     - { name: "103", src: "LABEL=103", state: "mounted", ocdata_link: "104" }
+     - { name: "104", src: "LABEL=104", state: "mounted", ocdata_link: "105" }
+     - { name: "105", src: "LABEL=105", state: "mounted", ocdata_link: "106" }
+     - { name: "106", src: "LABEL=106", state: "mounted", ocdata_link: "107" }
+     - { name: "131", src: "LABEL=131", state: "mounted", ocdata_link: "132" }
+     - { name: "132", src: "LABEL=132", state: "mounted", ocdata_link: "133" }
+     - { name: "133", src: "LABEL=133", state: "mounted", ocdata_link: "134" }
+     - { name: "134", src: "LABEL=134", state: "mounted", ocdata_link: "135" }
+     - { name: "135", src: "LABEL=135", state: "mounted", ocdata_link: "136" }
+     - { name: "136", src: "LABEL=136", state: "mounted", ocdata_link: "137" }
+
+volumes_nfs2:
+     - { name: "107", src: "LABEL=107", state: "mounted", ocdata_link: "108" }
+     - { name: "108", src: "LABEL=108", state: "mounted", ocdata_link: "109" }
+     - { name: "109", src: "LABEL=109", state: "mounted", ocdata_link: "110" }
+     - { name: "110", src: "LABEL=110", state: "mounted", ocdata_link: "111" }
+     - { name: "111", src: "LABEL=111", state: "mounted", ocdata_link: "112" }
+     - { name: "112", src: "LABEL=112", state: "mounted", ocdata_link: "113" }
+     - { name: "137", src: "LABEL=137", state: "mounted", ocdata_link: "138" }
+     - { name: "138", src: "LABEL=138", state: "mounted", ocdata_link: "139" }
+     - { name: "139", src: "LABEL=139", state: "mounted", ocdata_link: "140" }
+     - { name: "140", src: "LABEL=140", state: "mounted", ocdata_link: "141" }
+     - { name: "141", src: "LABEL=141", state: "mounted", ocdata_link: "142" }
+     - { name: "142", src: "LABEL=142", state: "mounted", ocdata_link: "." }
+
+volumes_nfs3:
+     - { name: "113", src: "LABEL=113", state: "mounted", ocdata_link: "114" }
+     - { name: "114", src: "LABEL=114", state: "mounted", ocdata_link: "115" }
+     - { name: "115", src: "LABEL=115", state: "mounted", ocdata_link: "116" }
+     - { name: "116", src: "LABEL=116", state: "mounted", ocdata_link: "117" }
+     - { name: "117", src: "LABEL=117", state: "mounted", ocdata_link: "118" }
+     - { name: "118", src: "LABEL=118", state: "mounted", ocdata_link: "119" }
+
+volumes_nfs4:
+     - { name: "119", src: "LABEL=119", state: "mounted", ocdata_link: "120" }
+     - { name: "120", src: "LABEL=120", state: "mounted", ocdata_link: "121" }
+     - { name: "121", src: "LABEL=121", state: "mounted", ocdata_link: "122" }
+     - { name: "122", src: "LABEL=122", state: "mounted", ocdata_link: "123" }
+     - { name: "123", src: "LABEL=123", state: "mounted", ocdata_link: "124" }
+     - { name: "124", src: "LABEL=124", state: "mounted", ocdata_link: "125" }
+
+volumes_nfs5:
+     - { name: "125", src: "LABEL=125", state: "mounted", ocdata_link: "126" }
+     - { name: "126", src: "LABEL=126", state: "mounted", ocdata_link: "127" }
+     - { name: "127", src: "LABEL=127", state: "mounted", ocdata_link: "128" }
+     - { name: "128", src: "LABEL=128", state: "mounted", ocdata_link: "129" }
+     - { name: "129", src: "LABEL=129", state: "mounted", ocdata_link: "130" }
+     - { name: "130", src: "LABEL=130", state: "mounted", ocdata_link: "." }
+
+ocdata_links: 
+   - { name: ".ocdata1", link: "data" }
+   - { name: ".ocdata2", link: "131" }
+
+nfs_volumes:
+  - ip: "{{nfs1_ip}}"
+    volumes: "{{volumes_nfs1}}"
+  - ip: "{{nfs2_ip}}"
+    volumes: "{{volumes_nfs2}}"
+  - ip: "{{nfs3_ip}}"
+    volumes: "{{volumes_nfs3}}"
+  - ip: "{{nfs4_ip}}"
+    volumes: "{{volumes_nfs4}}"
+  - ip: "{{nfs5_ip}}"
+    volumes: "{{volumes_nfs5}}"
+
+
+volumes_elk1:
+     - { name: "000", src: "LABEL=000", state: "mounted" }
+     - { name: "001", src: "LABEL=001", state: "mounted" }
+     - { name: "002", src: "LABEL=002", state: "mounted" }
+     - { name: "003", src: "LABEL=003", state: "mounted" }
+     - { name: "004", src: "LABEL=004", state: "mounted" }
+     - { name: "005", src: "LABEL=005", state: "mounted" }
+     - { name: "006", src: "LABEL=006", state: "mounted" }
+     - { name: "007", src: "LABEL=007", state: "mounted" }
+     - { name: "008", src: "LABEL=008", state: "mounted" }
+     - { name: "009", src: "LABEL=009", state: "mounted" }

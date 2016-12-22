@@ -1,0 +1,12 @@
+---
+
+
+- name: update pam config
+  lineinfile:
+    dest=/etc/pam.d/common-session
+    regexp="#*\s*session\s+optional\s+pam_systemd.so\s*"
+    line="#session\toptional\tpam_systemd.so"
+  tags:
+    - pamconfig
+    - config
+

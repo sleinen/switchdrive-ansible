@@ -1,0 +1,86 @@
+---
+
+
+##################
+# setup directories
+- name: create nagios directories
+  file: 
+    dest="/home/nagios/{{item}}"
+    state=directory
+    owner="nagios"
+    group="nagios"
+  with_items:
+    - "etc"
+    - "plugins-dynamic"
+    - "plugins-static"
+    - "check_mk/plugins"
+  tags: nagios
+
+
+##################
+# install configs
+
+- name: install nagios config file
+  template: 
+    src="mrpe/{{ node_type }}.j2"
+    dest="/home/nagios/etc/mrpe.cfg"
+    owner="nagios"
+    group="nagios"
+  tags: 
+    - nagios
+    - config
+    
+- name: install check log files config
+  copy: 
+    src="check_logfiles_config/{{ node_type }}.cfg"
+    dest="/home/nagios/etc/check_logfiles.cfg"
+    owner="nagios"
+    group="nagios"
+  tags: 
+    - nagios
+    - config
+
+##################
+# install scripts / plugins
+
+- name: install plugins-dynamic scripts
+  copy: 
+    src="check_mk/plugins/{{item}}"
+    dest="/home/nagios/check_mk/plugins/{{item}}"
+    mode="755"
+    owner="nagios"
+    group="nagios"
+  with_items: "{{check_mk_plugins}}"
+  tags: nagios
+
+- name: install plugins-dynamic scripts
+  copy: 
+    src="check_mk/{{item.name}}"
+    dest="/home/nagios/plugins-dynamic/{{item.name}}"
+    mode="{{item.mode}}"
+    owner="nagios"
+    group="nagios"
+  with_items:
+      - { name: "check_mk_agent.linux", mode: "700" }
+      - { name: "waitmax", mode: "755" }
+  tags: nagios
+
+
+- name: install plugins-static scripts
+  copy: 
+    src="plugins-static/{{item}}"
+    dest="/home/nagios/plugins-static/{{item}}"
+    mode="0755"
+    owner="nagios"
+    group="root"
+  with_items:
+      - check_connections_rate.sh
+      - check_haproxy.pl
+      - check_logfiles
+      - check_mountpoints.sh
+      - check_redis.pl
+      - ngowncloud
+      - ngpostgres
+  tags: nagios
+
+

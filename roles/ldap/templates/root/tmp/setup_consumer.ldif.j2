@@ -1,0 +1,12 @@
+dn: olcDatabase={1}hdb,cn=config
+changetype: modify
+add: olcSyncrepl
+olcSyncrepl: rid={{ inventory_hostname | regex_replace('.*\\.([^.]+)$', '\\1') }}
+  provider="ldap://{{hostvars[groups['ldap'][0]].inventory_hostname}}:389/"
+  tls_reqcert=never
+  type=refreshAndPersist
+  retry="60 30 300 +"
+  searchbase="dc=cloud,dc=switch,dc=ch"
+  bindmethod=simple
+  binddn="cn=admin,dc=cloud,dc=switch,dc=ch"
+  credentials={{ldap_password}}

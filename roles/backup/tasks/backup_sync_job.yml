@@ -1,0 +1,33 @@
+---
+
+- name: install authorized keys
+  copy:
+     src="authorized_keys/{{service_name}}_backup_root.pub"
+     dest="/root/.ssh/authorized_keys"
+  tags:
+    - backupconf
+    
+- name: install ssh key
+  copy:
+     content="{{ssh_private_key_backup_root[service_name]}}"
+     dest="/root/.ssh/id_rsa"
+  tags:
+    - backupconf
+  
+
+- name: install sync cron job script
+  template: src=drive_sync.sh.j2 dest=/root/drive_sync.sh mode=0500
+  tags:
+    - backupconf
+
+- name: install sync cron job
+  cron: cron_file=SWITCHdrive 
+    hour={{ item.hour }} minute={{ item.minute }} 
+    name="rsync data disk {{item.name}}" 
+    user=root 
+    job="/root/drive_sync.sh {{ item.name }}"
+    state={{item.state}}
+  with_items: rsync_volumes
+  tags:
+    - backupconf
+    - cron

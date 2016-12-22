@@ -1,0 +1,27 @@
+---
+
+- name: add packages
+  apt: 
+      name={{item}} 
+      state=present
+      update_cache={{apt_config.update_cache}}
+      cache_valid_time={{apt_config.cache_valid_time}}
+  with_items:
+    - libdbd-mysql
+    - libpython2.7
+  tags:
+    - collectd
+
+
+- name: add collectd_maxscale.conf
+  template:
+    src=collectd_maxscale.conf.j2
+    dest=/etc/collectd/collectd.conf.d/collectd_maxscale.conf
+  notify: 
+    - kill collectd
+    - restart collectd
+  when: ansible_hostname == "drive-web1"
+  tags:
+    - collectd
+    - config
+

@@ -1,0 +1,99 @@
+---
+
+registry_url: "{{docker_registry}}:5000"
+
+####################
+# logspout
+
+logspout_docker_name: "{{registry_url}}/logspout"
+logspout_docker_tag: "latest"
+logspout_docker_image: "{{logspout_docker_name}}:{{logspout_docker_tag}}"
+
+# port where local logspout interface is accessible
+logspout_http_port: 8080
+
+# where logspout routes it's logs to
+logstash_host: "elk.drive"
+logstash_logspout_port: 10100
+
+####################
+# ocphp_fpm
+
+php_config:
+  max_file_upload_size: 4G
+  max_execution_time: 3000
+  memory_limit: 512M
+php_ini_file: "php.ini"
+
+
+#owncloud_major_version: "9.1"
+#owncloud_version: "{{owncloud_major_version}}.1"
+owncloud_major_version: "9.0"
+owncloud_version: "{{owncloud_major_version}}.7"
+#owncloud_major_version: "8.2"
+#owncloud_version: "{{owncloud_major_version}}.8"
+owncloud_repo_base_url: "{{vault_owncloud_repo_base_url[owncloud_major_version]}}"
+owncloud_php_conf_dir:
+    "8.2": "/etc/php5"
+    "9.0": "/etc/php/7.0"
+    "9.1": "/etc/php/7.0"
+owncloud_pkgs:
+    "8.2": "php5-ldap php5-redis=2.2.4* php5-apcu php-xml-parser owncloud-server"
+    "9.0": "php-ldap php-redis php-apcu php-imagick php-bz2 php-xml-parser owncloud-enterprise"
+    "9.1": "php-ldap php-redis php-apcu php-imagick php-bz2 php-xml-parser owncloud-enterprise"
+owncloud_ubuntu_base_version:
+    "8.2": "14.04"
+    "9.0": "16.04"
+    "9.1": "16.04"
+owncloud_php_fpm:
+    "8.2": "/usr/sbin/php5-fpm"
+    "9.0": "/usr/sbin/php-fpm7.0"
+    "9.1": "/usr/sbin/php-fpm7.0"
+
+ocphp_fpm_docker_name: "{{registry_url}}/ocphp_fpm"
+ocphp_fpm_docker_tag: "{{owncloud_version}}"
+ocphp_fpm_docker_image: "{{ocphp_fpm_docker_name}}:{{ocphp_fpm_docker_tag}}"
+owncloud_webroot: "/var/webroot"
+
+####################
+# maxscale
+
+maxscale_docker_name: "{{registry_url}}/maxscale"
+maxscale_docker_tag: "latest"
+maxscale_docker_image: "{{maxscale_docker_name}}:{{maxscale_docker_tag}}"
+
+maxscale_port: 3306
+maxscale_socket: "/var/run/mysqld/mysqld.sock"
+
+####################
+# grafana
+
+grafana_version: 3.1.0
+grafana_docker_name: "{{registry_url}}/grafana"
+grafana_docker_tag: "latest"
+grafana_docker_image: "{{grafana_docker_name}}:{{grafana_docker_tag}}"
+
+grafana_data_dir: "/mnt/data/grafana"
+grafana_admin_passwd: "{{vault_grafana_admin_passwd}}"
+grafana_port: "80"
+grafana_host: "grafana.drive.switch.ch"
+
+
+####################
+# graphite
+graphite_data_dir: /mnt/data/graphite
+graphite_version: "0.9.15"
+graphite_docker_name: "{{registry_url}}/graphite"
+graphite_docker_tag: "{{graphite_version}}"
+graphite_docker_image: "{{graphite_docker_name}}:{{graphite_docker_tag}}"
+
+graphite_host: "grafana.{{site}}.cloud.switch.ch"
+graphite_port: "2003"
+
+####################
+# apache
+
+ocapache_docker_name: "{{registry_url}}/ocapache"
+ocapache_docker_tag: "latest"
+ocapache_docker_image: "{{ocapache_docker_name}}:{{ocapache_docker_tag}}"
+

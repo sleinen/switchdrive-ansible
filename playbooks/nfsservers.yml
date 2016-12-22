@@ -1,0 +1,36 @@
+---
+
+# the NSF servers
+
+- hosts: dev
+  tasks:
+    - name: talk to web servers to populate facts
+      command: /bin/true
+  tags:
+    - config
+  become: true
+
+- hosts: nfs
+  vars:
+        node_type: nfs
+  vars_files:
+    - ../vars/users.yml
+    - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+  roles:
+    - common
+    - nagios
+    - nfs-server
+    - scripts
+  post_tasks:
+    - name: create ocdata link
+      file: 
+        dest: "/mnt/data/{{ item.name }}"
+        src: "/mnt/{{ item.link }}/.ocdata"
+        state: link
+        force: yes
+      with_items: "{{ocdata_links}}"
+      delegate_to: "{{ hostvars[groups['nfs'][0]].inventory_hostname }}"
+      tags:
+        - ocdata
+  become: true
+

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+
+
+# generate deep file structure
+mkdir tree
+cd tree
+no_of_files=50;
+counter=1;
+level=0;
+while [[ $counter -le $no_of_files ]]; do
+	dd bs=1024 count=$((RANDOM/20)) if=/dev/urandom of=tree-file.$counter;
+	mkdir $counter
+	let "docd = $((RANDOM % 100 > 50))"
+	if (($RANDOM % 100 > 50)); then
+		if (($RANDOM % 100 > 70)); then
+			if (($level > 0)); then
+				cd ..
+				level=$((level-1));
+			fi
+		else
+			if (($level < 49)); then
+					cd $counter
+					level=$((level+1));
+			fi
+		fi
+	fi
+	let "counter += 1";
+done
+
+exit
+
+# generate flat file structure
+no_of_files=1000;
+counter=1;
+mkdir flat
+cd flat
+while [[ $counter -le $no_of_files ]]; do
+	dd bs=1024 count=$((RANDOM/20)) if=/dev/urandom of=flat-file.$counter;
+	let "counter += 1";
+done
+cd ..
+

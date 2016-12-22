@@ -1,0 +1,20 @@
+    <LoadPlugin python>
+        Globals true
+    </LoadPlugin>
+
+    <Plugin python>
+        ModulePath "/opt/collectd/collectd.plugins/"
+
+        Import "haproxy"
+
+        <Module haproxy>
+          #Socket "/var/lib/haproxy/stats"
+          ProxyMonitor "server"
+          ProxyMonitor "backend"
+          ProxyMonitor "ssl"
+          ProxyMonitor "unsecured"
+          ProxyMonitor "sync"
+          ProxyMonitor "owncloud"
+          ProxyMonitor "ldap"
+        </Module>
+    </Plugin>

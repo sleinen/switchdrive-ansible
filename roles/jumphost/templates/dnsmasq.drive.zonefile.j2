@@ -1,0 +1,22 @@
+address=/jumphost.{{ internal_domain }}/{{ jumphost_internal }}
+address=/jumpip.{{ internal_domain }}/{{ hostvars[groups['jumphost'][0]].inventory_hostname }}
+
+{% for group in groups %}
+{% if group != 'all' and group != 'production' and group != 'jumphost' and group != 'engines' %}
+{% for host in groups[group] %}
+{% if host != 'localhost' %}
+{% if loop.index == 1 %}
+address=/{{group}}.{{ internal_domain }}/{{ hostvars[host].inventory_hostname }}
+{% endif %}
+#address=/{{group}}{{loop.index}}.{{ internal_domain }}/{{ hostvars[host].inventory_hostname }}
+address=/{{ hostvars[host].ansible_hostname | regex_replace('^(drive|sldrive|szdrive|zdrive|ldrive|tzdrive|tldrive)-(.*)$', '\\2') }}.{{ internal_domain }}/{{ hostvars[host].inventory_hostname }}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+address=/drive-stage.switch.ch/{{ hostvars[groups['lb'][0]].inventory_hostname }}
+
+{% for host in groups['registry'] %}
+address=/{{docker_registry}}/{{ hostvars[host].inventory_hostname }}
+{% endfor %}

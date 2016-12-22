@@ -1,0 +1,9 @@
+---
+# handles the webservers
+
+- hosts: lb[0]
+  roles:
+    - docker
+    - letsencrypt
+  become: true
+

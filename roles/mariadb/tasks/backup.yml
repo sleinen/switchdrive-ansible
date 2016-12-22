@@ -1,0 +1,54 @@
+---
+
+
+- name: daily backup cronjob
+  cron: 
+     name="backup-{{item.hour}}-{{item.minute}}" 
+     hour={{item.hour}} minute={{item.minute}}
+     user=root 
+     job="/root/backupMariadb > /var/log/backupMariadb.log 2>&1"
+     cron_file=mariadb-backup
+     state={{item.state}}
+  tags:
+    - config
+    - cron
+  run_once: true
+  delegate_to: "{{ hostvars[groups['mariadb'][0]].inventory_hostname }}"
+  with_items:
+    - { hour: 0, minute: 0, state: present}
+
+
+- name: daily backup  of backup to db2 cronjob
+  cron: 
+     name="backup-to-db2-{{item.hour}}-{{item.minute}}" 
+     hour={{item.hour}} minute={{item.minute}}
+     user=root 
+     job="/bin/tar -cf - -C /mnt/data/backup `find . -maxdepth 1 -name "??*" -mtime 0` | ssh {{ hostvars[groups['mariadb'][1]].inventory_hostname }} tar -xf - -C /mnt/data/backup >> /var/log/backupMariadb.log 2>&1"
+     cron_file=mariadb-backup
+     state={{item.state}}
+  tags:
+    - config
+    - cron
+  run_once: true
+  delegate_to: "{{ hostvars[groups['mariadb'][0]].inventory_hostname }}"
+  with_items:
+    - { hour: 1, minute: 0, state: present}
+  when: not stage_or_test_system
+
+- name: clenaup backups
+  cron: 
+     name="backup-to-db2-{{item.hour}}-{{item.minute}}" 
+     hour={{item.hour}} minute={{item.minute}}
+     user=root 
+     job="/root/cleanUpBackupMariadb >> /var/log/backupMariadb.log 2>&1"
+     cron_file=mariadb-backup
+     state={{item.state}}
+  tags:
+    - config
+    - cron
+  run_once: true
+  delegate_to: "{{ hostvars[groups['mariadb'][1]].inventory_hostname }}"
+  with_items:
+    - { hour: 0, minute: 0, state: present}
+  when: not stage_or_test_system
+

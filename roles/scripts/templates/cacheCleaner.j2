@@ -1,0 +1,29 @@
+#!/bin/bash
+
+disks=( data {101..124} )
+declare -A disk_server_map
+eval `echo declare -A disk_server_map=\( [data]=nfs1 [{101..106}]=nfs1 [{107..112}]=nfs2 [{113..118}]=nfs3 [{119..124}]=nfs4 \)`
+export disk_server_map
+
+function scanDir() {
+	# params: server disk dir
+	scan_path=`echo -n $3| sed -e "s&/mnt/$2/&&"`
+	do_scan=`ssh -n $1 sudo find $3 -mindepth 1 -mtime +7 -exec rm \'{}\' "';'" -print | wc -l`
+		if [ $do_scan -ne 0 ]; then
+		echo "$scan_path $do_scan" | tee -a /tmp/cacheCleaner.log;
+		sudo /root/occ files:scan -p $scan_path >> /tmp/cacheCleaner.scan.log
+	fi	
+}
+
+export -f scanDir
+
+for disk in ${disks[@]}; do
+	server=${disk_server_map[$disk]}
+	echo "****************************************************" | tee -a /tmp/cacheCleaner.log
+	echo $server:$disk | tee -a /tmp/cacheCleaner.log
+	sudo find /mnt/$disk/ -mindepth 2 -maxdepth 2 -name cache | \
+		while read -r line; do scanDir ${disk_server_map[$disk]} $disk $line; done 
+done
+
+
+	

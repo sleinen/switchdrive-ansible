@@ -1,0 +1,39 @@
+---
+
+- name: copy graphite build instructions to remote host
+  synchronize:
+    src: graphite
+    dest: /tmp
+    delete: yes
+  tags:
+    - graphite
+
+#- name: pull base image
+#  docker_image: 
+#    name: "ubuntu:16.04"
+#    force: true
+#    state: present
+#  tags:
+#    - graphite
+
+
+- name: build graphite
+  docker_image: 
+    path: "/tmp/graphite" 
+    name: "{{graphite_docker_name}}"
+    tag: "{{graphite_docker_tag}}"
+    dockerfile: "Dockerfile"
+    state: present
+    tls_hostname: localhost
+    force: yes
+  tags:
+    - graphite
+
+- name: push image
+  shell: docker push "{{graphite_docker_image}}"
+  tags:
+    - graphite
+
+
+
+

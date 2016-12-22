@@ -1,0 +1,57 @@
+
+#make db4 new master
+
+SITE=drive
+
+# shutdown all pgbouncers
+ansible-playbook -i inventories/$SITE jobs/pgbouncer_stop.yml
+
+# restart master db
+ssh db5.$SITE sudo service postgresql restart
+
+#check replication lag vor new master: should be 0
+
+# stop old master:
+ssh db5.$SITE sudo service postgresql stop
+
+# edit inventory/$SITE
+   fix host-lists for: 
+     -> [db] & [dbslave]
+
+[db]
+10.0.23.34 ansible_ssh_user=ubuntu
+
+[dbslave]
+10.0.23.36 ansible_ssh_user=ubuntu
+
+
+   fix following values:
+     -> db_ip=10.0.23.34
+
+#restart redis server
+
+# promote slave to master
+ssh db4.$SITE sudo touch /mnt/dbdata/9.4/main/ImTheMaster
+ansible-playbook -i inventories/$SITE playbooks/dbservers.yml
+ssh db4.$SITE sudo rm /mnt/dbdata/9.4/main/recovery.conf
+ssh db4.$SITE sudo service postgresql restart
+
+
+# change pgbouncer config
+ansible-playbook -i inventories/$SITE playbooks/webservers.yml  --tag=pgconfig
+ansible-playbook -i inventories/$SITE playbooks/syncservers.yml  --tag=pgconfig
+ansible-playbook -i inventories/$SITE playbooks/devservers.yml  --tag=pgconfig
+ansible-playbook -i inventories/$SITE playbooks/mgmtservers.yml  --tag=pgconfig
+
+# start all pgbouncers again.
+ansible-playbook -i inventories/$SITE jobs/pgbouncer_start.yml
+
+# fix / reset slaves
+ssh db4.$SITE sudo rm /mnt/dbdata/9.4/main/ImTheMaster
+ssh db6.$SITE sudo service postgresql stop
+ssh db6.$SITE sudo rm -rf /mnt/dbdata/9.4/main
+ansible-playbook -i inventories/$SITE playbooks/dbslaveservers.yml
+
+
+
+

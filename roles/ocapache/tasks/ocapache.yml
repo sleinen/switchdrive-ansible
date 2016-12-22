@@ -1,0 +1,60 @@
+---
+
+- name: disable locally installed apache
+  service: name=apache2 state=stopped enabled=false
+  ignore_errors: yes
+  tags:
+    - ocapache
+
+- name: Create dirs
+  file: path="{{item}}" state=directory group=root owner=root
+  with_items:
+    - "/etc/apache2/sites-enabled"
+  tags:
+    - ocapache
+
+
+- name: drop apache site configurations
+  template: 
+    src: "{{ service_name }}.conf.j2"
+    dest: "/etc/apache2/sites-enabled/{{item.shard_name}}.conf"
+  notify: restart ocapache
+  with_items:
+    - "{{shard_config[service_name]}}"
+  tags:
+    - ocapache
+
+- name: drop apache root site configurations
+  template: 
+    src: "root.conf.j2"
+    dest: "/etc/apache2/sites-enabled/00_root.conf"
+  notify: restart ocapache
+  tags:
+    - ocapache
+    
+- name: drop apache configuration
+  template: src=apache2.conf dest=/etc/apache2/apache2.conf
+  notify: restart ocapache
+  tags:
+    - ocapache
+
+
+- name: apache docker 
+  docker:
+    name: ocapache
+    image: "{{ocapache_docker_image}}"
+    restart_policy: always
+    state: reloaded
+    pull: always
+    net: host
+    volumes:
+      - "{{owncloud_webroot}}:{{owncloud_webroot}}"
+      - "/etc/apache2/sites-enabled:/etc/apache2/sites-enabled"
+      - "/etc/apache2/apache2.conf:/etc/apache2/apache2.conf"
+      - "/var/log/apache2:/var/log/apache2"
+      - "/var/run/php:/var/run/php"
+  tags:
+    - ocapache
+
+
+

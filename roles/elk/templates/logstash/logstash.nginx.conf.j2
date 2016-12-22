@@ -1,0 +1,58 @@
+filter {
+  if [type] == "nginx-access" {
+    grok {
+      match => { "message" => "%{NGLOGSTASH}|%{NGCOMBINED}" }
+      #remove_field => ["message"]
+    }
+    date {
+        match => ["epoch", "UNIX"]
+        remove_field => ["epoch"]
+    }
+    mutate {
+        convert => {
+            "timestamp" => "string"
+            "response" => "integer"
+            "bytes" => "integer"
+        }
+    }
+    geoip {
+      source => "clientip"
+      target => "geoip"
+      database => "/etc/logstash/GeoLiteCity.dat"
+    }
+    if [host] =~ /.*sync.*/ {
+        grok {
+            match => { "agent" => "%{OCUSERAGENT}" }
+        }
+    } else {
+        useragent {
+            source => "agent"
+        }
+        if [os_name] == "Other" {
+            grok {
+                match => { "agent" => "%{OCUSERAGENTWEB}|-" }
+                overwrite => ["name"]
+            }
+        }
+    }
+    metrics {
+      meter => [ "logstash.%{host}.metric.nginx.access", "logstash.total.metric.nginx.access"]
+      add_tag => "metric"
+      flush_interval => 10
+      rates => []
+    }
+  }
+  if [type] == "nginx-error" {
+    metrics {
+      meter => [ "logstash.%{host}.metric.nginx.error", "logstash.total.metric.nginx.error" ]
+      add_tag => "metric"
+      flush_interval => 10
+      rates => []
+    }
+  }
+  if [type] == "nginx-access" or [type] == "nginx-error" {
+    mutate {
+        rename => { "host" => "logsource" }
+    }
+  }
+}

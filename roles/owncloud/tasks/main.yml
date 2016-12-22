@@ -1,0 +1,31 @@
+---
+
+# setup NFS
+
+- include: nfs_client.yml
+
+# web server
+
+- name: disable locally installed apache
+  service: name=apache2 state=stopped enabled=false
+  ignore_errors: yes
+  tags:
+    - apache
+    
+- include: root_site.yml
+
+# iptables
+#- name: restart iptables-persistent
+#  service: name=iptables-persistent state=restarted
+
+# misc
+#- include: email.yml
+#- include: install_ssh-keys.yml
+
+- include: logstash.yml
+
+- include: ocdata.yml
+
+- include: cron.yml
+
+

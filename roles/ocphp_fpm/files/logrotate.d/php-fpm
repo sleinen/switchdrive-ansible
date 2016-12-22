@@ -1,0 +1,12 @@
+/var/log/php/php*-fpm.*.log {
+        rotate 12
+        weekly
+        missingok
+        notifempty
+        compress
+        delaycompress
+        copytruncate
+        postrotate
+                docker exec -ti ocphp_fpm /usr/lib/php/php7.0-fpm-reopenlogs
+        endscript
+}

@@ -1,0 +1,53 @@
+---
+
+- name: Install required packages
+  apt: name={{item}} 
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  with_items:
+    - nfs-common
+  tags:
+    - infrastructure
+ 
+
+
+- name: deny rpcbind
+  lineinfile: "dest=/etc/hosts.deny line='rpcbind : ALL'"
+  tags:
+    - infrastructure
+    - config
+
+- name: allow nfs server
+  lineinfile: "dest=/etc/hosts.allow line='rpcbind : {{ ldap_ip }}'"
+  tags:
+    - infrastructure
+    - config
+
+# set mode to 770, otherwise oC will chmod the complete data directory to 770
+# this will kill the NFS server
+- name: create mountpoint
+  file: dest=/mnt/{{ item.1.name }} state=directory owner=www-data group=www-data mode=770
+  with_subelements: 
+    - "{{nfs_volumes}}"
+    - volumes
+  tags:
+    - infrastructure
+    - quobyte
+    - mount
+
+
+
+- name: mount nfs directory
+  action: mount name=/mnt/{{ item.1.name }} src={{ item.0.ip }}:/mnt/{{ item.1.name }} fstype=nfs opts=rw,noatime,async,rsize=1048576,wsize=1048576 state="{{ item.1.state }}"
+  with_subelements: 
+    - "{{nfs_volumes}}"
+    - volumes
+  tags:
+    - infrastructure
+    - mount
+
+- name: collectd nfsv4 plugin
+  copy: src=collectd/collectd_nfsv4.conf dest=/etc/collectd/collectd.conf.d/nfsv4.conf
+  notify: restart collectd
+  tags:
+    - collectd
+

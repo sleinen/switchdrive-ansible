@@ -1,0 +1,10 @@
+# add password to cn=config -> allow for access via Apache Directory Studio
+dn: olcDatabase={0}config,cn=config
+changetype: modify
+replace: olcRootPW
+olcRootPW: {{ldap_cn_config_password}}
+
+dn: olcDatabase={0}config,cn=config
+changetype: modify
+replace: olcRootDN
+olcRootDN: cn=Manager,cn=config

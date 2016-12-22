@@ -1,0 +1,179 @@
+SQL statements used when fixing oc_share
+===============================================
+
+After some nfs mount didn't work, oc deleted may entries in oc_filecache. A cleanup process also removed the corresponding entries in oc_share.
+After a full user scan. The entries were back in oc_filecache, but with different fileids of course.
+
+We loaded the a backup of the db before the incident on db1.sldrive. The active new db was db4.drive.
+
+
+We created a table in db4:
+
+db4: 
+CREATE TABLE oc_share_diff (
+    id integer NOT NULL,
+    share_type smallint DEFAULT (0)::smallint NOT NULL,
+    share_with character varying(255) DEFAULT NULL::character varying,
+    uid_owner character varying(64) DEFAULT ''::character varying NOT NULL,
+    parent integer,
+    item_type character varying(64) DEFAULT ''::character varying NOT NULL,
+    item_source character varying(255) DEFAULT NULL::character varying,
+    item_target character varying(255) DEFAULT NULL::character varying,
+    file_source integer,
+    file_target character varying(512) DEFAULT NULL::character varying,
+    permissions smallint DEFAULT (0)::smallint NOT NULL,
+    stime bigint DEFAULT (0)::bigint NOT NULL,
+    accepted smallint DEFAULT (0)::smallint NOT NULL,
+    expiration timestamp(0) without time zone DEFAULT NULL::timestamp without time zone,
+    token character varying(32) DEFAULT NULL::character varying,
+    mail_send smallint DEFAULT (0)::smallint NOT NULL,
+    storage integer,
+    path character varying(4000),
+    path2 character varying(4000)
+);
+
+
+===========================
+
+We created two new tables on db1: (they are identical to oc_share)
+
+db1: 
+CREATE TABLE oc_share2 (
+    id integer NOT NULL,
+    share_type smallint DEFAULT (0)::smallint NOT NULL,
+    share_with character varying(255) DEFAULT NULL::character varying,
+    uid_owner character varying(64) DEFAULT ''::character varying NOT NULL,
+    parent integer,
+    item_type character varying(64) DEFAULT ''::character varying NOT NULL,
+    item_source character varying(255) DEFAULT NULL::character varying,
+    item_target character varying(255) DEFAULT NULL::character varying,
+    file_source integer,
+    file_target character varying(512) DEFAULT NULL::character varying,
+    permissions smallint DEFAULT (0)::smallint NOT NULL,
+    stime bigint DEFAULT (0)::bigint NOT NULL,
+    accepted smallint DEFAULT (0)::smallint NOT NULL,
+    expiration timestamp(0) without time zone DEFAULT NULL::timestamp without time zone,
+    token character varying(32) DEFAULT NULL::character varying,
+    mail_send smallint DEFAULT (0)::smallint NOT NULL,
+);
+
+db1:
+CREATE TABLE oc_share3 (
+    id integer NOT NULL,
+    share_type smallint DEFAULT (0)::smallint NOT NULL,
+    share_with character varying(255) DEFAULT NULL::character varying,
+    uid_owner character varying(64) DEFAULT ''::character varying NOT NULL,
+    parent integer,
+    item_type character varying(64) DEFAULT ''::character varying NOT NULL,
+    item_source character varying(255) DEFAULT NULL::character varying,
+    item_target character varying(255) DEFAULT NULL::character varying,
+    file_source integer,
+    file_target character varying(512) DEFAULT NULL::character varying,
+    permissions smallint DEFAULT (0)::smallint NOT NULL,
+    stime bigint DEFAULT (0)::bigint NOT NULL,
+    accepted smallint DEFAULT (0)::smallint NOT NULL,
+    expiration timestamp(0) without time zone DEFAULT NULL::timestamp without time zone,
+    token character varying(32) DEFAULT NULL::character varying,
+    mail_send smallint DEFAULT (0)::smallint NOT NULL,
+);
+
+
+we copied the current oc_share table of db4 to oc_share3 (using COPY command)
+
+db4: COPY oc_share TO '/tmp/oc_share_current.csv' DELIMITER ';' CSV HEADER;
+# scp file
+db1: 
+COPY oc_share3 FROM '/home/ubuntu/oc_share_current.csv' DELIMITER ';' CSV HEADER;
+
+we copied a cleaned up version of db1:oc_share to oc_share2 (manually deleted shares removed by users during the time of db backup and the incident)
+
+
+# now delete all entries that were not removed during incident:
+
+db1: 
+delete from oc_share2 USING oc_share3 where oc_share2.id == oc_share3.id;
+
+# save copy of oc_share2 for future reference:
+
+COPY oc_share2 TO '/tmp/oc_share_diff.csv' DELIMITER ';' CSV HEADER;
+
+
+# delete shares where item_source, item_target and file_source are not identical.
+delete from oc_share_diff where CAST (item_source as integer) <> file_source;
+delete from oc_share_diff where item_target <> ('/' || item_source);
+
+
+export data to file:
+db1:
+copy (select oc_share2.*, fc1.storage, fc1.path, '' as path2 from oc_share2 inner join oc_filecache as fc1 on fc1.fileid = cast (oc_share2.item_source as integer) ) TO '/tmp/test1.csv' DELIMITER ';' CSV HEADER;
+
+copy file over to db4
+
+db4:
+COPY oc_share_diff FROM '/home/ubuntu/test1.csv' DELIMITER ';' CSV HEADER;
+
+insert data into oc_share with new fileid mapping:
+
+
+db4:
+insert into oc_share (select id, share_type, share_with, uid_owner, oc_share_diff.parent, item_type, cast(fileid as character varying(255)) as item_source, '/'|| cast(fileid as character varying(255)) as item_target, fileid as file_source, file_target, oc_share_diff.permissions, stime, accepted, expiration, token, mail_send from oc_share_diff inner join oc_filecache on oc_filecache.path = oc_share_diff.path and oc_filecache.storage = oc_share_diff.storage) ;
+
+
+===========================
+# now repeat for shares where: item_target <> ('/' || item_source)
+
+COPY oc_share2 FROM '/tmp/oc_share_diff.csv' DELIMITER ';' CSV HEADER;
+delete from oc_share2 where item_target = ('/' || item_source);
+
+copy (select oc_share2.*, fc1.storage, fc1.path, fc2.path as path2 from oc_share2 inner join oc_filecache as fc1 on fc1.fileid = cast (oc_share2.item_source as integer) inner join oc_filecache as fc2 on fc2.fileid = cast(substring(item_target from 2) as integer)) TO '/tmp/test41.csv' DELIMITER ';' CSV HEADER;
+
+select oc_share2.*, fc1.storage, fc1.path, fc2.path as path2 from oc_share2 inner join oc_filecache as fc1 on fc1.fileid = cast (oc_share2.item_source as integer) inner join oc_filecache as fc2 on fc2.fileid = cast(substring(item_target from 2) as integer)
+
+
+
+select id, share_type, share_with, uid_owner, oc_share_diff.parent, item_type, cast(fc1.fileid as character varying(255)) as item_source, 
+'/'|| cast(fc2.fileid as character varying(255)) as item_target, fc1.fileid as file_source, file_target, oc_share_diff.permissions, stime, accepted, expiration, token, mail_send 
+from oc_share_diff inner join oc_filecache as fc1 on fc1.path = oc_share_diff.path and fc1.storage = oc_share_diff.storage 
+inner join oc_filecache as fc2 on fc2.path = oc_share_diff.path2 and fc2.storage = oc_share_diff.storage
+;
+
+insert into oc_share (
+select id, share_type, share_with, uid_owner, oc_share_diff.parent, item_type, cast(fc1.fileid as character varying(255)) as item_source, 
+'/'|| cast(fc2.fileid as character varying(255)) as item_target, fc1.fileid as file_source, file_target, oc_share_diff.permissions, stime, accepted, expiration, token, mail_send 
+from oc_share_diff inner join oc_filecache as fc1 on fc1.path = oc_share_diff.path and fc1.storage = oc_share_diff.storage 
+inner join oc_filecache as fc2 on fc2.path = oc_share_diff.path2 and fc2.storage = oc_share_diff.storage
+) ;
+
+
+
+===========================
+# now repeat for shares where: CAST (item_source as integer) <> file_source
+
+COPY oc_share2 FROM '/tmp/oc_share_diff.csv' DELIMITER ';' CSV HEADER;
+delete from oc_share2 where CAST (item_source as integer) = file_source;
+
+copy (
+select oc_share2.*, fc1.storage, fc1.path, fc2.path as path2 from oc_share2 inner join oc_filecache as fc1 on fc1.fileid = cast (oc_share2.item_source as integer) inner join oc_filecache as fc2 on fc2.fileid = file_source
+) TO '/tmp/test14.csv' DELIMITER ';' CSV HEADER;
+
+select oc_share2.*, fc1.storage, fc1.path, fc2.path as path2 from oc_share2 inner join oc_filecache as fc1 on fc1.fileid = cast (oc_share2.item_source as integer) inner join oc_filecache as fc2 on fc2.fileid = file_source;
+
+COPY oc_share TO '/tmp/oc_share_after_second_fix.csv' DELIMITER ';' CSV HEADER;
+COPY oc_share_diff FROM '/home/ubuntu/test14.csv' DELIMITER ';' CSV HEADER;
+
+
+select id, share_type, share_with, uid_owner, oc_share_diff.parent, item_type, cast(fc1.fileid as character varying(255)) as item_source, 
+'/'|| cast(fc1.fileid as character varying(255)) as item_target, fc2.fileid as file_source, file_target, oc_share_diff.permissions, stime, accepted, expiration, token, mail_send 
+from oc_share_diff inner join oc_filecache as fc1 on fc1.path = oc_share_diff.path and fc1.storage = oc_share_diff.storage 
+inner join oc_filecache as fc2 on fc2.path = oc_share_diff.path2 and fc2.storage = oc_share_diff.storage
+;
+
+
+insert into oc_share (
+select id, share_type, share_with, uid_owner, oc_share_diff.parent, item_type, cast(fc1.fileid as character varying(255)) as item_source, 
+'/'|| cast(fc1.fileid as character varying(255)) as item_target, fc2.fileid as file_source, file_target, oc_share_diff.permissions, stime, accepted, expiration, token, mail_send 
+from oc_share_diff inner join oc_filecache as fc1 on fc1.path = oc_share_diff.path and fc1.storage = oc_share_diff.storage 
+inner join oc_filecache as fc2 on fc2.path = oc_share_diff.path2 and fc2.storage = oc_share_diff.storage
+) ;
+
+COPY oc_share TO '/tmp/oc_share_after_third_fix.csv' DELIMITER ';' CSV HEADER;

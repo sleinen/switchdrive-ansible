@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+USER=owncloud
+HOST=`hostname | sed -e 's&.*-&&'`
+
+
+
+docker run --rm -ti --net=host mariadb bash -c "echo \"$@\" | mysql -u$USER -p'{{mariadb_passwd}}' -h $HOST.drive --default-character-set=utf8 owncloud"
+

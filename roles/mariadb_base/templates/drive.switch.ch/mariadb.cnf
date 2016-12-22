@@ -1,0 +1,144 @@
+# MariaDB-specific config file.
+# Read by /etc/mysql/my.cnf
+# https://mariadb.com/kb/en/mariadb/server-system-variables/
+
+# --- default config ---
+
+[client]
+#Default is Latin1, if you need UTF-8 set this (also in server section)
+#default-character-set = utf8
+
+[mysqld]
+#
+# * Character sets
+#
+# Default is Latin1, if you need UTF-8 set all this (also in client section)
+#
+#character-set-server  = utf8
+#collation-server      = utf8_general_ci
+#
+
+# --- owncloud stuff ---
+
+## owncloud uses collation utf8_bin, It is set on table level -> no need
+## to change default;  collection=utf8_bin will also set character set to utf8
+#collation-server = utf8_bin
+#init-connect='SET NAMES utf8'
+
+# --- required by galera ---
+
+default_storage_engine=InnoDB
+innodb_autoinc_lock_mode=2
+innodb_flush_log_at_trx_commit=0
+binlog_format=ROW
+
+# query cache is ok in a Galera context for mariadb > 10.1.2
+# nextcloud developers recomment activating the cache (not sure they know what they are doing)
+#query_cache_type=1
+#query_cache_size=1024M
+#query_cache_limit=2M
+# I tried turning it on -> it was a desaster :-(
+
+# http://aadant.com/blog/wp-content/uploads/2013/09/50-Tips-for-Boosting-MySQL-Performance-CON2655.pdf recommends turning it off
+query_cache_type=0
+query_cache_size=0
+
+
+# --- wsrep ---
+
+wsrep_on={{mariadb_wsrep_on}}
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+wsrep_provider_options="gcache.size=1024M"
+wsrep_cluster_name={{galera_cluster_name}}
+wsrep_cluster_address={{ mariadb_wsrep_cluster_address }}
+wsrep_node_address={{ ansible_default_ipv4.address }}
+wsrep_sst_method=rsync
+wsrep_certify_nonPK=1
+wsrep_max_ws_rows=131072
+wsrep_max_ws_size=1073741824
+wsrep_retry_autocommit=1
+wsrep_auto_increment_control=ON
+## twice the number of CPU;  Note however that, if consistency problems frequently occur, setting the value to 1 will probably fix the problem
+wsrep_slave_threads=90
+
+## Critical reads:
+wsrep_sync_wait=1
+
+# --- debug / log ---
+#wsrep_debug = 1
+wsrep_log_conflicts=ON
+
+
+# --- innodb --- (https://mariadb.com/kb/en/mariadb/xtradbinnodb-server-system-variables/)
+innodb_file_per_table=1
+# ON: When an IST occurs, want there to be no torn pages? (With FusionIO or other drives that guarantee atomicity, OFF is better.)
+innodb_doublewrite=ON
+
+# optimization for SSDs (default is 512)
+innodb_log_block_size=4096
+
+# 60-80 % of RAM (in bytes)
+innodb_buffer_pool_size=170G
+# innodb_buffer_pool_size / 1GB or less
+innodb_buffer_pool_instances=64
+# default: 200
+innodb_io_capacity=1000
+# (default: 4
+innodb_read_io_threads=64
+# default: 4
+innodb_write_io_threads=64
+# default: 1
+innodb_purge_threads=32
+
+# increase concurrency: (default =1)
+innodb_sync_array_size=8
+# limit number of threads. (2x CPU + num disks)
+innodb_thread_concurrency=92
+
+# https://www.percona.com/blog/2016/05/31/what-is-a-big-innodb_log_file_size/
+innodb_log_file_size=500MB
+
+# --- threading ---
+thread_handling=pool-of-threads
+thread_pool_max_threads=10000
+thread_pool_size=44
+# cache no longer used with pool-of-threads
+#thread_cache_size=1024
+
+
+# --- misc ---
+# 
+max_connections=4000
+max_connect_errors=10000
+
+tmp_table_size=32M
+max_heap_table_size=32M
+# https://mariadb.com/kb/en/mariadb/optimizing-table_open_cache/
+table_open_cache=2000
+
+# http://dimitrik.free.fr/blog/archives/2012/07/mysql-performance-readonly-adventure-in-mysql-56.html
+innodb_spin_wait_delay=94
+
+# don't check dns
+skip-name-resolve
+
+# default is 1000. SSD might be 5000
+#innodb_io_capacity
+
+# --- logging ---
+#log_syslog=1
+#server_audit_output_type=SYSLOG
+
+slow-query-log = 1
+slow-query-log-file = /var/lib/mysql/mysql-slow.log
+log-slow-verbosity=query_plan,explain
+# seconds
+long_query_time = 1.000000
+
+
+# --- percona grafana plugin ---
+# comment out the following lines when creating new db.
+{{mariadb_disable_plugins}}performance_schema=on
+{{mariadb_disable_plugins}}userstat=1
+{{mariadb_disable_plugins}}query_response_time_stats=1
+

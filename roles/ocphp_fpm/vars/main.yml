@@ -1,0 +1,9 @@
+---
+
+owncloud_logfile_name: "owncloud.{{OWNCLOUD_VERSION}}.log"
+owncloud_logdir: "/run/shm/"
+owncloud_logfile: "{{owncloud_logdir}}/{{owncloud_logfile_name}}"
+
+license_key: "{{vault_license_key}}"
+oc_config_secret: "{{vault_oc_config_secret[site]}}"
+

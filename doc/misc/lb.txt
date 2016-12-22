@@ -1,0 +1,4 @@
+set weight on load balancer:
+
+sudo socat /var/lib/haproxy/stats - <<< "set weight sync/drive-sync1 4"
+sudo socat /var/lib/haproxy/stats - <<< "get weight sync/drive-sync1"

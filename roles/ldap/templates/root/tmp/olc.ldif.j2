@@ -1,0 +1,14 @@
+dn: olcDatabase={1}hdb,cn=config
+changetype: modify
+delete: olcDbConfig
+-
+add: olcDbConfig
+olcDbConfig: set_cachesize 0 20971520 0
+olcDbConfig: set_lk_max_objects 15000
+olcDbConfig: set_lk_max_locks 15000
+olcDbConfig: set_lk_max_lockers 15000
+olcDbConfig: set_lg_bsize 20975120
+olcDbConfig: set_flags DB_LOG_AUTOREMOVE
+-
+add: olcDbCachesize
+olcDbCachesize: 49999

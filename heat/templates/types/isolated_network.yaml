@@ -1,0 +1,98 @@
+heat_template_version: 2013-05-23
+
+description: |
+  This template creates a private network needed for openstack
+
+##################
+parameters:
+  name_prefix:
+    type: string
+    description: "Resources Name Prefix"
+  name:
+    type: string
+    description: "Network Name"
+  cidr_ipv4:
+    type: string
+    description: "Network CIDR"
+  cidr_ipv6:
+    type: string
+    description: "Network CIDR"
+  dns_nameservers_ipv4:
+    type: comma_delimited_list
+    default: []
+    description: "Nameservers to be advertised by DHCP"
+  dns_nameservers_ipv6:
+    type: comma_delimited_list
+    default: []
+    description: "Nameservers to be advertised by DHCP"
+  gateway_ip_ipv4:
+    type: string
+    default: ""
+    description: "Nameservers to be advertised by DHCP"
+  gateway_ip_ipv6:
+    type: string
+    default: ""
+    description: "Nameservers to be advertised by DHCP"
+  enable_dhcp_ipv4:
+    type: string
+    default: false
+    description: "Enable DHCP on Netork?"
+  enable_dhcp_ipv6:
+    type: string
+    default: false
+    description: "Enable DHCP on Netork?"
+
+##################
+resources:
+
+  priv_network:
+    type: OS::Neutron::Net
+    properties:
+      name: 
+        str_replace:
+          template: "name_prefix-name"
+          params: 
+            name_prefix: { get_param: name_prefix }
+            name: { get_param: name }
+  priv_subnet_ipv4:
+    type: OS::Neutron::Subnet
+    properties:
+      name: 
+        str_replace:
+          template: "name_prefix-name_subnet_ipv4"
+          params: 
+            name_prefix: { get_param: name_prefix }
+            name: { get_param: name }
+      cidr: { get_param: cidr_ipv4 }
+      dns_nameservers: { get_param: dns_nameservers_ipv4 }
+      enable_dhcp: { get_param: enable_dhcp_ipv4 }
+      gateway_ip: { get_param: gateway_ip_ipv4 }
+      network_id: { get_resource: priv_network }
+  priv_subnet_ipv6:
+    type: OS::Neutron::Subnet
+    properties:
+      name: 
+        str_replace:
+          template: "name_prefix-name_subnet_ipv6"
+          params: 
+            name_prefix: { get_param: name_prefix }
+            name: { get_param: name }
+      cidr: { get_param: cidr_ipv6 }
+      dns_nameservers: { get_param: dns_nameservers_ipv6 }
+      enable_dhcp: { get_param: enable_dhcp_ipv6 }
+      gateway_ip: { get_param: gateway_ip_ipv6 }
+      network_id: { get_resource: priv_network }
+      ip_version: 6
+      
+##################
+outputs:
+  network_id:
+    description: new private network
+    value: { get_resource: priv_network}
+  subnet_id_ipv4:
+    description: new private subnet
+    value: { get_resource: priv_subnet_ipv4}
+  subnet_id_ipv6:
+    description: new private subnet
+    value: { get_resource: priv_subnet_ipv6}
+

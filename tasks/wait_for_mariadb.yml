@@ -1,0 +1,27 @@
+---
+
+- name: Check if first time boot
+  stat: 
+    path: "{{mariadb_mount_point}}/installed"
+  register: db_installed
+  tags: 
+    - mariadb
+    - create_mariadb_marker_file
+
+- name: install marker file
+  file: path="{{mariadb_mount_point}}/installed" state=touch
+  when: not db_installed.stat.pw_name is defined
+  tags: 
+    - mariadb
+    - create_mariadb_marker_file
+
+- name: waiting for mariadb to be back up
+  wait_for:
+    host={{ inventory_hostname }}
+    state=started
+    port=3306
+    delay=15
+    timeout=3600
+  delegate_to: "{{ hostvars[groups['jumphost'][0]].inventory_hostname }}"
+  become: false
+  tags: mariadb

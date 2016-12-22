@@ -1,0 +1,31 @@
+##
+# L_check_procs_postgres checks that there is at least 1 process of postgres.
+##
+L_check_procs_postgres /usr/lib/nagios/plugins/check_procs -c 1:  -C postgres
+
+##
+# L_ngowncloud_users checks the number of ldap users (table oc_ldap_user_mappingi, database owncloud).
+# If this number is zero, a critical error is triggered.
+# Notice that if the tables does not exist, a warning error is triggered instead (echo $? of the postgres command).
+# This probe has been adapted to Nagios from a zabbix script by Petasolutions.
+##
+L_ngowncloud_users    /home/nagios/plugins-static/ngowncloud users
+
+##
+# L_ngpostgres_db_fetched checks the number of tuples fetched for a specified database.
+# This probe has been adapted to Nagios from a zabbix script by Petasolutions.
+##
+L_ngpostgres_db_fetched  /home/nagios/plugins-static/ngpostgres  db_fetched  {{ dbname }}
+
+##
+# L_ngpostgres_db_inserted checks the number of tuples inserted for a specified database.
+# This probe has been adapted to Nagios from a zabbix script by Petasolutions.
+##
+L_ngpostgres_db_inserted  /home/nagios/plugins-static/ngpostgres  db_inserted {{ dbname }}
+
+##
+# L_ngpostgres_db_updated checks the number of tuples updated for a specified database.
+# This probe has been adapted to Nagios from a zabbix script by Petasolutions.
+##
+L_ngpostgres_db_updated  /home/nagios/plugins-static/ngpostgres  db_updated  {{ dbname }}
+

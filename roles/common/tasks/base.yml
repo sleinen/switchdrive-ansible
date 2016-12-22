@@ -1,0 +1,25 @@
+---
+
+
+- name: setup locale
+  apt: name=language-pack-de state=present
+
+- name: update apt
+  apt: update_cache=yes cache_valid_time={{apt_config.cache_valid_time}}
+  when: apt_config.update_cache
+
+- name: install packages
+  apt: name={{ item }} state=present
+  with_items:
+    - ntp
+    - iptables-persistent
+    - xfsprogs
+
+- name: disable TCPtime stamps
+  lineinfile:
+    dest=/etc/sysctl.conf
+    line="{{ item }}"
+  with_items:
+    - "net.ipv4.tcp_timestamps = 0"
+  notify: reload sysctl
+

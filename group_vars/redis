@@ -1,0 +1,6 @@
+---
+
+iptables:
+  tcp:
+    - 6379
+  udp: []

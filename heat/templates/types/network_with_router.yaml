@@ -1,0 +1,97 @@
+heat_template_version: 2013-05-23
+
+description: |
+  This template create a private network with: dhcp, gateway and router.
+
+##################
+parameters:
+  name_prefix:
+    type: string
+    default: staging
+    description: "Resources Name Prefix"
+  name:
+    type: string
+    label: Network Name
+    description: |
+      A name for the new private network.
+  cidr:
+    type: string
+    label: CIDR
+    description: |
+      Subnet to be used. E.g. 10.10.10.0/24
+  gateway_ip:
+    type: string
+    default: ""
+    description: "Nameservers to be advertised by DHCP"
+  region:
+    type: string
+    label: "SWITCHengines region: LS or ZH"
+  pool_start:
+    type: string
+  pool_end:
+    type: string
+
+##################
+resources:
+  external_network:
+    type: external_network.yaml
+    properties:
+      region: { get_param: region }
+  private_network:
+    type: OS::Neutron::Net
+    properties:
+      name: 
+        str_replace:
+          template: "name_prefix-name"
+          params: 
+            name_prefix: { get_param: name_prefix }
+            name: { get_param: name }
+  private_subnet:
+    type: OS::Neutron::Subnet
+    properties:
+      name: 
+        str_replace:
+          template: "name_prefix-name_subnet"
+          params: 
+            name_prefix: { get_param: name_prefix }
+            name: { get_param: name }
+      cidr: { get_param: cidr }
+      allocation_pools: 
+        - start: { get_param: pool_start }
+          end: { get_param: pool_end }
+      dns_nameservers: [130.59.31.251, 130.59.31.248]
+      enable_dhcp: true
+      gateway_ip: { get_param: gateway_ip }
+      host_routes:
+        - {destination: 169.254.169.254/32, nexthop: { get_param: gateway_ip }}
+      network_id: { get_resource: private_network }
+      
+  private_router:
+    type: OS::Neutron::Router
+    properties:
+      admin_state_up: true
+      name: 
+        str_replace:
+          template: "name_prefix-name"
+          params: 
+            name_prefix: { get_param: name_prefix }
+            name: { get_param: name }
+  private_router_gw:
+    type: OS::Neutron::RouterGateway
+    properties:
+      network_id: { get_attr: [external_network, network_id]  }
+      router_id: { get_resource: private_router }
+  private_router_int:
+    type: OS::Neutron::RouterInterface
+    properties:
+      router_id: { get_resource: private_router }
+      subnet_id: { get_resource: private_subnet }
+            
+##################
+outputs:
+  network_id:
+    description: new private network
+    value: { get_resource: private_network}
+  subnet_id:
+    description: new private subnet
+    value: { get_resource: private_subnet}

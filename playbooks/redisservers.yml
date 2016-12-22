@@ -1,0 +1,13 @@
+---
+
+- hosts: redis
+  vars:
+     node_type: redis
+  vars_files:
+    - ../vars/users.yml
+  roles:
+    - common
+    - nagios
+    - redis
+    #- scripts
+  become: true

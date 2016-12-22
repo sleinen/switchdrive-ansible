@@ -1,0 +1,3 @@
+https://prometheus.io/docs/querying/api/#deleting-series
+
+curl -XDELETE -g 'http://localhost:9090/api/v1/series?match[]=node_filesystem_size'

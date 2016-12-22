@@ -1,0 +1,19 @@
+---
+
+- name: add dnsmasq
+  apt: name=dnsmasq state=present
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  tags:
+    - dns
+
+
+- name: drop drive dns zone file
+  template:
+     src=dnsmasq.drive.zonefile.j2
+     dest=/etc/dnsmasq.d/drive
+  notify: restart dnsmasq
+  tags:
+    - config
+    - dns
+
+  

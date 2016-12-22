@@ -1,0 +1,10 @@
+---
+
+iptables:
+  tcp:
+    - 5000
+  udp: []
+
+  
+data_mount_point: /mnt/data
+

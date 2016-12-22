@@ -1,0 +1,5 @@
+---
+
+- name: restart ocphp_fpm
+  shell: "docker restart php_fpm_{{OWNCLOUD_VERSION}}"
+

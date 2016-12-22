@@ -1,0 +1,61 @@
+---
+
+iptables:
+  tcp:
+    - 389
+    - 636
+  udp: []
+#
+# This is used to store files that indicate that an operation has been run. Note that if you change this after you have
+# run the script, you may clobber your previous install and/or other bad things. I do not know if if /etc/ansible is
+# the best place to put these files but I wanted to avoid home directories in case the user that runs ansible ever changes.
+ansible_done_dir: /etc/ansible/.done
+
+ldap_done_dir: "{{ansible_done_dir}}/ldap"
+ldap_create_user_and_groups_done: "{{ldap_done_dir}}/create-users-and-groups"
+ldap_slapd_dpkg_reconfigure_done: "{{ldap_done_dir}}/slapd-dpkg-reconfigure-done"
+
+
+# the domain is the fully qualified domain name that will be used to
+# i.e. domain1.example.org => dc=domain1,dc=example,dc=org
+# in the slapd initial configuration
+# This has to to match the "ldap_dc" variable defined on the next
+# line
+
+ldap_domain: cloud.switch.ch
+ldap_dc: dc=cloud,dc=switch,dc=ch
+#ldap_password: "{{ ldap_password }}"
+ldap_password_size: 16  # The length ldap_password
+ldap_automount_machine: nfs.bcc.switch.ch
+ldap_server: ldap://ldap.cloud.switch.ch
+ldap_g_suffix: ou=Groups
+ldap_u_suffix: ou=Users
+ldap_m_suffix: ou=Machines
+
+ldif_to_be_applied:
+   - edumember
+   - create_owncloud
+   - create_indexes
+   - create_oc_indexes
+   - create_monitor
+   - create_monitor_passwd
+   - create_cn_config_passwd
+   - olc
+   - load_syncprov_module
+
+ldif_provider:
+   - setup_provider
+ldif_consumer:
+   - setup_consumer
+ldif_as_admin:
+   - create_users_and_groups
+
+collectd_processes: 
+   - slapd
+
+provider: False
+consumer: False
+
+
+scripts:
+   - { name: "ldapSearch", path: "/root", mode: "0550" }

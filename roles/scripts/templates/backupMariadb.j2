@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+
+BACKUP_DIR_IN_DOCKER="/backup/"
+BACKUP_DIR_ROOT="/mnt/data/backup/"
+
+# take weekly backup from (1-7 = Monday-Sunday)
+DAY_OF_WEEK_TO_KEEP=6
+
+DAYS_TO_KEEP=7
+WEEKS_TO_KEEP=5
+
+
+function perform_backup()
+{
+	SUFFIX=$1
+	BACKUP_DIR=${BACKUP_DIR_IN_DOCKER}"`date +\%Y-\%m-\%d`$SUFFIX/"
+	docker exec mariadb bash -c "xtrabackup --backup --datadir=/var/lib/mysql/ --target-dir=${BACKUP_DIR} --password=\$MYSQL_ROOT_PASSWORD"
+	docker exec mariadb bash -c "xtrabackup --prepare --target-dir=${BACKUP_DIR}"
+	docker exec mariadb bash -c "xtrabackup --prepare --target-dir=${BACKUP_DIR}"
+}
+
+
+# WEEKLY BACKUPS
+
+DAY_OF_WEEK=`date +%u` #1-7 (Monday-Sunday)
+EXPIRED_DAYS=`expr $((($WEEKS_TO_KEEP * 7) + 1))`
+
+if [ $DAY_OF_WEEK = $DAY_OF_WEEK_TO_KEEP ];
+then
+        # Delete all expired weekly directories
+        find $BACKUP_DIR_ROOT -maxdepth 1 -mtime +$EXPIRED_DAYS -name "*-weekly" -exec rm -rf '{}' ';'
+
+        perform_backup "-weekly"
+
+        exit 0;
+fi
+
+# DAILY BACKUPS
+
+# Delete daily backups 7 days old or more
+find $BACKUP_DIR_ROOT -maxdepth 1 -mtime +$DAYS_TO_KEEP -name "*-daily" -exec rm -rf '{}' ';'
+
+perform_backup "-daily"

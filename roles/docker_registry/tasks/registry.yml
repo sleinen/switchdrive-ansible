@@ -1,0 +1,45 @@
+---
+
+
+- name: data top directory
+  action: file dest="{{data_mount_point }}/registry" state=directory owner=root group=root mode=755
+  tags:
+    - registry
+
+- name: Create dirs
+  file: path="{{data_mount_point }}/registry/{{item}}" state=directory group=root owner=root mode=755
+  with_items:
+    - data
+    - certs
+  tags:
+    - registry
+
+- name: install certificates
+  copy: content="{{ docker_cert[service_name][item] }}" dest="{{data_mount_point }}/registry/certs/{{ docker_registry }}.{{item}}"
+  with_items:
+    - "crt"
+    - "key"
+  tags:
+    - registry
+
+- name: registry
+  docker:
+    name: registry
+    image: "registry:2"
+    hostname: registry
+    restart_policy: always
+    state: reloaded
+    pull: always
+    env:
+      REGISTRY_HTTP_TLS_CERTIFICATE: /certs/{{ docker_registry }}.crt
+      REGISTRY_HTTP_TLS_KEY: /certs/{{ docker_registry }}.key
+    ports:
+      - 5000:5000
+    volumes:
+      - "{{data_mount_point }}/registry/certs:/certs:ro"
+      - "{{data_mount_point }}/registry/data:/var/lib/registry"
+  tags:
+    - registry
+
+
+

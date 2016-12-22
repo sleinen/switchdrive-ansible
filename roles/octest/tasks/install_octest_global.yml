@@ -1,0 +1,47 @@
+---
+
+- apt_key: 
+    url='http://download.opensuse.org/repositories/isv:ownCloud:desktop/Ubuntu_14.04/Release.key'
+    state=present
+  tags:
+    - octest
+
+
+- apt_repository: 
+    repo='deb http://download.opensuse.org/repositories/isv:/ownCloud:/desktop/Ubuntu_14.04/ /'
+    state=present
+    update_cache=yes
+  tags:
+    - octest
+
+
+- apt: name={{ item }} 
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  tags:
+    - octest
+  with_items:
+    - owncloud-client
+
+- file: dest=/home/ubuntu/scripts state=directory owner=ubuntu group=ubuntu
+  tags:
+    - octest
+    
+- file: dest=/home/ubuntu/log state=directory
+  tags:
+    - octest
+
+- name: install scripts
+  template: 
+    src={{ item }}.j2
+    dest=/home/ubuntu/scripts/{{ item }}
+    mode=0755
+    owner=ubuntu
+    group=ubuntu
+  with_items:
+    - generate
+    - sync
+  tags:
+    - octest
+    - scripts
+
+

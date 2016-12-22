@@ -1,0 +1,12 @@
+---
+
+- include: base.yml
+- include: ntp.yml
+- include: iptables.yml
+- include: add_users.yml
+- include: etc_hosts_mgmt.yml
+- include: rsyslog.yml
+- include: collectd.yml
+- include: dnsmasq_client.yml
+- include: environment.yml
+- include: release_upgrade_notification.yml

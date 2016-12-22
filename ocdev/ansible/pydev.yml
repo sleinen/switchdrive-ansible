@@ -1,0 +1,40 @@
+---
+
+- name: Download pydev zip file
+  get_url:
+    url=http://sourceforge.net/projects/pydev/files/pydev/PyDev%20{{ pydev_version }}/PyDev%20{{ pydev_version }}.zip/download
+    dest=/tmp/PyDev_{{ pydev_version }}.zip
+    mode=0644
+  tags:
+    - pydev
+
+- file: path=/opt/pydev_src state=directory
+  tags:
+    - pydev
+
+- name: unzip pydev
+  unarchive: copy=false src=/tmp/PyDev_{{ pydev_version }}.zip dest=/opt/pydev_src
+    creates=/opt/pydev_src/plugins
+  tags:
+    - pydev
+
+- name: copy relevant files
+  shell: "cp -r /opt/pydev_src/plugins/org.python.pydev_{{ pydev_version }}*/pysrc /opt/pysrc"
+  args:
+    creates: /opt/pysrc
+  tags:
+    - pydev
+
+
+- name: add path mapping
+  lineinfile: 
+    dest=/opt/pysrc/pydevd_file_utils.py
+    line="PATHS_FROM_ECLIPSE_TO_PYTHON = [(r'{{eclipse_workdir}}', r'/opt')]"
+    regexp="^PATHS_FROM_ECLIPSE_TO_PYTHON\s="
+  tags:
+    - pydev
+
+- name: set PYTHONPATH
+  lineinfile: dest=/etc/environment regexp="^export PYTHONPATH.*" line="export PYTHONPATH=/opt/pysrc"
+  tags:
+    - pydev

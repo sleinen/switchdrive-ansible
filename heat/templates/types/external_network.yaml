@@ -1,0 +1,23 @@
+heat_template_version: 2013-05-23
+
+description: |
+  This template allows to select the external network by region instead of uuid.
+
+parameters:
+  region:
+    type: string
+    label: "SWITCHengines region: LS or ZH"
+    default: "LS"
+  external_networks:
+    type: json
+    default: {
+       "LS": "71ad36a2-d833-4e00-8e16-ec5d967762e3",
+       "ZH": "3cc83f7d-9119-475b-ba17-f3510c7902e8",
+       "S1": "92673e99-9e7a-4a38-9c97-b7f99406c517",
+       "S2": "b6c3f104-daea-4dff-a77a-04954ba2ae93"       
+    }
+
+outputs:
+  network_id:
+    description: selected external network id
+    value: { "Fn::Select": [{get_param: region}, {get_param: external_networks}] }

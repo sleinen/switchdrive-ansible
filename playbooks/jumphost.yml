@@ -1,0 +1,45 @@
+---
+# handles the jumphost server
+
+- hosts: jumphost
+  vars_files:
+    - ../vars/users.yml
+  vars:
+        node_type: jumphost
+  roles:
+    - common
+    - nagios
+  become: true
+
+- hosts: 
+    - mariadb
+    - maxscale
+    - nfs
+    - web
+    - sync
+    - mgmt
+    - elk
+    - lb
+    - ldap
+    - monitoring
+    - dev
+    - reg
+    - graphite
+    - redis
+    - jumphost
+    - backup
+    - test
+    - registry
+  gather_facts: no
+  tasks:
+    - setup:
+  tags:
+    - dns
+
+- hosts: jumphost
+  roles:
+    - jumphost
+  tags:
+    - dns
+  become: true
+

@@ -1,0 +1,109 @@
+#!/bin/bash
+
+if [ "x$1" == "x" ]; then 
+	echo "Usage: `basename $0` <source_dir> <dir_number>
+.      source_dir: where to copy from. E.g. /mnt/104
+.      dir_number: three digits, set number to be copied. E.g. 102"
+	exit
+fi
+
+export LC_ALL="en_US.UTF-8"
+
+
+DIRNUMBER="$2"
+DEST_DIR="/mnt/${DIRNUMBER}"
+SOURCE_DIR="$1"
+USER_LIST="/root/userlists/${DIRNUMBER}"
+MOVED_USER_DIR="${SOURCE_DIR}/_moved/"
+`mkdir -p $MOVED_USER_DIR`
+SOURCE_HOST=`mount | grep ${SOURCE_DIR} | sed -e 's/:.*//'`
+DEST_HOST=`mount | grep ${DEST_DIR} | sed -e 's/:.*//'`
+
+MOVED=0
+FAILED=0
+SKIPPED=0
+IGNORED=0
+
+cd $SOURCE_DIR;
+
+for user in `cat ${USER_LIST}`; do
+	if [ -d $SOURCE_DIR/$user ] && ! [ -h $SOURCE_DIR/$user ] ; then
+		if ! [ -d ${DEST_DIR}/$user ] || [ `stat -c %U ${DEST_DIR}/$user` != "www-data" ]; then
+			echo Copying user $user
+			#ETAG=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+			ETAG=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+			#LASTSEEN=`/usr/bin/psql -t -d owncloud -U owncloud -c "select configvalue from oc_preferences where appid = 'login' and configkey = 'lastLogin' and userid = '$user';"`
+			if [ $? -ne 0 ] ; then
+				ok=false
+				while ( ! $ok ); do 
+					echo could not access database. Retrying..
+					sleep 30
+					ETAG=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+					#LASTSEEN=`/usr/bin/psql -t -d owncloud -U owncloud -c "select configvalue from oc_preferences where appid = 'login' and configkey = 'lastLogin' and userid = '$user';"`
+					if [ $? -eq 0 ] ; then
+						ok=true;
+					fi
+				done
+			fi
+			if [ "x${SOURCE_HOST}" == "x${DEST_HOST}" ]; then
+				echo "ssh ${SOURCE_HOST} /bin/tar -C ${SOURCE_DIR} -cf - $user | tar -xf - -C ${DEST_DIR}"
+				ssh ${SOURCE_HOST} /bin/tar -C ${SOURCE_DIR} -cf - $user | tar -xf - -C ${DEST_DIR}
+			else
+				echo "ssh ${SOURCE_HOST} /bin/tar -C ${SOURCE_DIR} -cf - $user | ssh ${DEST_HOST} tar -xf - -C ${DEST_DIR}"
+				ssh ${SOURCE_HOST} /bin/tar -C ${SOURCE_DIR} -cf - $user | ssh ${DEST_HOST} tar -xf - -C ${DEST_DIR}
+			fi
+			if [ $? -ne 0 ] ; then
+				echo Could not run tar, skipping $user
+				SKIPPED=$((SKIPPED+1))
+			else
+				#ETAG2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+				ETAG2=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+				#LASTSEEN2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select configvalue from oc_preferences where appid = 'login' and configkey = 'lastLogin' and userid = '$user';"`
+				if [ $? -ne 0 ] ; then
+					ok=false
+					while ( ! $ok ); do 
+						echo could not access database. Retrying..
+						sleep 30
+						ETAG2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+						#LASTSEEN2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select configvalue from oc_preferences where appid = 'login' and configkey = 'lastLogin' and userid = '$user';"`
+						if [ $? -eq 0 ] ; then
+							ok=true;
+						fi
+					done
+				fi
+				#if [ $((LASTSEEN2-LASTSEEN)) -ne 0 ]; then
+				if [ "$ETAG" != "$ETAG2" ]; then
+					echo user was active, skipping
+					SKIPPED=$((SKIPPED+1))
+				else
+					echo Moving now: $user
+					mv $SOURCE_DIR/$user $MOVED_USER_DIR
+					ln -s $DEST_DIR/$user $SOURCE_DIR
+					if [ $? -ne 0 ] ; then
+						echo failed to move, retrying...
+						echo $user >> $DEST_DIR/_check
+						mv $SOURCE_DIR/$user $MOVED_USER_DIR/$user2
+						ln -s $DEST_DIR/$user $SOURCE_DIR
+						if [ $? -ne 0 ] ; then
+							echo failed again, giving up
+							echo $user >> $DEST_DIR/_failed
+							FAILED=$((FAILED+1))
+						else
+							MOVED=$((MOVED+1))
+						fi
+					else
+						MOVED=$((MOVED+1))
+					fi
+				fi
+			fi
+		fi
+	else
+		echo Ignoreing $user
+		IGNORED=$((IGNORED+1))
+	fi
+	echo "*******************************************"
+	echo Ignored: $IGNORED
+	echo Skipped: $SKIPPED
+	echo Moved: $MOVED
+	echo Failed: $FAILED
+done

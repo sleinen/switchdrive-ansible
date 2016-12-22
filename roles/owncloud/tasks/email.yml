@@ -1,0 +1,11 @@
+---
+
+- name: route www-data mail to /dev/null
+  lineinfile:
+    "line='{{item.user}}: {{item.email}}' dest='/etc/aliases' regexp='{{item.user}}\\s*:.*'"
+  with_items:
+    - { user: "www-data", email: "/dev/null" }
+  tags:
+    - config
+    - email
+

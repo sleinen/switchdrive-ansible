@@ -1,0 +1,11 @@
+---
+apply_common_iptables: false
+
+data_mount_point: /mnt/data
+data_volume_fstype: ext4
+
+prometheus_version: 0.20.0
+prometheus_mount_point: "{{data_mount_point}}/prometheus"
+
+
+

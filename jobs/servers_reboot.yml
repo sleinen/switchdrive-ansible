@@ -1,0 +1,11 @@
+---
+
+- hosts: all
+   #- web
+   #- sync
+  #serial: 1
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: reboot
+      command: reboot now

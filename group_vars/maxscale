@@ -1,0 +1,11 @@
+---
+
+iptables:
+  tcp:
+    - "3306"
+  udp: []
+
+scripts:
+   - { name: "mariadb", path: "/root", mode: "0550" }
+   - { name: "maxadmin", path: "/root", mode: "0550" }
+   

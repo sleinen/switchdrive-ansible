@@ -1,0 +1,10 @@
+create user '{{maxscale_user}}'@'%' identified by '{{maxscale_password}}';
+
+GRANT SELECT on mysql.user to '{{maxscale_user}}'@'%';
+GRANT SELECT ON mysql.db TO '{{maxscale_user}}'@'%';
+GRANT SELECT ON mysql.tables_priv TO '{{maxscale_user}}'@'%';
+GRANT SHOW DATABASES ON *.* TO '{{maxscale_user}}'@'%';
+
+GRANT REPLICATION SLAVE on *.* to '{{maxscale_user}}'@'%';
+GRANT REPLICATION CLIENT on *.* to '{{maxscale_user}}'@'%';
+

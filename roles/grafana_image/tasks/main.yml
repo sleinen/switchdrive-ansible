@@ -1,0 +1,3 @@
+---
+
+- include: grafana_image.yml

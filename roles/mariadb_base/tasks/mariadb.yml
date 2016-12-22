@@ -1,0 +1,85 @@
+---
+
+- name: 'Create directory for MariaDB'
+  file: path={{mariadb_mount_point}} state=directory owner=999 group=999 mode=0755
+  tags: mariadb
+
+- name: 'Create directory for MariaDB backups'
+  file: path={{mariadb_backup_dir}} state=directory owner=999 group=999 mode=0755
+  tags: mariadb
+
+- name: 'Create directory for MariaDB configs'
+  file: path=/etc/mysql/conf.d state=directory owner=root group=root mode=0755
+  tags: mariadb
+
+- name: 'Create directory for MariaDB init'
+  file: path=/etc/mysql/init state=directory owner=root group=root mode=0755
+  tags: mariadb
+
+- name: 'Create directory for MariaDB socket'
+  file: path=/run/mysqld state=directory owner=999 group=999 mode=0755
+  tags: mariadb
+
+- name: Copy included mariadb configuration to /etc/mysql/conf.d
+  template: 
+      src={{ service_name }}/{{item}} 
+      dest=/etc/mysql/conf.d/{{item}} 
+      mode=0644 owner=root group=root
+  notify:
+    - restart mariadb
+  with_items:
+    - mariadb.cnf
+    - tokudb.cnf
+    - mysqld_safe_syslog.cnf
+  tags: 
+    - mariadb
+    - mariadbconfig
+
+- name: MaxScale user setup
+  template:
+    src=maxscale.user.sql.j2
+    dest=/etc/mysql/init/maxscale.user.sql
+  tags: mariadb
+
+- name: mariadb docker 
+  docker:
+    name: mariadb
+    image: "mariadb:{{mariadb_version}}"
+    state: reloaded
+    pull: always
+    net: host
+    expose:
+      - "4567"
+      - "4568"
+      - "4444"
+    ports: 
+      # 3306: mysql; 4567: galera; 4568: IST; 4444: SST
+      - "3306:3306"
+      - "4567:4567"
+      - "4568:4568"
+      - "4444:4444"
+    env:
+      MYSQL_ROOT_PASSWORD: "{{mariadb_passwd}}"
+      MYSQL_DATABASE: "{{mariadb_database}}"
+      MYSQL_USER: "{{mariadb_user}}"
+      MYSQL_PASSWORD: "{{mariadb_passwd}}"
+    volumes:
+       - "/etc/mysql/init:/docker-entrypoint-initdb.d"
+       - "/etc/mysql/conf.d:/etc/mysql/conf.d"
+       - "{{mariadb_mount_point}}:/var/lib/mysql"
+       - "{{mariadb_backup_dir}}:/backup"
+       #- "/run/mysqld:/run/mysqld"
+       - "/run/systemd/journal/syslog:/dev/log"
+    # normal
+    command: "{{mariadb_cmdline_options}}"
+    restart_policy: "{{mariadb_restart_policy}}"
+    
+    # get a shell to do maintenance
+    # (read this after crash: https://www.percona.com/blog/2014/09/01/galera-replication-how-to-recover-a-pxc-cluster/)
+    #command: "bash -c 'sleep 90000'"
+    #restart_policy: no
+
+  become: true
+  tags:
+    - mariadb
+

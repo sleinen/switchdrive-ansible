@@ -1,0 +1,14 @@
+---
+
+- hosts:
+    - web
+    - sync
+    - dev
+  become: true
+  pre_tasks:
+    - name: stop apache
+      command: docker stop ocapache
+    - name: delete apache
+      command: docker rm ocapache
+  roles:
+    - ocapache

@@ -1,0 +1,5 @@
+---
+
+- name: restart mariadb
+  shell: "docker stop mariadb; docker start mariadb"
+

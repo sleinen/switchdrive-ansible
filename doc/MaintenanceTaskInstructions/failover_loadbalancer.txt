@@ -1,0 +1,11 @@
+-----------------------------------
+# Switch from one lb to another.
+
+openstack ip floating remove 86.119.34.137 drive-lb1
+openstack ip floating add 86.119.34.137 drive-lb2
+
+# and back
+
+openstack ip floating remove 86.119.34.137 drive-lb2
+openstack ip floating add 86.119.34.137 drive-lb1
+

@@ -1,0 +1,16 @@
+---
+
+- apt: name=php5
+- apt: name=php5-gd
+- apt: name=php5-curl
+- apt: name=php5-sqlite
+- apt: name=php5-json
+- apt: name=php5-curl
+- apt: name=php5-intl
+- apt: name=php5-mcrypt
+- apt: name=php5-ldap
+- apt: name=php5-imap
+- apt: name=php5-gmp
+- apt: name=php5-apcu
+- apt: name=php5-imagick
+- apt: name=phpunit

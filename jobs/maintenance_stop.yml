@@ -1,0 +1,20 @@
+---
+
+- hosts:
+   - web
+   - sync
+   - mgmt
+   - dev
+  gather_facts: no
+  tasks:
+
+    - name: disable maintenance mode
+      lineinfile:
+        dest=/var/www/owncloud/config/config.php
+        regexp='maintenance'
+        line=" 'maintenance' => false,"
+
+    - name: restart app servers
+      service: name=php5-fpm state=restarted
+
+

@@ -1,0 +1,111 @@
+<?php
+$CONFIG = array (
+  'instanceid' => 'oceacd978fb9',
+  'passwordsalt' => '/JmaEK3g1hMbdJA+QmWGqP9YYGMhpM',
+  'datadirectory' => '/mnt/data',
+  #"overwritehost"     => "{{item.shard_name}}.drive-backup.switch.ch",
+
+  'dbtype' => 'mysql',
+  'dbname' => '{{item.shard_name}}',
+  'dbtableprefix' => 'oc_',
+  'dbuser' => 'owncloud',
+#  'dbhost' => '{{hostvars[groups["mariadb"][0]].inventory_hostname}}',
+  'dbhost' => 'localhost',
+  'dbpassword' => '{{mariadb_passwd}}',
+
+
+  'version' => '9.0.7.1',
+  'installed' => {{item.installed}},
+  'ldapIgnoreNamingRules' => false,
+  
+  'log_type' => 'owncloud',
+  'loglevel' => '0',
+  'log_query' => false,
+  'cron_log' => true,
+  'log_authfailip' => false,
+  'logfile' => '/var/log/owncloud/{{item.shard_name}}.{{owncloud_logfile_name}}',
+  'logdateformat' => 'U.u',
+  'logtimezone' => 'Europe/Berlin',
+  'log_rotate_size' => 104857600,
+  
+  'mail_domain' => 'switch.ch',
+  'mail_smtpdebug' => false,
+  'mail_smtpmode' => 'smtp',
+  'mail_smtphost' => 'localhost',
+  'mail_smtpport' => 25,
+  'theme' => '',
+  'check_for_working_webdav' => false,
+  'check_for_working_htaccess' => true,
+  'updatechecker' => false,
+  'license-key' => '{{license_key}}',
+  'appstoreenabled' => false,
+  'enable_previews' => false,
+  'asset-pipeline.enabled' => true,
+  'filesystem_check_changes' => 0,
+  'trusted_domains' => 
+  array (
+    0 => '{{item.shard_name}}.{{ service_name }}',
+    1 => '{{ service_name }}',
+  ),
+  'customclient_desktop' => 'https://help.switch.ch/drive/downloads/',
+  'customclient_android' => 'https://play.google.com/store/apps/details?id=ch.switchdrive.androidclient',
+  'customclient_ios' => 'https://itunes.apple.com/en/app/switchdrive/id847336453?mt=8',
+  'has_internet_connection' => true,
+  'supportedDatabases' => 
+  array (
+    0 => 'mysql',
+  ),
+  'shared_folder' => '/',
+  'share_folder' => '/',
+  'secret' => '{{oc_config_secret}}',
+  'overwrite.cli.url' => 'https://{{item.shard_name}}.{{ service_name }}',
+  'maintenance' => false,
+  'singleuser' => false,
+  'minimum.supported.desktop.version' => '1.7',
+  'memcache.local' => '\\OC\\Memcache\\APCu',
+  'memcache.distributed' => '\\OC\\Memcache\\Redis',
+  'memcache.locking' => '\\OC\\Memcache\\Redis',
+  'filelocking.enabled' => true,
+  'redis' => 
+  array (
+    'host' => '{{ hostvars[groups['redis'][0]].inventory_hostname }}',
+    'port' => 6379,
+    'timeout' => 0.0,
+  ),
+  'enabledPreviewProviders' => 
+  array (
+    0 => 'OC\\Preview\\PNG',
+    1 => 'OC\\Preview\\JPEG',
+    2 => 'OC\\Preview\\GIF',
+    3 => 'OC\\Preview\\XBitmap',
+    4 => 'OC\\Preview\\MP3',
+    5 => 'OC\\Preview\\TXT',
+    6 => 'OC\\Preview\\MarkDown',
+  ),
+  'trashbin_retention_obligation' => 'auto',
+  'objectstore_disabled' => 
+  array (
+    'class' => 'OCA\\ObjectStore\\S3',
+    'arguments' => 
+    array (
+      'bucket' => 'SWITCHdrive-test',
+      'autocreate' => true,
+      'options' => 
+      array (
+        'version' => '2006-03-01',
+        'region' => '',
+        'credentials' => 
+        array (
+          'key' => '055303dc7cb8449ab97ade40b7709ef9',
+          'secret' => '23a800e5074a48019c25d70ab1de8c19',
+        ),
+        'endpoint' => 'https://os.unil.cloud.switch.ch',
+        'command.params' => 
+        array (
+          'PathStyle' => true,
+        ),
+      ),
+    ),
+  ),
+  'enable_certificate_management' => true,
+);

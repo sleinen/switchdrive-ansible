@@ -1,0 +1,29 @@
+##
+# check_logfiles checks the log files as defined in the specified configuration file
+##
+L_check_nfs_server_logs sudo /home/nagios/plugins-static/check_logfiles -f /home/nagios/etc/check_logfiles.cfg
+
+##
+# L_check_nfs checks all the mountpoints present in fstab  
+##
+L_check_nfs /home/nagios/plugins-static/check_mountpoints.sh -a
+
+##
+# L_check_nfsd checks the numbers of nfsd processes: more than 7 is OK, between 1 and 7 is WARNING, none is CRITICAL 
+##
+L_check_nfsd /usr/lib/nagios/plugins/check_procs -c 1: -w 7:   -C nfsd -u root
+
+##
+# L_check_nfsiod checks that one and only one nfsiod process is up and running. Any other value triggers a CRITICAL value.
+##
+L_check_nfsiod /usr/lib/nagios/plugins/check_procs -C nfsiod -u root -c 1:1
+
+##
+# L_check_nfsd4_callbacks checks that one and only one nfsd4_callbacks process is up and running. Any other value triggers a CRITICAL value.
+##
+L_check_nfsd4_callbacks /usr/lib/nagios/plugins/check_procs -C nfsd4_callbacks -u root -c 1:1
+
+##
+# L_check_rpc.mountd checks that one and only one rpc.mountd process is up and running. Any other value triggers a CRITICAL value.
+##
+L_check_rpc.mountd /usr/lib/nagios/plugins/check_procs -C rpc.mountd -u root -c 1:1

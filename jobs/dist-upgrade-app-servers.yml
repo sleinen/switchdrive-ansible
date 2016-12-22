@@ -1,0 +1,55 @@
+---
+
+# Performs a rolling dist upgrade on all app servers and then reboots them
+# Change the value of serial: to adjust the number of server to be updated.
+
+- hosts: 
+    - web
+    - sync
+    - mgmt
+    - dev
+  become: yes
+  gather_facts: no
+  tasks:
+    - name: apt-get update
+      apt: update_cache=yes
+
+
+- hosts: 
+    - web
+    - sync
+    - mgmt
+    - dev
+  serial: 1
+  become: yes
+  tasks:
+    #- name: gather facts from lb
+    #  run_once: yes
+    #  setup:
+    #  delegate_to: "{{item}}"
+    #  delegate_facts: True
+    #  with_items: "{{groups['lb']}}"
+      
+    - name: disable in load balancer
+      command: "/root/ha_update di {{ ansible_hostname | regex_replace('^(drive|sldrive|szdrive|zdrive|ldrive|tzdrive|tldrive)-(.*)$', '\\2') }}"
+      delegate_to: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"
+      
+    - name: apt-get dist-upgrade
+      apt: upgrade=dist dpkg_options='force-confold,force-confdef'
+      
+    - name: reboot
+      command: '/sbin/reboot'
+      async: 0
+      poll: 0
+      ignore_errors: true
+      
+    - include: tasks/wait_for_appserver.yml
+      
+    - name: enable in load balancer
+      command: "/root/ha_update en {{ ansible_hostname | regex_replace('^(drive|sldrive|szdrive|zdrive|ldrive|tzdrive|tldrive)-(.*)$', '\\2') }}"
+      delegate_to: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"
+      
+
+
+
+

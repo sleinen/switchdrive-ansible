@@ -1,0 +1,9 @@
+---
+
+# the jumphost only exposes SSH
+
+iptables:
+  tcp: 
+    - 53
+  udp: 
+    - 53

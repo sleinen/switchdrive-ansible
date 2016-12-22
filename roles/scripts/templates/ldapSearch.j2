@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if [ "x$1" == "x" ]; then 
+    echo "Usage: `basename $0` [<filter>]
+.      filter:  search filter E.g. uid=christian.schnidrig@switch.ch
+"
+    exit
+fi
+
+ldapsearch -H ldap://localhost:389/ -D "cn=admin,dc=cloud,dc=switch,dc=ch" -w "{{ldap_password}}" -b "dc=cloud,dc=switch,dc=ch" "$@"
+
+

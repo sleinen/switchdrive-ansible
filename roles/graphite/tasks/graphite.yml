@@ -1,0 +1,30 @@
+---
+
+
+- name: Create dirs
+  file: path="{{item}}" state=directory group=107 owner=105
+  with_items:
+    - "{{graphite_data_dir}}"
+    - "{{graphite_data_dir}}/log"
+    - "{{graphite_data_dir}}/carbon"
+    - "{{graphite_data_dir}}/whisper"
+  tags:
+    - graphite
+
+- name: graphite container
+  docker:
+    name: graphite
+    image: "{{graphite_docker_image}}"
+    hostname: graphite
+    restart_policy: always
+    state: reloaded
+    pull: always
+    ports:
+      - 2003:2003
+      - 8080:80
+    volumes:
+      - "{{graphite_data_dir}}:/var/lib/graphite"
+  tags:
+    - graphite
+
+

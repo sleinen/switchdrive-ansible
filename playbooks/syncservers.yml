@@ -1,0 +1,25 @@
+---
+# handles the syncservers
+
+- hosts: sync
+#  gather_facts: no
+  vars:
+    node_type: web
+  vars_files:
+    - ../vars/users.yml
+    - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+  roles:
+    - common
+    - role: docker_14_06
+      tags: docker
+    - maxscale
+    - exim
+    - nagios
+    - logstash_forwarder
+    - owncloud
+    - ocphp_fpm
+    - ocapache
+    - scripts
+  become: true
+
+

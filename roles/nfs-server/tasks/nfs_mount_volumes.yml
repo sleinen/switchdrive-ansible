@@ -1,0 +1,44 @@
+---
+
+- name: mountpoints
+  action: file dest="/mnt/{{item.name}}" state=directory owner=www-data group=www-data mode=770
+  with_items: "{{vols}}"
+  tags:
+    - mount
+
+#- name: make filesystem vdb
+#  command: mkfs.xfs /dev/vdb
+#  ignore_errors: yes
+
+- name: mount volumes
+  mount: 
+    name=/mnt/{{ item.name }}
+    src={{ item.src }}
+    fstype=xfs
+    opts=noatime
+    state=mounted
+  with_items: "{{vols}}"
+  tags:
+    - mount
+
+- name: set nfs exports
+  template: src=exports.j2 dest=/etc/exports
+  notify:
+    - reexport nfs
+    #- restart nfs server
+  tags:
+    - config
+    - export
+
+- name: setup ocdata link
+  file: dest="/mnt/{{ item.name }}/.ocdata"
+        src="/mnt/{{ item.ocdata_link }}/.ocdata"
+        state=link force=yes
+  with_items: "{{vols}}"
+  tags:
+    - config
+    - ocdata
+    - mount
+
+
+

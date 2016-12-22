@@ -1,0 +1,12 @@
+# load monitor module
+dn: cn=module{0},cn=config
+changetype: modify
+add: olcModuleLoad
+olcModuleLoad: back_monitor
+
+# instantiate monitor database
+dn: olcDatabase=Monitor,cn=config
+changetype: add
+objectClass: olcDatabaseConfig
+objectClass: olcMonitorConfig
+olcDatabase: Monitor

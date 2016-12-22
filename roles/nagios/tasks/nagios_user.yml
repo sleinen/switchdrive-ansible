@@ -1,0 +1,27 @@
+---
+
+- name: Add nagios group
+  action: group name=nagios  state=present gid={{nagios_gid}}
+  tags: nagios
+
+- name: Add nagios user
+  action: user name=nagios  state=present createhome=yes group=nagios groups=adm uid={{nagios_uid}}
+  tags: nagios
+
+- name: create nagios .ssh dir
+  file: dest=/home/nagios/.ssh state=directory owner=nagios group=nagios mode=764
+  tags: nagios
+
+- name: create authorized_keys file in .ssh dir for Nagios
+  copy: src=check_mk/authorized_keys dest=/home/nagios/.ssh/authorized_keys mode=644 owner=nagios group=nagios
+  tags: 
+    - nagios
+    - nagios_ssh_key
+
+- name: add Nagios to sudoers file (so it can check log files)
+  lineinfile: "dest=/etc/sudoers line='nagios ALL=NOPASSWD: ALL'"
+  tags: nagios
+
+#- name: Update bashrc for Nagios (not needed)
+#  lineinfile: dest=/home/nagios/.bashrc line="export HAPROXY_USER={{ HAPROXY_USER }} ; export HAPROXY_PASSWORD={{ HAPROXY_PASSWORD }}"
+#  tags: nagios

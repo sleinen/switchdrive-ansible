@@ -1,0 +1,68 @@
+#!/bin/bash
+
+export LC_ALL="en_US.UTF-8"
+
+if [ "x$1" == "x" ]; then 
+	echo "Usage: `basename $0` <source_dir> <dir_numbers> [<num_users>]
+.      source_dir:  directory from where users are move away. E.g. /mnt/data
+.      dir_numbers: list of directories to which users should be moved E.g. "102 105 107"
+.      num_users:   number of users that should be moved away from source disk"
+	exit
+fi
+
+MAX_USERS_PER_DISK=650
+ALL_DISKS=`echo 1{01..18}`
+USERLISTS_DIR=/root/userlists
+
+SOURCE_DIR="$1"
+SOURCE_HOST=`mount | grep ${SOURCE_DIR} | sed -e 's/:.*//'`
+
+DEST_DIR_LIST="$2"
+NUM_USERS=$3
+
+cd $SOURCE_DIR;
+mkdir -p $USERLISTS_DIR
+
+for destdir in $DEST_DIR_LIST; do
+	numUsers=`find /mnt/${destdir} -maxdepth 1 -mindepth 1 -type d | wc -l`
+	capacity=$((MAX_USERS_PER_DISK - numUsers))
+	echo /mnt/${destdir}: $capacity capacity left
+	export capacity_$destdir=$capacity
+done
+
+echo -n '' > ${USERLISTS_DIR}/all
+count=0
+for user in `find ${SOURCE_DIR} -maxdepth 1 -mindepth 1 -type d | grep @`; do
+	user=`echo $user | sed -e 's/.*\///'`
+	new=true
+	for disk in $ALL_DISKS; do
+		if [ -d /mnt/$disk/$user ] && [ "/mnt/$disk" != "$SOURCE_DIR" ]; then
+			new=false
+			echo skipping $user
+		fi
+	done
+	if ($new);then
+		echo $user >> ${USERLISTS_DIR}/all
+	fi
+	if ((NUM_USERS > 0)) && ((++count >= NUM_USERS)); then
+		break;
+	fi
+done
+total=`wc -l ${USERLISTS_DIR}/all| sed -e 's/ .*//'`
+echo total users to be moved: $total
+
+
+offset=0
+for destdir in $DEST_DIR_LIST; do
+	capacity_var="capacity_$destdir"
+	capacity=${!capacity_var}
+	if ((total - offset > 0)) ; then
+		#echo "head -n $((capacity + offset)) ${USERLISTS_DIR}/all | tail -n $((capacity <= (total - offset)?capacity:(total - offset))) > ${USERLISTS_DIR}/$destdir"
+		head -n $((capacity + offset)) ${USERLISTS_DIR}/all | tail -n $((capacity <= (total - offset)?capacity:(total - offset))) > ${USERLISTS_DIR}/$destdir
+		offset=$((offset + capacity))
+	fi
+done
+if ((total - offset > 0)) ; then
+	#echo "tail -n +${offset} ${USERLISTS_DIR}/all > ${USERLISTS_DIR}/rest"
+	tail -n +${offset} ${USERLISTS_DIR}/all > ${USERLISTS_DIR}/rest
+fi

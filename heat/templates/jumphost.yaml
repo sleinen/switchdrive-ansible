@@ -1,0 +1,99 @@
+heat_template_version: 2013-05-23
+
+description: |
+  This template provisions a jumphost for the owncloud cluster
+
+################################
+parameters:
+  name_prefix:
+    type: string
+    description: "Resources Name Prefix"
+  ssh_key:
+    type: string
+    label: "SSH-Key name"
+    default: Christian-Schnidrig
+  region:
+    type: string
+    label: "SWITCHengines region: LS or ZH"
+    default: "ZH"
+  jump_ip_id:
+    type: string
+  flavor:
+    type: string
+    default: "not used"
+  net_drive:
+    type: string
+  net_backbone:
+    type: string
+    default: "not used"
+  root_volume_id:
+    type: string
+  hostname:
+    type: string
+  drive_ip:
+    type: string
+  backbone_4_ip:
+    type: string
+    default: "not used"
+  backbone_6_ip:
+    type: string
+    default: "not used"
+
+
+################################
+resources:
+      
+  ################################
+  # security groups
+  ssh_secgroup:
+    type: "OS::Neutron::SecurityGroup"
+    properties:
+      name: 
+        str_replace:
+          template: |
+            prefix-ssh
+          params: 
+            prefix: {get_param: name_prefix}
+      rules:
+        - port_range_min: 22
+          port_range_max: 22
+          protocol: tcp
+          
+  ################################
+  # ports
+  port_drive:
+    type: OS::Neutron::Port
+    properties:
+      network_id: { get_param: net_drive }
+      fixed_ips: 
+        - ip_address: { get_param: drive_ip }
+      security_groups: 
+        - default
+        - { get_resource: ssh_secgroup }
+
+  ################################
+  jumphost:
+    type: types/server.yaml
+    properties:
+      hostname: { get_param: hostname }
+      domainname: { get_param: name_prefix }
+      name_prefix: { get_param: name_prefix }
+      ssh_key: { get_param: ssh_key }
+      flavor: { get_param: flavor }
+      networks:
+        map:
+          - port: { get_resource: port_drive}
+      root_volume_id: { get_param: root_volume_id }
+
+  ################################
+  floating_ip_association:
+    type: OS::Nova::FloatingIPAssociation
+    properties:
+      floating_ip: { get_param: jump_ip_id }
+      server_id: { get_attr: [jumphost, server_id] }  
+
+################################
+outputs:
+  server_id:
+    description: id of created server
+    value: { get_attr: [jumphost, server_id] }

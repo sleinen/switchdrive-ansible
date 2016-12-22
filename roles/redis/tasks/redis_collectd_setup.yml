@@ -1,0 +1,21 @@
+---
+
+- name: install redis script for collectd
+  copy:
+     src=redis_info.py
+     dest=/usr/lib/collectd/redis_info.py
+  notify: restart collectd
+  tags:
+    - collectd
+
+- name: add collectd_redis.conf
+  template:
+    src=collectd_redis.conf.j2
+    dest=/etc/collectd/collectd.conf.d/collectd_redis.conf
+  notify: 
+    - kill collectd
+    - restart collectd
+  tags:
+    - collectd
+    - config
+

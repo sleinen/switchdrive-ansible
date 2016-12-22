@@ -1,0 +1,4 @@
+NGUSERNAME [a-zA-Z0-9\.\@\-\+_%]+
+NGUSER %{NGUSERNAME}
+NGCOMBINED %{IPORHOST:clientip}%{SPACE}%{NGUSER:ident}%{SPACE}%{NGUSER:auth}%{SPACE}\[%{HTTPDATE:timestamp}\]%{SPACE}"%{WORD:verb}%{SPACE}%{URIPATHPARAM:request}%{SPACE}HTTP/%{NUMBER:httpversion}"%{SPACE}%{NUMBER:response:int}%{SPACE}(?:%{NUMBER:bytes:int}|-)%{SPACE}(?:"(?:%{URI:referrer}|-)"|%{QS:referrer})%{SPACE}%{QS:agent}
+NGLOGSTASH %{IPORHOST:clientip}%{SPACE}%{NGUSER:ident}%{SPACE}%{NGUSER:auth}%{SPACE}\[%{HTTPDATE:timestamp}\]%{SPACE}"%{WORD:verb}%{SPACE}%{URIPATHPARAM:request}%{SPACE}HTTP/%{NUMBER:httpversion}"%{SPACE}%{NUMBER:response:int}%{SPACE}(?:%{NUMBER:bytes:int}|-)%{SPACE}(?:"(?:%{URI:referrer}|-)"|%{QS:referrer})%{SPACE}%{QS:agent}%{SPACE}%{IPORHOST:http_host}%{SPACE}%{NUMBER:request_time:float}%{SPACE}%{NUMBER:upstream_response_time:float}%{SPACE}%{NUMBER:epoch:float}%{SPACE}\[%{GREEDYDATA:cookies}\]

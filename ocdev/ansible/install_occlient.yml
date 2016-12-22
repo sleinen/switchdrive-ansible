@@ -1,0 +1,18 @@
+---
+
+- apt_key: url='http://download.opensuse.org/repositories/isv:ownCloud:desktop/xUbuntu_14.04/Release.key' state=present
+  tags:
+    - occlient
+
+
+- apt_repository: repo='deb http://download.opensuse.org/repositories/isv:/ownCloud:/desktop/xUbuntu_14.04/ /' state=present update_cache=yes
+  tags:
+    - occlient
+
+
+- apt: name={{ item }} update_cache=yes
+  tags:
+    - occlient
+  with_items:
+    - owncloud-client
+

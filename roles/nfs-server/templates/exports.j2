@@ -1,0 +1,13 @@
+# /etc/exports: the access control list for filesystems which may be exported
+#               to NFS clients.  See exports(5).
+#
+# dropped by ansible - don't change
+#
+
+
+#/mnt/data *(rw,sync,no_root_squash,no_subtree_check)
+
+{% for volume in vols %}
+/mnt/{{ volume.name }} {{ inventory_hostname | regex_replace('(.*)\\.[^.]*$', '\\1') }}.0/24(rw,sync,no_root_squash,no_subtree_check)
+{% endfor %}
+

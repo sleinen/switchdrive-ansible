@@ -1,0 +1,7 @@
+---
+
+- include: nfs_main.yml
+- include: nfs_mount_volumes.yml
+- include: install_ssh-keys.yml
+
+

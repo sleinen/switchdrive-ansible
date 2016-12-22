@@ -1,0 +1,9 @@
+/run/shm/owncloud.*.log {
+  rotate 1
+  daily
+  size 10M
+  nocreate
+  nocompress
+  missingok
+  notifempty
+}

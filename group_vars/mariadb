@@ -1,0 +1,47 @@
+---
+
+iptables:
+  tcp:
+    - "3306"
+    - "4567"
+    - "4568"
+    - "4444"
+    # prometheus
+    - "9100"
+    - "9104"
+  udp: []
+
+master: true
+slave: false
+
+galera_cluster_name: SWITCHdrive
+
+data_mount_point: /mnt/data
+data_volume_fstype: xfs
+
+mariadb_version: 10.1.16
+mariadb_mount_point: "{{data_mount_point}}/mariadb"
+mariadb_backup_dir: "{{data_mount_point}}/backup"
+
+# ON: galera enabled; OFF: galera disabled
+mariadb_wsrep_on: ON
+# "#": plugins disabled; "": plugins enabled
+mariadb_disable_plugins: ""
+mariadb_restart_policy: always
+mariadb_cmdline_base_options: "--log-bin=log_bin --plugin-load=query_response_time"
+mariadb_cmdline_options: "{{mariadb_cmdline_base_options}}"
+#mariadb_wsrep_cluster_address: "gcomm://{{ hostvars[groups['mariadb'][0]].inventory_hostname }},{{ hostvars[groups['mariadb'][1]].inventory_hostname }},{{ hostvars[groups['mariadb'][2]].inventory_hostname }}"
+
+# prometheus exporters
+mysqld_exporter_version: "0.8.1"
+node_exporter_version: "0.12.0"
+
+scripts:
+   - { name: "mariadb", path: "/root", mode: "0550" }
+   - { name: "backupMariadb", path: "/root", mode: "0550" }
+   - { name: "cleanUpBackupMariadb", path: "/root", mode: "0550" }
+
+# nagios
+check_mk_plugins:
+   - mk_mysql
+

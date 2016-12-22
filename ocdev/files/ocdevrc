@@ -1,0 +1,26 @@
+[appstore]
+user =
+url = https://api.owncloud.com/v1
+password =
+
+[setup]
+type = https
+
+[startapp]
+homepage =
+author =
+email =
+
+[devup]
+core = v7.0.5
+activity = stable7
+bookmarks = stable7
+calendar = stable7
+chat = master
+contacts = stable7
+documents = stable7
+gallery = stable7
+music = stable7
+notes = stable7
+news = stable7
+

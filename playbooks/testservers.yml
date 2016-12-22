@@ -1,0 +1,13 @@
+---
+# the database servers
+
+- hosts: test
+  vars_files:
+    - ../vars/users.yml
+    - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+  roles:
+    - common
+    - octest
+    - smashbox
+  become: true
+

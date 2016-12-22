@@ -1,0 +1,6 @@
+LoadPlugin processes
+<Plugin processes>
+   {% for processname in collectd_processes %}
+   Process "{{processname}}"
+   {% endfor %}
+</Plugin>

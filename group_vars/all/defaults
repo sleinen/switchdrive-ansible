@@ -1,0 +1,56 @@
+---
+# Variables here are applicable to all host groups
+
+apt_config:
+  update_cache: yes
+  cache_valid_time: 7200
+
+httpd_port: 80
+apply_common_iptables: true
+collectd_processes: []
+
+elk_syslog_port: 10000
+elk_owncloud_ports:
+    - 10001
+    - 10002
+elk_postgres_port: 10010
+
+# lumberjack_host may not be an IP: -> if changed then certificate needs to be updated as well.
+lumberjack_host: elk.{{internal_domain}}
+lumberjack_port: 5043
+
+apache_config:
+  keepAlive: 'On'
+  keepAliveTimeout: 100
+  maxKeepAliveRequests: 200
+
+scripts: []
+scripts_pkgs: []
+
+nagios_gid: 792
+nagios_uid: 499
+check_mk_plugins: []
+
+ldap_password: "{{vault_ldap_password[site]}}"
+ldap_cn_config_password: "{{vault_ldap_cn_config_password[site]}}"
+admin_pass: "{{vault_admin_pass[site]}}"
+
+HAPROXY_USER: "{{vault_haproxy_user[site]}}"
+HAPROXY_PASSWORD: "{{vault_haproxy_passwd[site]}}"
+
+mariadb_database: "owncloud"
+mariadb_user: "owncloud"
+mariadb_passwd: "{{vault_mariadb_passwd[site]}}"
+
+maxscale_user: 'maxscale'
+maxscale_password: "{{vault_maxscale_password[site]}}"
+
+# root password
+enc_root_passwd: "{{vault_enc_root_passwd[site]}}"
+
+letsencrypt:
+  domains: 
+    drive-backup.switch.ch: "-d drive-backup.switch.ch -d a01.drive-backup.switch.ch -d a02.drive-backup.switch.ch -d a03.drive-backup.switch.ch -d a04.drive-backup.switch.ch -d a05.drive-backup.switch.ch"
+    drive-stage.switch.ch: "-d drive-stage.switch.ch -d a01.drive-stage.switch.ch -d a02.drive-stage.switch.ch -d a03.drive-stage.switch.ch -d a04.drive-stage.switch.ch -d a05.drive-stage.switch.ch"
+  email: "christian.schnidrig@gmail.com"
+

@@ -1,0 +1,12 @@
+module(load="impstats"
+       interval="10"
+       severity="6" # info
+       facility="6" # lpr
+       resetCounters="off"
+       format="json"
+       )
+
+# fix wrong encoding of some owncloud stuff
+module(load="mmutf8fix")
+action(type="mmutf8fix")
+

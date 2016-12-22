@@ -1,0 +1,11 @@
+---
+
+- name: waiting for app server to be back up
+  wait_for:
+    host={{ inventory_hostname }}
+    state=started
+    port=80
+    delay=15
+    timeout=3600
+  delegate_to: "{{ hostvars[groups['jumphost'][0]].inventory_hostname }}"
+  become: false

@@ -1,0 +1,20 @@
+---
+
+shard_config: 
+  drive-backup.switch.ch:
+    - {shard_name: 'a01', installed: 'true', version: '9.0.7', hour: "*", minute: "5,20,35,50" }
+    - {shard_name: 'a02', installed: 'true', version: '9.0.7', hour: "*", minute: "10,25,40,55"}
+
+shard_mapping:
+  drive-backup.switch.ch:
+     9.0.7: "a01 a02"
+
+# 15768000 = 6 months
+strict_transport_security_max_age:
+  drive.switch.ch: 15768000
+  drive-stage.switch.ch: 15768000
+  drive-backup.switch.ch: 0
+
+php_version_root_site: "{{OWNCLOUD_VERSION}}"
+owncloud_versionstring_root_site: "9.0.7"
+owncloud_version_root_site: "{{owncloud_versionstring_root_site}}.1"

@@ -1,0 +1,37 @@
+---
+
+- name: add packages
+  apt: 
+      name={{item}} 
+      state=present
+      update_cache={{apt_config.update_cache}}
+      cache_valid_time={{apt_config.cache_valid_time}}
+  with_items:
+    - libdbd-mysql
+    - libpython2.7
+    - python-mysqldb
+  tags:
+    - collectd
+
+- name: add collectd mysql plugin
+  copy:
+    src=collectd_mysql_plugin/mysql.py
+    dest=/opt/collectd/collectd.plugins/mysql.py
+  notify: 
+    - kill collectd
+    - restart collectd
+  tags:
+    - collectd
+    - config
+
+- name: add collectd_mariadb.conf
+  template:
+    src=collectd_mariadb.conf.j2
+    dest=/etc/collectd/collectd.conf.d/collectd_mariadb.conf
+  notify: 
+    - kill collectd
+    - restart collectd
+  tags:
+    - collectd
+    - config
+

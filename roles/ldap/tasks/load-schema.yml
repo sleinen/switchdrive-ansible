@@ -1,0 +1,48 @@
+---
+
+- name: ldap | Make an ansible directory for remembering what we previously run
+  file: path="{{ldap_done_dir}}" state=directory owner=root group=root
+  tags:
+    - ldap
+    - auth
+
+- name: ldap | Copy over ldif files
+  template: src=root/tmp/{{ item }}.ldif.j2 dest=/tmp/{{ item }}.ldif owner=root group=root
+  with_flattened: 
+    - ldif_to_be_applied
+    - ldif_as_admin
+    - ldif_provider
+    - ldif_consumer
+  tags:
+    - ldap
+    - auth
+
+- name: ldap | apply ldifs
+  shell: ldapmodify -Y EXTERNAL -H ldapi:/// -f {{ item }}.ldif && touch "{{ldap_done_dir}}/{{item}}-done" chdir=/tmp creates="{{ldap_done_dir}}/{{item}}-done"
+  with_items: ldif_to_be_applied
+  tags:
+    - ldap
+    - auth
+
+- name: ldap | apply ldifs as admin
+  shell: ldapmodify -w {{ldap_password}} -x -D cn=admin,{{ldap_dc}} -f {{ item }}.ldif && touch "{{ldap_done_dir}}/{{item}}-done" chdir=/tmp creates="{{ldap_done_dir}}/{{item}}-done"
+  with_items: ldif_as_admin
+  tags:
+    - ldap
+    - auth
+
+- name: ldap | apply provider ldifs
+  shell: ldapmodify -Y EXTERNAL -H ldapi:/// -f {{ item }}.ldif && touch "{{ldap_done_dir}}/{{item}}-done" chdir=/tmp creates="{{ldap_done_dir}}/{{item}}-done"
+  with_items: ldif_provider
+  when: provider
+  tags:
+    - ldap
+    - auth
+
+- name: ldap | apply consumer ldifs
+  shell: ldapmodify -Y EXTERNAL -H ldapi:/// -f {{ item }}.ldif && touch "{{ldap_done_dir}}/{{item}}-done" chdir=/tmp creates="{{ldap_done_dir}}/{{item}}-done"
+  with_items: ldif_consumer
+  when: consumer
+  tags:
+    - ldap
+    - auth

@@ -1,0 +1,21 @@
+---
+
+- name: install scripts
+  copy: src={{item}}.pl dest=/home/ubuntu/scripts/{{item}} mode=0755 owner=ubuntu group=ubuntu
+  with_items:
+    - octest
+    - test
+  tags:
+    - octest
+    - scripts
+
+- name: /etc/init conf for octest
+  copy: src=octest.conf dest=/etc/init/octest.conf
+  tags:
+    - octest
+
+- name: start octest
+  service: name=octest state=stopped
+  tags:
+    - octest
+

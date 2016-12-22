@@ -1,0 +1,14 @@
+---
+
+- name: set LC_ALL
+  lineinfile: dest=/etc/environment regexp="^LC_ALL=.*" line="LC_ALL=en_US.utf8"
+  tags:
+    - environment
+    - config
+
+- name: set LANG
+  lineinfile: dest=/etc/environment regexp="^LANG=.*" line="LANG=en_US.utf8"
+  tags:
+    - environment
+    - config
+

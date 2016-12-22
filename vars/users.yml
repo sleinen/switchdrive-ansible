@@ -1,0 +1,125 @@
+---
+
+user:
+  # peta
+  fischer:
+    comment: "Jens-Christian Fischer"
+    uid: 1070
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDFRFUYN8WEFxHWkhKfaGS6Gqs+NKt+4eVqHb+s1IwT17g0PcnF3VoT30KgSqFsvVrvYnE6BCcIoJZnCgIcbzJccjdsXcF4v/40yYfuFsuk6nCnNI3fdaZjcizgdtgytBsj/kW42PJ6d6dIXLftF6dKJkBNYf4MsD1Yws4qpmMvIiV54ml7eh5nG7C1xbYuYJUTEebFGEPIkQXKMm7maNVvH4ppqRlIK27ayrTVfXSbbJJw+kPYn59p8vY8CAtTUkJ5wkiwAenZe+IfCMYGw29ZkTbahmzBVCtm+PMllUNggsEQABp9uGo9n2HukbvSBjqus5shqb808oK+c/asb4Wb fischer@peta-dhcp-13.switch.ch"
+  usai:
+    comment: "Alessandro Usai"
+    uid: 989
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA9zD6fdwOASm7RcheEGUJGCi2oh6ryHEX7CebhKGeshsh4ez8W+ovU4aq6gG+IDSOrP9b2QpRTdUHz+fDWf0F6TBUFzermljudccinEsORPdl/T4XzaLcWZ4aL8AsiaLQ2X8IvThTQqpQfeMxFVmSI++Z5NdXO2EfZ9nWZjlsgjgUL8UlIWd/uwlBwwIyRmXywcOoy71Qw99RLjJefvlJiYnKDfU2YSw8zO/Py3ptaJeBdBxXA/ph8REJtwapry5ugvkxb6UYZAKqMcC9WoIAYtDyJWexSMF6SUNe2c8jSK24jDZIFyp6Ju+dYBcBx3J1gxetY2uZz9Yiqd19gtWU0w== usai@macau.switch.ch"
+  tschopp:
+    comment: "Valery Tschopp"
+    uid: 959
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAIEA6KbrQuMxm9z8BrfJrMQXUvGyvVJafK4Q3KyAQoVTbEgSFzuVMgna2Z5M6clCadXt+wO4em8dkCxPY+qI6TpoD3lfeJ3o9nhqa3LMs3rldE4I2v1OvB1vNlGdhlB6ZJ4ZC+PYlL+y3n62IKcxMsfJw5dfIZOrda1Wu52f6QbvbdE= valery.tschopp@switch.ch"
+  leinen:
+    comment: "Simon Leinen"
+    uid: 925
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKYviHb6GPnzfpS/rRBkv4oUVCFbqil29XRPLbxkYf4nO3O37TUp7WGrsCeB8cf8IUEEYry8Cx2rAzYRRHNTQ0yzluD69D+5O+7b0MCf0gmma9eygXD/W7r69Zt1GmHVzPLd4YLoPQ3Hn6HxVPZcxXh7eTq1ItQuBAbUaKUlpMWFRT9U/DVBBCaQjKf0SH9Ev9jGJA60cvgY497vlj86F5Y+npD7hhCJJaUdce+LI8FVYGwFX7jC/9A+hvEQYpcSjjg9ChGTC0Mgk/O6Rl14vsbkBdI6HERvlolvZ2/Qw8i6lnXHqM7d5KkGXnTVI5hjwZDl4cg5N+UXMPa39jKnT5 leinen@macsl-10966.local"
+  schnidri:
+    comment: "Christian Schnidrig"
+    uid: 1097
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCdkGxbjU/dgwjg7x4jdByN9aKmFFYHsUyz0gzaJnH/tS+bMTQBxSuHpq0hwTsz3upVC42QR+L3aYvGhCV89Nsjx/m9ErqZ4sZGDrlQtTyA98v15N0PabeEjKakiNUMfbHnwMRs0n/rO/oEPpEjbkc9VhlJxMdGErr/lkvUHVlmt4VfeIrWf4NjcHZm8yGMOAufDtLj5iQi2jZI5beplh4uGPuWw39HAmRS2q2tsKnHAyPBNbYI6uAf1xwGCQExRzdoT7UNXY1+i+uQdPt2JlSBEE25gKMlt4VbkuJQFGHSP8mEEUl1p+0F3lBuPkyTCUXNDTgCvH9svazFxuTbFwDf schnidri@maccsc.switch.ch"
+  proto:
+    comment: "Saverio Proto"
+    uid: 1110
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD6iCEu+Nj3RrDwYpM3rQZysouVPriE8a1SITXmN6T8S8+4qYJugzAHhmWs49Bj0iHmy4srPmeiu+h6n6nHFNLFHSIYrfsihutEnF4zA80mH19WyqkO+ZvWB3KkmLkx/H36lVVFJwZEGKPCzI+tRaxThEcKNEDoj/+rrtvoo9OQ5mJD14kWirRHLFm3lbxssDEfaFLqZGFQjCLklBcZQQXV3GgbOixZMhS5pNC3xQJh9UEbgCYht0hVD3FueY6JOc/nPXg+ETBhDkMXkJPKfKz5U+r2Vf9lJ9J91uYcHeoAdhaPs1aO+zVFa+wJ91cCRF300FVZNCiqszaGDSVa6KcF proto@macfp.switch.ch"
+  # SePl
+  bleh:
+    comment: "Stephan Bleh"
+    uid: 1093
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCjeafYt+uCCyJmPhWZxerK/fr0KFswtgD19msn/I+GkEUTI7ZqQqqo0mgKQ99bEy9QGkXT3FG7iQgie+XUp6ahIEFzgyhOf8MIc2DfbZbUww09mv2zhlmkkSJPSWafq7RVEI92Hwf0+qTtei4KOBn3dNtqO4doXcUoiZNL9LJfZMWx3JNCnM/lNVb/oNdzFgzI+Syht6aR8JKnh+NilEKHNDgPBjwoZ7iPposjMGTPB+Fqp9RWQSOYKx2RE6MUEGnbDJodJSanJq+CTJEJyWlrD//zIv/DVJGj46pGWALYKdzYSq4hwW+FgIFSx2JmhsH7VFGd882OWh78GSgJKrz2fLkUkVILvd8ZKVtfClnLMmSWZ+iHxh4mK65KSfWa37jvDep+WCzLoncps4GEchEHW32m1zPKpvl8ZndV+2KQj5BBHAcZmd+gT/IOMRTNFTNUd38LAR9UkBrv+/cUAvTSief/Y2Y3xNG8vDp9cQApwkFel/JkHkzkoSCeFSTOoDi0vwmg3HKKeC4elZ9zVgaIl5Jnwy5w/naxskQ0KR6aE2bJ7V3ukJ7p12Zze088KDdp3Mx2kKOTFYbuB8lub+hYSkqmq/GtrzVG24bRWJYVxki9Kq2+yknGMwJGovb4rKLoRvS05E4dJdCiFbA2Aok9/hZYvGlrEtjQ5BncayM5Zw== stephan.bleh@switch.ch"
+  # InEn
+  furter:
+    comment: "Renato Furter"
+    uid: 996
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAylaVOcSO8Z9VTuOH03fDVxNYFeCPK4M7hS7ReNd+xW7i3jWHXBDG3eAE7YpRGKj1wioDXNwp2IE3b5+qobJvdGjsX94tquaENbImnfCCgSL324FSmItH/2y7twJG6bU8ErsCs2Q7kbDg52AOb3sh/kvDxx6biYuSyFARGbC1oRj9dHBd7IZ6rf829lYhzpvppwczSUCF87y1Lj1L3OJJa0c9z8Yro7K2PC7WzLBvr/Gm+DRO/3jRPGOYWCW/7L1Q4NJ4dmmQK6xF3ZbRUJck7rOfOcx/gRQzIoPNRlFYiyT4/KKwAJ6Yb36X3z1X0sof13bJpdTMTVz+f83Q6ZOlDQ== furter@macrf.switch.ch"
+  herzog:
+    comment: "Christoph Herzog"
+    uid: 1075
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDYVSl1icuTNzZgaOxiEu/k5qNkvILNBV6hiu2Lw4/eTBINF9MTEpSI+Q749DcEToo3crIDCmSKUdofS8Uvih1lecsJQQRqdvMzO5WXH2l+8VCEcoAgAMuFTThF0LsdSGeV4vEV0a7DbD/hhGUP68m/cLa1UWwNJSx3khei+Q+kMF7aLlj0hZ5gQuAQ+rxbv8PB6b5vPvBimKccfHNm37XAjJecYodStlrqWVg2wE23ElUHc5RaPdnnUIQi9xej570kWKkLUGo0v5KEqt2HfNqYZAckPpbiTRBeMlnLzD4k7AZDkZUO99k0dyimfoZQYZc/AAFn66ZUqaWB+ok3wP1DHDFLHUSeZqAjjOFyefXSdjnMEtCpooSyXa3c4iA6BPSMlDAcmntwF35WPFMEofJtV/zd8VDZVWslTiMSnvYuV421DoDk0udD7fCsEzjTzyFLFTEuIvPg5TCIpOJVsxGB0NFGJ1wD87O89dBwdUBNJ5iwrYC24zNk8Q26igwl3m2SN/6SvrD0PkVOiXcwLkMyZJDdGBfuOrkWiO8RhpDHYbIKjKkX5JrisQlbOI3tDcm57Zk75cg18f+WTOjFtcKk9oAp9+bmUNRGOMMHjyUUBNjClSP8Jh6Tt2weFXxKROWBgiRTcYiehhGrixDUCm2wUyRUs2pIHVlAAoEvppMA3w== herzog@Christoph-Herzog.local"
+  fritschi:
+    comment: "Daniel Fritschi"
+    uid: 992
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6T2rSWXCdd7hSC7zbq8cBkzwMjwstK1eYVArJniysF6ICVNVYEYdDbwoQmckf0sUMV6jr6eaY0LNoXvOgWmSAWNc8YAaWHgN6+uMRW9q+VEqNvm5Zn+WIYPoGjpTbgM41E4pL6vNUa6/uAVlpY75g6CqNC7S9dyKD7fc7uTRhf7K5OYBCSJ7mgYt2xAsPKateYD+8u3+yzDWrYAd1JUx/Q/M/dHfR2nkBhJZC2KD03DMUBoS0hkErtF86G4W3RhMaOQbw3ghRpEps04kjOZAW/61+g9Je41NJUz5WsM5uPdoZYFXwXC/DDGbjmeLKDUpMYQ6y4HDtwICUncNolS6DQ== fritschi@ho-174.switch.ch"
+  # SeSu
+  wieting:
+    comment: "Paola Wieting"
+    uid: 913 
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAwVuIxGxS6HIIqRQVQEoD4jJR5aDYiq7L+XZXFw376I3OwR/n6uqRduX1e+diRkPXv4mNTFvvyH1lPMl5zQr5tVHV/P1WsEOHwEjmw0ivJx5Za+9k9EvFmRlvztFl92nnDqfCyKPA1XknRc/XLMBTl29zV3b/Ax2mglKT5/uNYUOS5GKhwW0iZ7CGs5T0Gz7x5eeUnBXKVfNiP0x7nBlHsEMVTWO2FSUy6zFkPSCxtgxEAjcKPMfya8XahGwpBhIlPsHDX9sUL65ufggj1zZCpaTU/egiDaCKH1jnShZZt4ah6/U3sR69N8h+jFmYFdYEwGph71aFYna0LSsmM+FN/w== wieting@nmq-242.switch.ch"
+  malmborg:
+    comment: "Helena von Malmborg"
+    uid: 974
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC8iw1av0GLxToiCr9L3KwKRrK/PNn566DpM/yvtVVRyYn7bvQCpr34GgYj6ugrXRLrRX2HzSj5c5oiMjIguG7c6tcA5plkFVA1R1esGygIix0fnVqfl3Y7w/lwhOja9p1FPL6MoisD1hoZqWInGg0cAHDXkchV04jv5IGVwG69kopcqVSPO0EKY1X9A3BwnVzGa+KJszuGenLohCmF31aa1ig3PSHAZuWvDo6hffiFXvDs9/pJWVt5K4UDKnGF/vnhEKkrEl2nCazyRnUFRPF6DH8tOcFKDpzA/l/myu3Otx31A5V+NCXFIrxSh8OFmQAY5WCb15hQjoF8TULrkUoU04YYnSTEKy/fu2FMMPAQeIJ/3xATHIcZNK0Jz+JAgGBT5jDqJ+TP73YcO4fkpzrrfCrO3ZXUNIVOoQkWRp7Crgx6+LpZKAVr+jGYodOjOlGCjUHKOXHnH0xhsS4u6IJMmSDeDv4rcTnRgB7O4SG/eWK/99Dbi0oeI+GbFhm+Rum2Lxj6G9NZJxmet4cHNFKgXDxlo2pfex4U1rlx5HlG/gYI3XQfzaiA9KTyDBGg4ZZGX8VTi/hR/tJROJLwDw6GnHx9wHVyHXf6gLLLYziTlItJHsv3Lz/y5vT4t71zBnaZv/kHrDswQCnbrLQUJxOxORQzjAv4AW5VVY0FENlfHw== malmborg@machvm.switch.ch"
+  wuethric:
+    comment: "Samuel Wuethrich"
+    uid: 1100
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC0+feO5A67tAcfjUqgtE6ol1hO1Kl9OI5mc9D7vVfPw4u4amg6y0vf2/eXdyeky8gSJhPf4e8GDmH2w84eQtB6RVE1d69xO50OmrBvY4CZAWu9VZFq/hyeQpxWpUo25x8PvdOh7glZ8JW8gQhtBJ018JNryxyVcGLk645Dc6rG/WJCwE7sxPBHVDvODeCEFVeX8rE9N0SojtrLh4BlxRuyNPDYE/cxSzpul809YyBzOaudGgaH7WYKGtnAjONRnRzIUeANq9hVeX9lIaZlEM4xqUpfZpaw469LAA5/YyfOCG807mo7ru81KyKpVIdtVYVuPnXAKF4lIX9gdYq/Vs8DA8omU/hyxUrAjkXZpjrT/GEtn57ENOnJO+Isv+u8GgbYBeuK/lgBmnYx9eJiVisMbUnB1ZN3RJksnVEdchONA6TneqZ4mmlcTN8Jsc5WSSFQQZmXJLkR0Usr4BTrp+xuMC4LfUgCiwZkgCz9kQiaEbAIOd9edSzZx7g3LPmiU4eXV/Ht/g97cG7oYEjKf7bPtoES+jyZ9Wazj6zmqVpTwTUpijVaI1uKx29/Q4JTnQWHPOeIV8N76k3DgkhgCokaQvEyK2zD10mOQWJ8M0UMGCcbBzddnoEBHdg6/PWvrV6/brlAPtMk1bKKeA15wn6EX8Ag9uEoki3HjyENGknTaQ== wuethric@Samuel-s-Computer.local"
+  mueller2:
+    comment: "Florian Müller"
+    uid: 1126
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC+pGe+JqyCO2sr7zIHP8v7SzE6/YBLO39q/zJcBa+XiEcP2LDxiSxgpENXwYlVfq8NdTCQzXtoYheBilU+nYkQyUBkvMaUI/XfXT6KcsTbWPUA4Ah7sE13JIhvLDiEpei/aPm6i9z0MdInWU/sx2RDs0afrVhcNnLLVrG4i7/MrLNIxbgN8KxFZalmJG+sJYrxrFrC16k7W0MkS3EyLkrjeGQHGSAySwgEpNYGDRymLJItkb94AHz+wd1vmhCtz+EmHJDkVaA1gD7d0JcP3fOEXzPakAUAALt5pJsY5qvG/RvGWubg2HyW++rm71spiMmnO/PsaSsZUh02nsf1qRKlCb9NmjJwCuUaR55CTRpQLbV6uxFO5OdSf8Dzy5kN1qglUKmVDxAUIwbnElUNCtnl7fcHjPrsgNWYSrrTVW/EtjsmRgI5tHplJV33BRjM9NjTcH8KrpjQx+laoz8HL/U2zh5PjtShP6Ti6Stamb0V9ML5tRONspEMyL0xUBtyTd2oT4foud+TcZJg6Hy1Few2kmo3hXeaVVw1OHMxmA6XrEFGyjVaWB85E6aX5sryIeC9E8xu4JGuaFa4gZS7nUoIcw4tfvFmGsFFpUEMypEF3oB79uRyTz51ID1kpMyzpCVv48MLzuiQNZM4KEOJUwvw8sx88uxGUONDt6U3M0BqBw== mueller2@macfm.switch.ch"
+  # OC
+  felix:
+    comment:
+    uid: 5001
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLFJviVB/qUL1qk9XFLrMbB4oleM+xjl10AMgooTD6nkONvaHZyvmhkfn4G6eFkqHIZbndIhD1Lw6Vuu1Bg1Fb/zz0AF15KA8z7JmuWnJ2ZrqK4kejotbedcGH4X+vhA7XtacNrjx+wUVKQUQVCAkdx6Ty0x2w9xhMe2O0EHEEK/9IpTaOX6mQ2EsjbSYqXtPXMjGeBfXNmIM0OkWoaAlg0+nN9nadJDa/NrKhBONE4pyhywZLDmgWdw5jVJGu1tLexwyfErZAgdtYFXNKLQIgI+/KPM1Db2ufAb8YxSDPb1i/Zc30YR1quDBl4IaFb/tKnjCdN1KAqbhXoGWyUQGl felix@chump"
+  jfd:
+    comment:
+    uid: 5002
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDI3qzcsA2ZGXkCKa4gQ/Q1HwzpvNkY5rtx7U8v0Zow6GSRrDzuvzvg2eC8z4+knJnr/rZzrYGUrQY5MXTldig5qqTKxv23SqyLjRPwozEdWK4cnEwjJ+P8L2/SaCW9AfDs+ow1K/4wBWfHXt8+/fMVP0LA7AvEA8eiKfSyYWwJBdeTEnttbLaHKd0uDbSipiIPmOOuoPScbs1wkXVyP/oCiaH6R6md2/jZiiXj6RXcTyc73uQPXcCQRWASoio8NgvGUALz7nBHWvv932PMYT0IV4xVH0cdbT+7hIikCggnZAIOu9MS6PHTgeLnbiTzX4GgpIA9MOAmaLtXQGgcDnwz jfd@lance"
+
+
+
+users_admin:
+  - fischer
+  - leinen
+  - schnidri
+  - fritschi
+  - herzog
+  - furter
+
+users_mgmt:
+  - wieting
+  - malmborg
+  - wuethric
+  - mueller2
+
+users_dev:
+  - tschopp
+  - furter
+
+
+production_users:
+  - '{{ users_admin }}'
+
+mgmt_users:
+  - '{{ users_admin }}'
+  - '{{ users_mgmt }}'
+
+staging_users:
+  - '{{ users_admin }}'
+  - '{{ users_dev }}'
+  
+remove_users:
+  - schnidrig
+  - rissman
+  - vernon
+  - kerins
+  - bleh
+  - usai
+
+ubuntu_keys:
+  - schnidri
+  - leinen
+  - fischer
+  - furter
+  - fritschi
+  - felix
+  - jfd
+
+deleted_ubuntu_keys:
+  - usai
+  

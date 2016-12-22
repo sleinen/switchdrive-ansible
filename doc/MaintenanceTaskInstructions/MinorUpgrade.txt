@@ -1,0 +1,135 @@
+upgrade oc 8.1.5 to 8.1.8
+==========================================
+#################
+# setup
+
+>>> mac
+cd ~/drive
+#SITE=sldrive
+SITE=drive
+
+#################
+# stop service
+
+>>> lb.$SITE
+
+# staging: only web1/2, sync1/2
+
+sudo /root/ha_update di web1
+sudo /root/ha_update di web2
+sudo /root/ha_update di web3
+sudo /root/ha_update di web4
+sudo /root/ha_update di sync1
+sudo /root/ha_update di sync2
+sudo /root/ha_update di sync3
+sudo /root/ha_update di sync4
+sudo /root/ha_update di sync5
+sudo /root/ha_update di sync6
+sudo /root/ha_update di sync7
+sudo /root/ha_update di sync8
+sudo /root/ha_update di sync9
+sudo /root/ha_update di sync10
+sudo /root/ha_update di sync11
+sudo /root/ha_update di sync12
+
+# kill all ongoing sessions
+>>> mac
+ssh db4.$SITE sudo service postgresql restart
+
+
+#################
+# db backup
+
+>>> db4.$SITE
+
+sudo -u postgres /home/postgres/pg_backup/pg_backup_rotated.sh
+
+#################
+# save old OC config
+>>> mac
+ssh web1.$SITE sudo cp /var/www/owncloud/config/config.php /tmp/config.php
+ssh web1.$SITE sudo chmod o+r /tmp/config.php
+scp web1.$SITE:/var/www/owncloud/config/config.php tmp/config.php-old
+
+
+#################
+# upgrade
+
+# edit inventory file and update Version info: OWNCLOUD_VERSION
+
+
+# install code
+
+# only app, no patches!
+>>> mac
+ansible-playbook -i inventories/$SITE playbooks/webservers.yml --limit=*.201 --tags=upgrade
+scp tmp/config.php-old web1.$SITE:~/config.php
+ssh web1.$SITE sudo mv /home/ubuntu/config.php /var/www/owncloud/config
+ssh web1.$SITE sudo chown www-data:www-data /var/www/owncloud/config/config.php
+
+# run upgrade (8.1.5 to 8.1.9: this step took about 30 minutes -> lots of db io)
+>>> web1.$SITE
+sudo /root/occ upgrade -vvv --skip-migration-test
+
+# backup new OC config
+>>> mac
+ssh web1.$SITE sudo cp /var/www/owncloud/config/config.php /tmp/config.php
+ssh web1.$SITE sudo chmod o+r /tmp/config.php
+scp web1.$SITE:/tmp/config.php tmp/config.php-new
+ssh web1.$SITE sudo rm /tmp/config.php
+
+#edit roles/owncloud/templates/owncloud/drive-xxx.switch.ch/config.php.j2
+    -> check/fix version
+    
+    enable file locking:
+
+           add this to config:
+             'memcache.locking' => '\OC\Memcache\Redis',
+             'filelocking.enabled' => true,
+
+ansible-playbook -i inventories/$SITE playbooks/webservers.yml
+ansible-playbook -i inventories/$SITE playbooks/syncservers.yml
+ansible-playbook -i inventories/$SITE playbooks/devservers.yml
+ansible-playbook -i inventories/$SITE playbooks/mgmtservers.yml
+
+#################
+# reenable 3rd party apps:
+
+sudo /root/occ app:enable files_drop
+sudo /root/occ app:enable impersonate
+
+#################
+# check upgrade
+
+# test on dev server
+https://drive.switch.ch:4443/index.php/apps/files/?dir=%2F&view=favorites
+
+#### check config on admin page #####
+
+#################
+# reenable lb
+>>> lb.$SITE
+
+sudo /root/ha_update en web1
+sudo /root/ha_update en web2
+sudo /root/ha_update en web3
+sudo /root/ha_update en web4
+sudo /root/ha_update en sync1
+sudo /root/ha_update en sync2
+sudo /root/ha_update en sync3
+sudo /root/ha_update en sync4
+sudo /root/ha_update en sync5
+sudo /root/ha_update en sync6
+sudo /root/ha_update en sync7
+sudo /root/ha_update en sync8
+sudo /root/ha_update en sync9
+sudo /root/ha_update en sync10
+sudo /root/ha_update en sync11
+sudo /root/ha_update en sync12
+
+#### test web and sync ####
+
+
+============
+
+   

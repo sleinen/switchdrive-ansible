@@ -1,0 +1,36 @@
+---
+
+- name: Create dirs
+  file: path="{{item}}" state=directory group=107 owner=104
+  with_items:
+    - "{{grafana_data_dir}}"
+    - "{{grafana_data_dir}}/data"
+    - "{{grafana_data_dir}}/log"
+  tags:
+    - grafana
+
+- name: grafana docker
+  docker:
+    name: grafana
+    image: "{{grafana_docker_image}}"
+    hostname: grafana
+    restart_policy: always
+    state: reloaded
+    #pull: always
+    ports:
+      - "{{grafana_port}}:3000"
+    volumes:
+      - "{{grafana_data_dir}}/data:/var/lib/grafana"
+      - "{{grafana_data_dir}}/log:/var/log/grafana"
+    env:
+      GF_SECURITY_ADMIN_PASSWORD: "{{grafana_admin_passwd}}"
+      GF_SERVER_ROOT_URL: "http://{{grafana_host}}:{{grafana_port}}/"
+      GF_USERS_ALLOW_SIGN_UP: true
+      GF_AUTH_BASIC_ENABLED: true
+      GF_PATHS_PLUGINS: /plugins
+#    links:
+#      - graphite
+#      - elasticsearch
+  tags:
+    - grafana
+

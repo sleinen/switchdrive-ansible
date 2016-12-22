@@ -1,0 +1,131 @@
+[mariadb]
+10.0.28.31 ansible_ssh_user=ubuntu
+#10.0.28.32 ansible_ssh_user=ubuntu
+#10.0.28.33 ansible_ssh_user=ubuntu
+
+[nfs]
+10.0.28.71 ansible_ssh_user=ubuntu vols="{{volumes_nfs1}}"
+
+[web]
+10.0.28.201 ansible_ssh_user=ubuntu active=True
+
+[sync]
+10.0.28.101 ansible_ssh_user=ubuntu active=True
+
+[mgmt]
+
+[lb]
+10.0.28.21 ansible_ssh_user=ubuntu
+
+[ldap]
+# the first one in the list has to be the provider!
+#10.0.28.51 ansible_ssh_user=ubuntu provider=True
+# the one from "drive"
+86.119.34.136
+
+[elk]
+#10.0.26.151 ansible_ssh_user=ubuntu vols="{{volumes_elk1}}"
+#dummy only
+10.0.28.151 ansible_ssh_user=ubuntu vols="{{volumes_elk1}}" elasticsearch_heap_size="16g"
+
+[monitoring]
+
+[dev]
+
+[reg]
+
+[cmd]
+
+[redis]
+10.0.28.241 ansible_ssh_user=ubuntu
+
+[jumphost]
+86.119.31.73 ansible_ssh_user=ubuntu
+
+[engines]
+
+[graphite]
+10.0.28.6 ansible_ssh_user=ubuntu
+
+[backup]
+#10.0.28.9 ansible_ssh_user=ubuntu
+
+[test]
+10.0.28.181 ansible_ssh_user=ubuntu
+
+[production:children]
+mariadb
+nfs
+web
+sync
+mgmt
+lb
+ldap
+monitoring
+engines
+graphite
+backup
+test
+elk
+dev
+
+reg
+cmd
+redis
+jumphost
+
+[production:vars]
+
+site=tldrive
+internal_domain={{site}}
+
+#main_site=True
+service_name=drive-backup.switch.ch
+
+# network
+jumphost_internal=10.0.28.5
+reverse_dns_domain=28.0.10.in-addr.arpa
+backbone_ipv4_prefix=10.2.49
+backbone_ipv4_network=10.2.0.0/16
+backbone_ipv4_gateway=10.2.49.1
+backbone_ipv6_prefix=2001:620:5ca1:231:
+
+# LDAP
+#ldap_ip=10.0.28.51
+#ldap_host=sldrive-ldap1
+ldap_ip=86.119.34.136
+ldap_host=box-ldap1
+stats_send_to=jens-christian.fischer@switch.ch
+stats_from=jens-christian.fischer@switch.ch
+
+# NFS
+nfs1_ip=10.0.28.71
+nfs2_ip=10.0.28.72
+volumes_inventory_name=stage
+
+# owncloud
+OWNCLOUD_MAJOR_VERSION='9.0'
+OWNCLOUD_VERSION='{{OWNCLOUD_MAJOR_VERSION}}.7'
+enterprise=true
+stage_or_test_system=True
+rails_environment=production
+
+# servers mails to root (cronjobs) are sent to this address
+notification_mail=drive-operations@switch.ch
+
+# Set the list of users that have access to these servers
+admin_users={{ production_users }}
+
+# cloud-id
+# host name for cloud-id
+cloud_id_service_name=cloud-id.switch.ch
+
+
+# mariadb
+#mariadb_wsrep_cluster_address=gcomm://10.0.28.31,10.0.28.32,10.0.28.33
+mariadb_wsrep_cluster_address=gcomm://10.0.28.31
+
+# misc
+docker_registry="docker.drive.switch.ch"
+graphite_host_floating_ip=86.119.31.74
+

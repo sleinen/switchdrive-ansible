@@ -1,0 +1,31 @@
+---
+- name: Install (or update) docker.io
+  apt:
+    name: docker.io
+    state: latest
+    update_cache: yes
+  tags:
+    - docker
+
+- name: Check if docker installed
+  command: /usr/bin/test -e /etc/default/docker
+  register: docker_installed
+  tags:
+    - docker
+
+- name: Expose docker host
+  lineinfile:
+    dest=/etc/default/docker
+    regexp="^#DOCKER_OPTS.*"
+    line="DOCKER_OPTS=\"-H unix:// -H tcp://{{ docker_host_ip }}:{{ docker_host_port }}\""
+  notify: "restart docker"
+  when: "docker_installed and export_docker_host"
+  tags:
+    - docker
+
+  
+- name: docker-py
+  pip: name=docker-py
+  tags:
+    - docker
+  

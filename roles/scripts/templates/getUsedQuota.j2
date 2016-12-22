@@ -1,0 +1,16 @@
+#!/bin/bash
+
+
+if [ "x$1" == "x" ]; then 
+    echo "Usage: `basename $0` <userName>
+.      e.g: `basename $0` christian.schnidrig@switch.ch
+"
+    exit
+fi
+
+QUOTA=`sudo -u postgres psql -d owncloud -c "select size from oc_filecache join oc_storages on storage=numeric_id where path='files' and id = 'home::$1';" | egrep '^\s*[0-9]+$' `
+
+GiB=` echo "trunc($QUOTA / 1024 /1024 /1024, 3)" | calc -p`
+
+echo "$1: ${GiB} GiB"
+

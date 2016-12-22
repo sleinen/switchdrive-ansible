@@ -1,0 +1,5 @@
+if $app-name startswith 'collectd' then {
+  if $msg contains 'dispatched' then {
+    stop
+  }
+}

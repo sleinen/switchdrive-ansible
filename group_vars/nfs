@@ -1,0 +1,15 @@
+---
+nfspool: 'nfsvolumes'
+owncloud_share: 'owncloud-test'
+
+iptables:
+  tcp:
+    - 111
+    - 2049
+  udp:
+    - 111
+    - 2049
+
+collectd_processes: 
+   - nfsd
+    

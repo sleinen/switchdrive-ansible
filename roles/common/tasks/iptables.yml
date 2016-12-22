@@ -1,0 +1,13 @@
+---
+
+
+- name: create iptables directory
+  file: dest=/etc/iptables state=directory
+
+- name: insert iptables template
+  template: src=iptables.j2 dest=/etc/iptables/rules.v4
+  when: apply_common_iptables
+  notify: reload iptable-rules
+  tags:
+    - iptables
+

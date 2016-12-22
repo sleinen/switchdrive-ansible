@@ -1,0 +1,43 @@
+# This role installs HAProxy and configures it.
+
+- name: haproxy ppa
+  apt_repository: repo="ppa:vbernat/haproxy-1.6"
+
+- name: install haproxy
+  apt:  name={{item}} 
+        state=installed
+        update_cache={{apt_config.update_cache}}
+        cache_valid_time={{apt_config.cache_valid_time}}
+  with_items:
+    - haproxy
+
+- name: enable haproxy
+  template: src=haproxy.default dest=/etc/default/haproxy
+  notify:
+    - restart haproxy
+  tags:
+    - config
+
+- name: Configure the haproxy cnf file with hosts
+  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg
+  notify:
+    - reload haproxy
+  tags:
+    - config
+    - haconfig
+
+- name: upload ssl pem
+  copy: content="{{ service_cert[service_name] }}" dest=/etc/haproxy/{{ service_name }}.pem
+  ignore_errors: yes
+  notify:
+    - restart haproxy
+  tags:
+    - config
+    - certificate
+
+- name: upload 503 Maintenance page
+  copy: src=503maintenance.html dest=/etc/haproxy/503maintenance.html
+  tags:
+    - maint
+
+

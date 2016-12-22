@@ -1,0 +1,35 @@
+---
+
+- name: add dnsmasq
+  apt: name=dnsmasq state=present
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  tags:
+    - dns
+
+- name: add resolv.conf base
+  template: 
+    src=dns/resolv_conf_base.j2
+    dest=/etc/resolvconf/resolv.conf.d/base
+  notify: restart dnsmasq
+  tags:
+    - dns
+    - config
+
+- name: add resolv.conf upstream
+  template: 
+    src=dns/resolv.upstream.j2
+    dest=/etc/resolv.upstream
+  notify: restart dnsmasq
+  tags:
+    - dns
+    - config
+
+- name: add resolv.conf base
+  template: 
+    src=dns/dnsmasq_client_conf.j2
+    dest=/etc/dnsmasq.d/drive_client.config
+  notify: restart dnsmasq
+  tags:
+    - dns
+    - config
+

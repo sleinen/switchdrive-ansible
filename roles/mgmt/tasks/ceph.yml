@@ -1,0 +1,14 @@
+---
+
+- copy: src=ceph/{{item}} dest=/usr/lib/collectd/plugins/ceph/{{item}}
+  with_items:
+     - __init__.py
+     - base.py
+     - ceph_latcncy_plugin.py
+     - ceph_monitor_plugin.py
+     - ceph_osd_plugin.py
+     - ceph_pg_plugin.py
+     - ceph_pool_plugin.py
+     - LICENSE
+
+- copy: src=ceph/ceph.conf dest=/etc/collectd/collectd.conf.d/ceph.conf

@@ -1,0 +1,20 @@
+---
+
+- name: prometheus docker 
+  docker:
+    name: mysqld-exporter
+    image: "prom/mysqld-exporter:{{mysqld_exporter_version}}"
+    state: reloaded
+    pull: always
+    net: host
+    ports: 
+      - "9104:9104"
+    env:
+      DATA_SOURCE_NAME: "root:{{mariadb_passwd}}@(localhost:3306)/"
+    restart_policy: always
+    command: "-collect.binlog_size=true -collect.info_schema.processlist=true -collect.info_schema.query_response_time=true -collect.info_schema.tables=true -collect.info_schema.tablestats=true -collect.auto_increment.columns=true -collect.info_schema.userstats=true"
+  become: true
+  tags:
+    - prometheus
+    - mysqld_exporter
+

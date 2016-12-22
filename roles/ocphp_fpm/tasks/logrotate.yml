@@ -1,0 +1,14 @@
+---
+
+- name: add owncloud logrotation config file
+  copy:
+    src=logrotate.d/{{item}}
+    dest=/etc/logrotate.d/{{item}}
+    mode=0644 owner=root
+  with_items:
+    - owncloud
+    - php-fpm
+  tags:
+    - app
+    - config
+    - logrotate

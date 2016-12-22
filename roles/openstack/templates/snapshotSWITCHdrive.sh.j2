@@ -1,0 +1,32 @@
+#!/usr/bin/ssh-agent /bin/bash
+
+# usage: $0 region volume_id
+
+
+LOG_FILE=/var/log/drive/snapshot.log
+
+echo "-------------------------------" >> $LOG_FILE
+date "+%Y.%m.%d-%H:%M" >> $LOG_FILE
+
+export OS_AUTH_URL="{{snapshot_auth_url}}"
+export OS_TENANT_ID={{snapshot_tenant_id}}
+export OS_USERNAME="{{snapshot_username}}"
+export OS_PASSWORD="{{snapshot_password}}"
+export OS_REGION_NAME="$1"
+VOLUME_ID="$2"
+VOLUME_NAME="$3"
+
+DISPLAY_NAME="backup-drive-data-$VOLUME_NAME-`/bin/date "+%Y%m%d-%H:%M"`"
+#while [ `/usr/bin/cinder snapshot-list | grep $DISPLAY_NAME | wc -l` -eq 0 ]; do
+    /usr/bin/cinder snapshot-create --force True --display-name $DISPLAY_NAME $VOLUME_ID >> $LOG_FILE 2>&1
+#    sleep 5
+#done
+
+
+#############
+# freeze is dangerous, it can lead to complete system freeze -> we disabled it
+#/usr/bin/ssh-add .ssh/id_drive_snapshot_user >> $LOG_FILE
+#/usr/bin/ssh -o ProxyCommand="ssh ubuntu@{{ hostvars[groups['jumphost'][0]].inventory_hostname }} -W %h:%p" ubuntu@{{ hostvars[groups['nfs'][0]].inventory_hostname }} /sbin/fsfreeze -f /mnt/data >> $LOG_FILE
+#/usr/bin/ssh -o ProxyCommand="ssh ubuntu@{{ hostvars[groups['jumphost'][0]].inventory_hostname }} -W %h:%p" ubuntu@{{ hostvars[groups['nfs'][0]].inventory_hostname }} /sbin/fsfreeze -u /mnt/data >> $LOG_FILE
+
+

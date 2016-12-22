@@ -1,0 +1,11 @@
+
+---
+
+#ansible_ssh_user: "{{vault_ansible_ssh_user}}"
+#ansible_ssh_user: "schnidri"
+#ansible_become_pass: '{{vault_ansible_become_pass}}'
+
+#os_username: '{{vault_os_username}}'
+#os_password: '{{vault_os_password}}'
+#os_tenant: '{{vault_os_tenant}}'
+

@@ -1,0 +1,14 @@
+---
+
+- hosts: 
+    - web
+    - sync
+    - dev
+    - mgmt
+  become: yes
+  tasks:
+    - name: restart ocphp_fpm
+      shell: "docker stop ocphp_fpm; docker start ocphp_fpm"
+
+
+

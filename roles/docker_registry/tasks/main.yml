@@ -1,0 +1,4 @@
+---
+
+- include: data-disk.yml
+- include: registry.yml

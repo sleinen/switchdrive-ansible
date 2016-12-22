@@ -1,0 +1,18 @@
+<LoadPlugin "python">
+    Globals true
+</LoadPlugin>
+
+<Plugin "python">
+    ModulePath "/opt/collectd/collectd.plugins"
+    Import mysql
+    <Module mysql>
+        Host "localhost"
+        Port 3306
+        User "root"
+        Password "{{mariadb_passwd}}"
+        #HeartbeatTable "percona.heartbeat" (if using pt-heartbeat to track slave lag)
+        Verbose true
+    </Module>
+</Plugin>
+
+

@@ -1,0 +1,40 @@
+---
+# Variables for the web server configuration
+
+
+
+# Ethernet interface on which the web server should listen.
+# Defaults to the first interface. Change this to:
+#
+#  iface: eth1
+#
+# ...to override.
+#
+iface: '{{ ansible_default_ipv4.interface }}'
+
+iptables:
+  tcp:
+    - 80
+  udp: []
+
+db_pool_size: 35
+
+collectd_processes:
+   - php-fpm
+   - nginx
+
+php_config:
+  max_file_upload_size: 4G
+  max_execution_time: 3000
+  memory_limit: 512M
+  upload_tmp_dir: /tmp
+  max_php_processes: 25
+  pm.max_requests: 0
+php_ini_file: "php.ini"
+
+scripts:
+   - { name: "occ", path: "/root", mode: "0550" }
+   - { name: "mariadb", path: "/root", mode: "0550" }
+   - { name: "mysqlcmd", path: "/root", mode: "0550" }
+   - { name: "maxadmin", path: "/root", mode: "0550" }
+

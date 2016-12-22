@@ -1,0 +1,3 @@
+
+%admin ALL=(www-data:www-data) NOPASSWD: /var/www/owncloud/occ
+%admin ALL=(www-data:www-data) NOPASSWD: /usr/bin/php

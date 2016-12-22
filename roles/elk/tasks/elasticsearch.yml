@@ -1,0 +1,66 @@
+---
+- name: ES apt repo
+  apt_repository:
+    repo="deb http://packages.elasticsearch.org/elasticsearch/{{ elk_elasticsearch.version }}/{{ ansible_os_family|lower }} stable main"
+    update_cache=yes
+  when: ansible_os_family == 'Debian'
+
+- name: Install ES apt packages
+  apt: pkg=elasticsearch 
+    update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+  when: ansible_os_family == 'Debian'
+  notify: Restart elasticsearch
+  
+- include: mount_elastic_volumes.yml
+
+- name: Curator PIP package
+  pip: name=elasticsearch-curator state=latest
+
+- name: ES default config file
+  template:
+    src=elasticsearch/default_elasticsearch.conf.j2
+    dest=/etc/default/elasticsearch
+    owner=root group=root mode=644
+  notify: Restart elasticsearch
+  tags:
+    - esconfig
+    - config
+
+- name: ES config file
+  template:
+    src=elasticsearch/elasticsearch.yml.j2
+    dest=/etc/elasticsearch/elasticsearch.yml
+    owner=root group=root mode=644
+  notify: Restart elasticsearch
+  tags:
+    - esconfig
+    - config
+
+- name: Make monit to look after ES
+  template:
+    src=monitor/elasticsearch.monitrc.conf.j2
+    dest=/etc/monit/conf.d/elasticsearch.monitrc.conf
+    owner=root group=root mode=644
+  notify: Restart monit
+  tags:
+    - esconfig
+    - config
+
+- name: cronjob deleting old indices
+  cron: 
+    name=curator-{{item.prefix}}
+    cron_file=elasticsearch
+    minute="{{item.minute}}" hour="{{item.hour}}"
+    user="elasticsearch"
+    job="/usr/local/bin/curator --host 127.0.0.1 delete indices --prefix '{{item.prefix}}' --older-than {{item.days}} --time-unit days --timestring '\%Y.\%m.\%d' > /tmp/curator.log 2>&1"
+  tags:
+    - esconfig
+    - config
+  with_items:
+    - {prefix: logstash-syslog, days: 31, hour: 4, minute: 5}
+    - {prefix: logstash-nginx, days: 31, hour: 4, minute: 10}
+    - {prefix: logstash-audit, days: 190, hour: 4, minute: 15}
+
+- include: es_plugins.yml
+
+

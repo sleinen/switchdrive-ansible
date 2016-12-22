@@ -1,0 +1,25 @@
+
+ssh db1.drive
+
+#start mariadb container
+
+docker run --name=tuner -ti --net=host mariadb bash 
+
+# install newest tuner...
+apt-get update
+apt-get install wget
+wget http://mysqltuner.pl/ -O mysqltuner.pl
+wget https://raw.githubusercontent.com/major/MySQLTuner-perl/master/basic_passwords.txt -O basic_passwords.txt
+wget https://raw.githubusercontent.com/major/MySQLTuner-perl/master/vulnerabilities.csv -O vulnerabilities.csv
+
+
+# run test
+perl mysqltuner.pl --host 10.0.23.31  --user root --pass "r5vbfkng7" --forcemem 246872 --forceswap=0 --skippassword
+
+
+
+
+
+
+
+

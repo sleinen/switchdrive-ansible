@@ -1,0 +1,196 @@
+### Config file for collectd(1).
+###
+### Use the man page and example source for reference:
+###
+### http://collectd.org/documentation/manpages/collectd.conf.5.shtml
+### http://git.verplant.org/?p=collectd.git;a=blob;f=src/collectd.conf.in
+
+### Global
+### ------
+### Global settings for the daemon.
+
+Hostname {{ ansible_hostname | regex_replace('^(drive|ldrive|zdrive|szdrive|sldrive|tzdrive|tldrive)-(.*)$', '\\2') }}
+#FQDNLookup true
+#TypesDB "/usr/share/collectd/types.db" "/etc/collectd/my_types.db"
+
+## Interval at which to query values. This may be overwritten on a per-plugin
+## base by using the 'Interval' option of the LoadPlugin block:
+##   <LoadPlugin foo>
+##	 Interval 60
+##   </LoadPlugin>
+##
+#Interval 10
+
+#Timeout 2
+#ReadThreads 5
+#WriteThreads 5
+
+# Limit the size of the write queue. Default is no limit. Setting up a limit
+# is recommended for servers handling a high volume of traffic.
+#WriteQueueLimitHigh 1000000
+#WriteQueueLimitLow   800000
+
+### Logging
+### -------
+### Plugins which provide logging functions should be loaded first, so log
+### messages generated when loading or configuring other plugins can be
+### accessed.
+
+LoadPlugin syslog
+
+<Plugin syslog>
+	LogLevel info
+	NotifyLevel OKAY
+</Plugin>
+
+### LoadPlugin section
+### ------------------
+### Specify what features to activate.
+
+LoadPlugin cpu
+LoadPlugin aggregation
+<Plugin "aggregation">
+   <Aggregation>
+     Plugin "cpu"
+     Type "cpu"
+     
+     GroupBy "Host"
+     GroupBy "TypeInstance"
+     
+     CalculateSum true
+#     CalculateAverage true
+#     CalculateMaximum true
+   </Aggregation>
+ </Plugin>
+
+LoadPlugin contextswitch
+#LoadPlugin entropy
+LoadPlugin load
+LoadPlugin memory
+LoadPlugin users
+LoadPlugin python
+
+# Plugin configuration
+# --------------------
+# In this section configuration stubs for each plugin are provided. A desc-
+# ription of those options is available in the collectd.conf(5) manual page.
+
+#<Plugin "cgroups">
+#	CGroup "libvirt"
+#	IgnoreSelected false
+#</Plugin>
+
+LoadPlugin df
+<Plugin df>
+#	Device "/dev/sda1"
+#	Device "192.168.0.2:/mnt/nfs"
+#	MountPoint "/home"
+#	FSType "ext3"
+
+	# ignore rootfs; else, the root file-system would appear twice, causing
+	# one of the updates to fail and spam the log
+	FSType rootfs
+	# ignore the usual virtual / temporary file-systems
+	FSType sysfs
+	FSType proc
+	FSType devtmpfs
+	FSType devpts
+	FSType tmpfs
+	FSType fusectl
+	FSType cgroup
+	IgnoreSelected true
+
+#	ReportByDevice false
+#	ReportReserved false
+#	ReportInodes false
+
+#	ValuesAbsolute true
+#	ValuesPercentage false
+</Plugin>
+
+LoadPlugin disk
+#<Plugin disk>
+#	Disk "hda"
+#	Disk "/[hsv]d[a-z]/"
+#	IgnoreSelected false
+#</Plugin>
+
+#LoadPlugin ethstat
+#<Plugin ethstat>
+#	Interface "eth0"
+#	Map "rx_csum_offload_errors" "if_rx_errors" "checksum_offload"
+#	Map "multicast" "if_multicast"
+#	MappedOnly false
+#</Plugin>
+
+#<Plugin exec>
+#	Exec user "/path/to/exec"
+#	Exec "user:group" "/path/to/exec"
+#	NotificationExec user "/path/to/exec"
+#</Plugin>
+
+LoadPlugin interface
+<Plugin interface>
+    Interface "lo"
+    IgnoreSelected true
+</Plugin>
+
+#LoadPlugin irq
+#<Plugin irq>
+#	Irq 7
+#	Irq 8
+#	Irq 9
+#	IgnoreSelected true
+#</Plugin>
+
+#<Plugin libvirt>
+#	Connection "xen:///"
+#	RefreshInterval 60
+#	Domain "name"
+#	BlockDevice "name:device"
+#	InterfaceDevice "name:device"
+#	IgnoreSelected false
+#	HostnameFormat name
+#	InterfaceFormat name
+#</Plugin>
+
+#<Plugin notify_email>
+#	SMTPServer "localhost"
+#	SMTPPort 25
+#	SMTPUser "my-username"
+#	SMTPPassword "my-password"
+#	From "collectd@main0server.com"
+#	# <WARNING/FAILURE/OK> on <hostname>.
+#	# Beware! Do not use not more than two placeholders (%)!
+#	Subject "[collectd] %s on %s!"
+#	Recipient "email1@domain1.net"
+#	Recipient "email2@domain2.com"
+#</Plugin>
+
+#LoadPlugin ntpd
+#<Plugin ntpd>
+#	Host "localhost"
+#	Port 123
+#	ReverseLookups false
+#	IncludeUnitID true
+#</Plugin>
+
+#LoadPlugin processes
+#<Plugin processes>
+#	Process "ceph-osd"
+#	Process "ceph-mon"
+#</Plugin>
+
+LoadPlugin swap
+#<Plugin swap>
+#	ReportByDevice false
+#	ReportBytes true
+#</Plugin>
+
+#<Plugin vmem>
+#	Verbose false
+#</Plugin>
+
+<Include "/etc/collectd/collectd.conf.d">
+	Filter "*.conf"
+</Include>

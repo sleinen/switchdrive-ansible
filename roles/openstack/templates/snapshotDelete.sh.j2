@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# usage: $0 region volume_id relativ-date
+
+export OS_AUTH_URL="{{snapshot_auth_url}}"
+export OS_TENANT_ID={{snapshot_tenant_id}}
+export OS_USERNAME="{{snapshot_username}}"
+export OS_PASSWORD="{{snapshot_password}}"
+export OS_REGION_NAME="$1"
+VOLUME_ID="$2"
+DATE="$3"
+
+function wait_complete {
+	STATUS="not yet run"
+	while [ "$STATUS" != "error_deleting" ] && [ "$STATUS" != "available" ] && [ "x$STATUS" != "x" ] ; do
+	    echo -n "."
+	    STATUS=`cinder snapshot-list --all-tenants| awk "/ $1 / { print \\\$6 }"`
+        sleep 1
+	done
+	if [ "$STATUS" != "deleting" ] && [ "x$STATUS" != "x" ]; then
+	    echo $STATUS
+	    exit 100
+    fi
+	echo
+}
+
+
+LOG_FILE=/var/log/drive/snapshot_delete.log
+
+echo "-------------------------------" >> $LOG_FILE
+date "+%Y.%m.%d-%H:%M" >> $LOG_FILE
+echo "Deleting Snapshots of $VOLUME_ID ($DATE)" >> $LOG_FILE
+
+DELETE_DATE=`/bin/date "+%Y%m%d" -d "$DATE"`
+VOLUMES=`cinder snapshot-list | grep "$VOLUME_ID" | awk "/-$DELETE_DATE-/ { print \\$2 }" `
+
+for volume in $VOLUMES; do
+	/usr/bin/cinder snapshot-delete $volume >> $LOG_FILE 2>&1
+	wait_complete $volume
+done
+
+
+

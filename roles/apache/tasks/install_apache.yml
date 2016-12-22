@@ -1,0 +1,31 @@
+---
+
+
+- name: Install the Apache server
+  action: apt name={{item}}
+  tags:
+    - apache
+  with_items:
+    -
+     apache2
+    #- libapache2-mod-php5.6
+    - libapache2-mod-xsendfile
+    - libapache2-mod-fastcgi
+
+- name: start apache service
+  service: name=apache2 state=started enabled=true
+  tags:
+      - apache
+
+# elk log format
+- name: apache config
+  lineinfile:
+    dest=/etc/apache2/apache2.conf
+    regexp="^\s*LogFormat\s+.*\s+elk\s*"
+    insertafter="^\s*LogFormat.*"
+    line='LogFormat "%a - %>u %t \\"%r\\" %>s %B \\"%{Referer}i\\" \\"%{User-Agent}i\\" %V %{ms}T %{begin:sec}t.%{begin:msec_frac}t [%{Cookie}i]" elk'
+  notify: restart apache2
+  tags:
+     - config
+     - apacheconfig
+

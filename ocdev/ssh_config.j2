@@ -1,0 +1,16 @@
+Host router.{{domain}}
+  User ubuntu
+  HostName {{floating_ip}}
+  ForwardAgent yes
+Host 10.253.* *.{{domain}}
+  User ubuntu
+  LogLevel error
+  ForwardAgent yes
+  ForwardX11 no
+  CheckHostIP no
+  StrictHostKeyChecking no
+  UserKnownHostsFile=/dev/null
+  ProxyCommand ssh ubuntu@{{floating_ip}} -W %h:%p
+  ControlMaster auto
+  ControlPath /tmp/ssh_mux_%h_%p_%r
+ 

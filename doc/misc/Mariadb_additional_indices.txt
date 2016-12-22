@@ -1,0 +1,35 @@
+
+The default set of indices that owncloud ships with proved not to be good enough.
+We added a few indices ourselves.
+
+
+#############
+# how to find which additional indices might be useful:
+
+The slow queries log is located at:
+      /mnt/data/mariadb/mysql-slow.log
+
+# by default queries not using indices are not logged. so turn that on:
+
+set global log_queries_not_using_indexes=on;
+
+# to turn it off again:
+set global log_queries_not_using_indexes=off;
+
+# to list the indices on a table, e.g. type:
+show index from oc_users;
+
+
+SELECT * FROM INFORMATION_SCHEMA.INDEX_STATISTICS WHERE TABLE_NAME = "author";
+
+
+indices added to owncloud db
+============================
+
+create index file_target_index on oc_share (file_target);
+create index uid_owner_index on oc_share (uid_owner);
+create index share_with_index on oc_share (share_with);
+
+create index uid_index on oc_group_user(uid);
+create index argument_index on oc_jobs(argument);
+

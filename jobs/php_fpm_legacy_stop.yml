@@ -1,0 +1,14 @@
+---
+
+- hosts: 
+    - web
+    - sync
+    - dev
+    - mgmt
+  become: yes
+  tasks:
+    - name: stop the php_fpm service
+      service: name=php5.6-fpm state=stopped
+
+
+

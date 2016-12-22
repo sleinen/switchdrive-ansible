@@ -1,0 +1,8 @@
+.DS_Store
+backups/*
+.idea/*
+/.README.md.html
+/.pydevproject
+.vagrant
+
+vault_password

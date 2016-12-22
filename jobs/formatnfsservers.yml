@@ -1,0 +1,20 @@
+---
+
+
+# run with: 
+#     ansible-playbook -i "10.0.23.75," jobs/formatnfsservers.yml
+
+
+- hosts: all
+  become: true
+  tasks:
+    - name: install xfs
+      apt: name=xfsprogs update_cache=yes
+    - name: make filesystem
+      command: mkfs.xfs -L {{ item.1 }} /dev/{{ item.0 }}
+      #command: xfs_admin -L {{ item.1 }} /dev/{{ item.0 }}
+      with_together:
+        - [ vdh, vdi, vdj, vdk, vdl, vdm ]
+        - [ "137", "138", "139", "140", "141 ", "142 "]
+      ignore_errors: yes
+

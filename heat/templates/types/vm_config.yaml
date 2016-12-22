@@ -1,0 +1,55 @@
+heat_template_version: 2013-05-23
+
+description: |
+  This template creates a default cloud config.
+
+parameters:
+  hostname:
+    type: string
+    label: "hostname"
+  domainname:
+    type: string
+    label: "domain name, such that <hostname>.<domain name> = fqdn"
+  admin_pass:
+    type: string
+    label: "password for admin user."
+
+resources:
+  vm_config:
+    type: OS::Heat::MultipartMime
+    properties:
+      parts:
+        - config: { get_resource: cloud_config }
+  cloud_config:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config: 
+        hostname: { get_param: hostname }
+        fqdn: 
+          Fn::Join: 
+            - "."
+            -  [{ get_param: hostname }, { get_param: domainname }]
+        write_files:
+          - path: /etc/apt/apt.conf.d/99force-ipv4
+            content: |
+              Acquire::ForceIPv4 true;
+          - path: /root/fixInterfaces
+            permissions: '0755'
+            content: |
+              #!/usr/bin/env bash
+              interfaces=`ip -oneline link | awk '{FS=": "}; /eth/ {print $2}'`
+              for int in $interfaces; do
+                 sudo ifdown $int
+                 sudo ifup $int
+              done
+        locale: en_US.UTF-8
+        password: { get_param: admin_pass }
+        chpasswd: { expire: False }
+        ssh_pwauth: False
+        manage_etc_hosts: False
+
+outputs:
+  vm_config:
+    description: new cloud-id config
+    value: { get_resource: vm_config}
+          

@@ -1,0 +1,41 @@
+---
+
+- hosts: all
+  become: yes
+  gather_facts: no
+  vars: 
+    pydev_version: 3.9.0
+    eclipse_workdir: /Users/schnidri/git/drive
+  handlers:
+    - name: restart apache2
+      service: name=apache2 state=restarted
+  become: yes
+  tasks:
+    - include: ansible/apache2.yml
+    - include: ansible/ocdev.yml
+    - include: ansible/php.yml
+
+    - apt: name=git
+
+    - apt: name=sqlite
+    #- apt: name=phpmyadmin
+    #- apt: name=mysql-server
+    #- apt: name=mysql-client
+
+    - copy: src=ocrun.sh dest=/home/vagrant/ocrun mode=0755 owner=vagrant
+    - copy: src=files/occ dest=/home/vagrant/occ mode=0755 owner=vagrant
+    - file: path=/data state=directory owner=www-data group=www-data
+    - file: path=/var/www/owncloud/data src=/data state=link owner=www-data group=www-data
+
+    - include: ansible/xdebug.yml
+    - include: ansible/install_smashbox.yml
+    - include: ansible/install_occlient.yml
+    - include: ansible/pydev.yml
+    
+    - lineinfile: dest=/etc/environment regexp="^export PYTHONPATH.*" line="export PYTHONPATH=/opt/pysrc:/opt/pyocclient"
+    - copy: src=files/smashdebug dest=/home/vagrant/smashdebug mode=0755 owner=vagrant
+    - file: path=/opt/apps state=directory owner=www-data group=www-data
+    - unarchive:  src=files/enterprise_key.tgz dest=/opt/apps creates=/opt/apps/enterprise_key
+    - unarchive:  src=files/provisioning_api.tgz dest=/opt/apps creates=/opt/apps/provisioning_api
+    
+

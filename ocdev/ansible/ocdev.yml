@@ -1,0 +1,10 @@
+---
+
+- apt: name=python3 update_cache=yes
+- apt: name=python3-pip
+- command: pip3 install ocdev
+  args:
+     creates: /usr/local/bin/ocdev
+- copy: src=files/devup.sh dest=/home/vagrant/devup mode=0755 owner=vagrant
+- copy: src=files/ocdevrc dest=/home/vagrant/.ocdevrc owner=vagrant
+

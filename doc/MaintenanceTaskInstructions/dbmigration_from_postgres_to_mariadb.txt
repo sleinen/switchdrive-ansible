@@ -1,0 +1,233 @@
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Preparation:
+
+#################
+# initialize new db;
+
+# configure and boot db1 as standalone db without galera:
+
+ansible-playbook -i inventories/drive jobs/mariadb_initdb.yml --limit=*31
+
+ 
+#################
+# on dev.drive: patch convertion code
+
+# Edit file converter: exclude oc_filecache from being transferred. 
+
+vi /var/www/owncloud/core/command/db/converttype.php
+
+# Line 283: 
+                                if ($table != "oc_filecache") {
+                                        $this->copyTable($fromDB, $toDB, $table, $input, $output);
+                                }
+
+# make sure we have correct config on dev.drive:
+
+ansible-playbook -i inventories/drive playbooks/devservers.yml -t occonfig
+
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# Migration
+
+>>> mac
+cd ~/drive
+#SITE=sldrive
+SITE=drive
+
+#################
+# stop service
+
+>>> lb.$SITE
+
+# staging: only web1/2, sync1/2
+
+sudo /root/ha_update di web1
+sudo /root/ha_update di web2
+sudo /root/ha_update di web3
+sudo /root/ha_update di web4
+sudo /root/ha_update di sync1
+sudo /root/ha_update di sync2
+sudo /root/ha_update di sync3
+sudo /root/ha_update di sync4
+sudo /root/ha_update di sync5
+sudo /root/ha_update di sync6
+sudo /root/ha_update di sync7
+sudo /root/ha_update di sync8
+sudo /root/ha_update di sync9
+sudo /root/ha_update di sync10
+sudo /root/ha_update di sync11
+sudo /root/ha_update di sync12
+
+# kill all ongoing sessions
+>>> mac
+ssh db4.$SITE sudo service postgresql restart
+
+
+
+
+#################
+# transfer schema and everything except oc_filecache.
+
+# on dev.drive:
+time /root/occ db:convert-type --password="r5vbfkng7" --clear-schema mysql owncloud 10.0.23.31 owncloud
+
+# that takes about 20 minutes
+
+
+#################
+# dump oc_filecache in sql compatible format.
+
+# on db4.drive
+
+rm /mnt/dbdata/backup/owncloud.filecache.sql
+time su -c "/usr/bin/pg_dump -Fp --data-only --column-inserts --disable-dollar-quoting --encoding='UNICODE' --table=oc_filecache  -U postgres owncloud -f /mnt/dbdata/backup/owncloud.filecache.sql" postgres
+
+# this takes 20 minutes.
+
+
+#################
+# copy files over to db1:
+
+# on db1.drive
+
+scp db4.drive:/mnt/dbdata/backup/owncloud.filecache.sql /mnt/data/backup
+
+#################
+# load oc_filecache table into mariadb:
+
+# on db1.drive
+
+tmux
+docker exec -ti mariadb bash
+######time cat /backup/owncloud.filecache.sql | egrep  "^INSERT\s+" | mysql --batch -u owncloud -p owncloud --password=$MYSQL_ROOT_PASSWORD
+time cat /backup/owncloud.filecache.sql | tail -n +17 | head -n -11 | mysql --batch -u owncloud --password=$MYSQL_ROOT_PASSWORD --default-character-set=utf8 owncloud
+
+# this command takes about 4 hours
+
+#################
+# backup new db
+
+# on db1.drive:
+
+docker exec -ti mariadb bash -c 'xtrabackup --backup --datadir=/var/lib/mysql/ --target-dir=/backup/migration/ --password=$MYSQL_ROOT_PASSWORD'
+docker exec -ti mariadb bash -c 'xtrabackup --prepare --target-dir=/backup/migration'
+docker exec -ti mariadb bash -c 'xtrabackup --prepare --target-dir=/backup/migration'
+
+
+# about 5 minutes
+
+#################
+# create galera cluster
+ 
+# initialize new cluster:
+
+ansible-playbook -i inventories/drive jobs/mariadb_bootcluster.yml
+
+# about 7 minutes
+
+# verify on maxscale, that all is working:
+/root/maxadmin list servers
+
+# log in on maxscale:
+/root/mariadb
+
+
+#################
+# update config
+
+edit config.php:
+  'dbtype' => 'mysql',
+  #'dbhost' => '{{hostvars[groups["maxscale"][0]].inventory_hostname}}',
+  'dbhost' => '{{hostvars[groups["mariadb"][0]].inventory_hostname}}',
+  'dbpassword' => '{{mariadb_passwd}}',
+
+
+ansible-playbook -i inventories/$SITE playbooks/webservers.yml -t occonfig
+ansible-playbook -i inventories/$SITE playbooks/syncservers.yml -t occonfig
+ansible-playbook -i inventories/$SITE playbooks/devservers.yml -t occonfig
+ansible-playbook -i inventories/$SITE playbooks/mgmtservers.yml -t occonfig
+
+
+
+#################
+# check upgrade
+
+# test on dev server
+https://drive.switch.ch:4443/index.php/apps/files/?dir=%2F&view=favorites
+
+
+
+#################
+# reenable lb
+>>> lb.$SITE
+
+sudo /root/ha_update en web1
+sudo /root/ha_update en web2
+sudo /root/ha_update en web3
+sudo /root/ha_update en web4
+sudo /root/ha_update en sync1
+sudo /root/ha_update en sync2
+sudo /root/ha_update en sync3
+sudo /root/ha_update en sync4
+sudo /root/ha_update en sync5
+sudo /root/ha_update en sync6
+sudo /root/ha_update en sync7
+sudo /root/ha_update en sync8
+sudo /root/ha_update en sync9
+sudo /root/ha_update en sync10
+sudo /root/ha_update en sync11
+sudo /root/ha_update en sync12
+
+#### test web and sync ####
+
+
+
+
+
+
+
+
+
+
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+# misc comments
+
+
+===============
+
+Monitor progress with:
+
+select count(*) from oc_filecache ;
+show status like "wsrep_cluster_size";
+SHOW STATUS LIKE 'Qcache%';
+
+==================
+Archive:
+
+----------
+
+# run the following command to load the table into mariadb (http://dev.mysql.com/doc/refman/5.5/en/optimizing-innodb-bulk-data-loading.html)
+
+time ( \
+ echo "SET @OLD_AUTOCOMMIT=@@AUTOCOMMIT, AUTOCOMMIT = 0; "; \
+ echo "SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS = 0; "; \
+ echo "SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS = 0; "; \
+ cat /backup/owncloud.filecache.sql | egrep -v "^SET\s+" ; \
+ echo "SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS; "; \
+ echo "SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS; "; \
+ echo "SET AUTOCOMMIT = @OLD_AUTOCOMMIT; "; \
+ echo "COMMIT; ") \
+| mysql --batch -u owncloud -p owncloud
+
+==============
+maxscale:
+
+docker exec -ti maxscale maxadmin -p mariadb list services
+docker exec -ti maxscale maxadmin -p mariadb list servers
+docker exec -ti maxscale maxadmin -p mariadb list clients
+docker exec -ti maxscale maxadmin -p mariadb list sessions
+
+
+

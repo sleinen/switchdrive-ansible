@@ -1,0 +1,46 @@
+heat_template_version: 2013-05-23
+  
+################################
+parameters:  
+  name_prefix:
+    type: string
+    description: "Resources Name Prefix"
+  hostname:
+    type: string
+  region:
+    type: string
+    label: "SWITCHengines region: LS or ZH"
+    default: "ZH"
+  ssh_key:
+    type: string
+    label: "Key name"
+    default: Christian-Schnidrig
+  volume_size:
+    type: string
+    default: "40"
+
+  base_image:
+    type: string
+    label: "Base OS Image (name or ID)"
+    default: Ubuntu Xenial 16.04 (SWITCHengines)
+#    default: Ubuntu Trusty 14.04 (SWITCHengines)
+
+################################
+resources:
+  root_volume:
+    type: OS::Cinder::Volume
+    properties:
+      name: 
+        str_replace:
+          template: |
+            hostname_root
+          params: 
+            hostname:   { get_param: hostname }
+      size: { get_param: volume_size }
+      image: { get_param: base_image }
+
+################################
+outputs:
+  volume_id:
+    value: { get_resource: root_volume }
+

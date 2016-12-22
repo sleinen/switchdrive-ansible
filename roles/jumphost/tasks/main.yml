@@ -1,0 +1,8 @@
+---
+
+- include: dnsmasq.yml
+
+- include: sshd.yml
+
+#- include: pam.yml
+

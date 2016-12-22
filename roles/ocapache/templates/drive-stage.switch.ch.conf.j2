@@ -1,0 +1,42 @@
+<VirtualHost *:80>
+        ServerName {{ service_name }}
+        ServerAdmin switchdrive@switch.ch
+        DocumentRoot /var/www/owncloud
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        LogLevel warn
+        CustomLog ${APACHE_LOG_DIR}/access.log elk
+        BrowserMatch "MSIE [2-6]" \
+                nokeepalive ssl-unclean-shutdown \
+                downgrade-1.0 force-response-1.0
+        BrowserMatch "MSIE [17-9]" ssl-unclean-shutdown
+        <Directory /var/www/owncloud>
+                Options Indexes FollowSymLinks MultiViews
+                AllowOverride All
+                Allow from all
+                Require all granted
+                <IfModule mod_dav.c>
+                    Dav off
+                </IfModule>
+                Satisfy Any
+                
+#                SetEnv MOD_X_SENDFILE_ENABLED 1
+#                XSendFile On
+#                XSendFilePath /mnt/
+
+                SetEnv HOME /var/www/owncloud
+                SetEnv HTTP_HOME /var/www/owncloud
+        </Directory>
+        <IfModule mod_fastcgi.c>
+                AddType application/x-httpd-fastphp5 .php
+                Action application/x-httpd-fastphp5 /php5-owncloud-fcgi
+                Alias /php5-owncloud-fcgi /usr/lib/cgi-bin/php5-owncloud-fcgi
+                FastCgiExternalServer /usr/lib/cgi-bin/php5-owncloud-fcgi -socket /var/run/php/php7.0-fpm.sock -pass-header Authorization
+                #FastCgiExternalServer /usr/lib/cgi-bin/php5-owncloud-fcgi -host 127.0.0.1:9000 -pass-header Authorization
+                <Directory /usr/lib/cgi-bin>
+                    Require all granted
+                </Directory>
+         </IfModule>
+         <IfModule mod_headers.c>
+            Header always set Strict-Transport-Security "max-age=15768000; includeSubDomains; preload"
+         </IfModule>
+</VirtualHost>

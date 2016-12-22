@@ -1,0 +1,56 @@
+##
+# L_check_http checks (internally) that it is possible to http connect to the node.
+# If a response is returned in less than 5 seconds an OK state is returned;
+# otherwise a warning (between 5 and 10) or a critical (more than 10) is returned.
+##
+L_check_http /usr/lib/nagios/plugins/check_http -w 5 -c 10  -H {{ inventory_hostname }}
+
+##
+# check_logfiles checks the log files as defined in the specified configuration file
+##
+L_check_reg_server_logs sudo /home/nagios/plugins-static/check_logfiles -f /home/nagios/etc/check_logfiles.cfg
+
+##
+# L_check_shibd_process checks that at least one shibd process is up and running.
+# Notice that check_mk will notice if shibd is running, and if so will also automatically start monitoring it.
+##
+L_check_shibd_process /usr/lib/nagios/plugins/check_procs -C shibd -u _shibd -c 1:
+
+##
+# L_check_apache_process checks that at least one apache process is up and running.
+# Notice that check_mk will notice if apache is running, and if so will also automatically start monitoring it.
+##
+L_check_apache_process /usr/lib/nagios/plugins/check_procs -C apache2 -u www-data -c 1: -w 2:
+
+##
+# L_check_mysqld_process checks that at least one mysqld process is up and running.
+# Notice that check_mk will notice if mysqld is running, and if so will also automatically start monitoring it.
+##
+L_check_mysqld_process /usr/lib/nagios/plugins/check_procs -C mysqld -u mysql -c 1:
+
+##
+# L_check_rsyslogd_process checks that at least one rsyslogd process is up and running.
+##
+L_check_rsyslogd_process /usr/lib/nagios/plugins/check_procs -C rsyslogd -u syslog -c 1:
+
+##
+# L_check_PassengerWatchd_process checks that at least one PassengerWatchd process is up and running.
+##
+L_check_PassengerWatchd_process /usr/lib/nagios/plugins/check_procs -C PassengerWatchd -c 1:
+
+##
+# L_check_PassengerHelper_process checks that at least one PassengerHelper process is up and running.
+##
+L_check_PassengerHelper_process /usr/lib/nagios/plugins/check_procs -C PassengerHelper -c 1:
+
+##
+# L_check_PassengerLoggin_process checks that at least one PassengerLoggin process is up and running.
+##
+L_check_PassengerLoggin_process /usr/lib/nagios/plugins/check_procs -C PassengerLoggin -c 1:
+
+##
+# L_check_ldap_bind checks an ldap bind (ldapsearch) to the ldap server on port 636 with 'ou=Users,dc=cloud,dc=switch,dc=ch'
+# -3 [--ver3] use ldap protocol version 3 (default protocol version: 2)
+##
+#L_check_ldap_bind /usr/lib/nagios/plugins/check_ldap -p 636 -H {{ ldap_host }}.novalocal -b 'ou=Users,dc=cloud,dc=switch,dc=ch' -3
+

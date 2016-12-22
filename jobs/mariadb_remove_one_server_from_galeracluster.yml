@@ -1,0 +1,23 @@
+---
+
+# This job can be used to:
+#   1) Remove one server from the galera cluster and start it as a standalone server.
+
+# run with --limit= !!!!!!!!!!!!!
+
+
+# in order to add the server back to the cluster run:
+# ansible-playbook -i inventories/XYZ playbooks/mariadbservers.yml --limit=*.XX -t mariadb
+
+
+- hosts: mariadb
+  become: true
+  vars_files:
+    - ../vars/users.yml
+  vars:
+    node_type: mariadb
+    mariadb_wsrep_on: OFF
+    mariadb_disable_plugins: "#"
+  run_once: true
+  roles:
+    - mariadb_base

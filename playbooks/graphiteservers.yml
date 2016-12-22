@@ -1,0 +1,24 @@
+---
+
+- hosts: 
+    - mariadb
+  gather_facts: no
+  tasks:
+    - setup:
+  tags:
+    - prometheus
+
+
+- hosts: graphite
+  vars_files:
+    - '../vars/users.yml'
+  roles:
+    - data_disk
+    - common
+    - docker
+    - grafana
+    - graphite
+    - prometheus
+    - logspout
+  become: true
+

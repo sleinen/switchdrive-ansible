@@ -1,0 +1,19 @@
+---
+
+- name: install owncloud cronjobs
+  cron: cron_file=owncloud 
+    hour={{ item.hour }} minute={{ item.minute }} 
+    name="php-cronjob-{{item.shard_name}}" 
+    state=present 
+    user=root 
+    job="docker exec --user www-data php_fpm_{{item.version}} php -f {{owncloud_webroot}}/{{item.shard_name}}/cron.php"
+  with_items: 
+     - "{{shard_config[service_name]}}"
+  when: 
+  tags:
+    - config
+    - cron
+    - app
+  run_once: true
+  delegate_to: "{{ hostvars[groups['web'][0]].inventory_hostname }}"
+    

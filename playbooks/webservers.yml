@@ -1,0 +1,33 @@
+---
+# handles the webservers
+
+- hosts: web
+  vars:
+    node_type: web
+    php_ini_file: "php.xdebug.ini"
+  vars_files:
+    - ../vars/users.yml
+    - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+  roles:
+    - common
+    - role: docker_14_06
+      tags: docker
+    - maxscale
+    - exim
+    - nagios
+    - logstash_forwarder
+    - owncloud
+    - ocphp_fpm
+    - ocapache
+    - scripts
+  #tasks:
+  #  - name: setup cronjob
+  #    cron: name="owncloud" user=www-data minute="*/15" job="php -f /var/www/owncloud/cron.php"
+  #    run_once: true
+  #    delegate_to: "{{ hostvars[groups['web'][0]].inventory_hostname }}"
+  #    tags:
+  #      - app
+  #      - config
+  #      - cron
+  become: true
+

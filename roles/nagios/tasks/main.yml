@@ -1,0 +1,7 @@
+---
+
+- include: nagios_packages.yml
+- include: nagios_user.yml
+- include: nagios.yml
+
+

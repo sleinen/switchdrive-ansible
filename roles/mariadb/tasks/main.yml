@@ -1,0 +1,8 @@
+---
+
+- include: install_ssh-keys.yml
+- include: mariadb_collectd_setup.yml
+- include: mysqld_exporter.yml
+- include: node_exporter.yml
+- include: backup.yml
+- include: sysctl.yml

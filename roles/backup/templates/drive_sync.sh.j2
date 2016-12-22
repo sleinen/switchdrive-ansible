@@ -1,0 +1,16 @@
+#!/bin/bash
+
+MOUNT_ROOT=/mnt
+TIME=`date "+%Y.%m.%d_%H:%M"`
+LOG_DIR=/var/log/rsync
+
+VOL_NAME=$1
+REMOTE_IP="[2001:620:5ca1:131::9]"
+
+/bin/mkdir -p ${LOG_DIR}
+
+LOGFILE="${LOG_DIR}/${VOL_NAME}.$TIME"
+(/usr/bin/rsync -axS --delete --stats $REMOTE_IP:${MOUNT_ROOT}/${VOL_NAME}/ ${MOUNT_ROOT}/${VOL_NAME} > ${LOGFILE} ;echo `date` >> ${LOGFILE})&
+
+
+/usr/bin/find ${LOG_DIR} -mtime +7 -type f -exec rm "{}" \;

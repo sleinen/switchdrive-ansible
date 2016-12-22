@@ -1,0 +1,5 @@
+---
+
+- name: restart ocapache
+  shell: "docker stop ocapache; docker start ocapache"
+
