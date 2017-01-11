@@ -131,8 +131,8 @@ openstack snapshot list | grep 'root-.*-'`date "+%Y%m%d"` | sort -k 4
 >>> db1.$SITE
 
 sudo docker exec mariadb bash -c "xtrabackup --backup --datadir=/var/lib/mysql/ --target-dir=/backup/preUpgrade --password=\$MYSQL_ROOT_PASSWORD"
-sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/preUpgrade
-sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/preUpgrade
+sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/preUpgrade"
+sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/preUpgrade"
 
 # OC 8.1 config
 >>> mac
@@ -170,6 +170,7 @@ ansible-playbook -i inventories/$SITE-8.2 playbooks/webservers.yml --limit=*.201
 # run upgrade
 >>> web1.$SITE
 sudo /root/occ upgrade -vvv --skip-migration-test
+# takes about 60 Minutes
 
 # backup OC 8.2 config
 >>> mac
@@ -205,15 +206,19 @@ ansible-playbook -i inventories/$SITE playbooks/webservers.yml --limit=*.201 --t
 /root/mariadb
   -> use owncloud;
      ALTER TABLE `oc_filecache` ADD COLUMN checksum varchar(255) DEFAULT NULL AFTER permissions;
+# this takes about 30 Minutes
+
+
 
 # run upgrade
 >>>> web1.$SITE
 sudo /root/occ upgrade -vvv --skip-migration-test
+# this takes about 20 Minutes
 
 # backup upgraded database
 sudo docker exec mariadb bash -c "xtrabackup --backup --datadir=/var/lib/mysql/ --target-dir=/backup/postUpgrade --password=\$MYSQL_ROOT_PASSWORD"
-sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/postUpgrade
-sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/postUpgrade
+sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/postUpgrade"
+sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/postUpgrade"
 
 
 # backup OC 9.0 config
@@ -319,3 +324,4 @@ nova list-secgroup $LB_SERVER_ID
 ***************************************
 
 
+for the upgrade test with read only file-system on web10: edit file lib/private/util.php line 702
