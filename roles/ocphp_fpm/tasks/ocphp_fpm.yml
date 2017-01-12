@@ -10,56 +10,26 @@
     - ocphp_fpm
 
 
-# owner www-data = 33
-- name: install configs
-  template: 
-     src={{item.src}}
-     dest={{item.dest}}
-     owner={{item.owner}} mode={{item.mode}}
-  notify: restart ocphp_fpm
-  with_items:
-    - { src: "fpm/pool.d/owncloud.conf.j2", dest: "/etc/owncloud/fpm_pool_owncloud.{{OWNCLOUD_VERSION}}.conf", owner: "root", mode: "0644" }
-    - { src: "fpm/php-fpm.{{owncloud_major_version}}.conf", dest: "/etc/owncloud/php-fpm.{{OWNCLOUD_VERSION}}.conf", owner: "root", mode: "0644" }
-    - { src: "fpm/{{php_ini_file}}", dest: "/etc/owncloud/php.fpm.{{OWNCLOUD_VERSION}}.ini", owner: "root", mode: "0644" }
-    - { src: "cli/{{php_ini_file}}", dest: "/etc/owncloud/php.cli.{{OWNCLOUD_VERSION}}.ini", owner: "root", mode: "0644" }
-  tags:
-    - ocphp_fpm
-    - occonfig
+- include: install_php_fpm_config.yml
+  with_items: "{{shard_mapping[service_name]}}"
+  loop_control:
+    loop_var: shards
     
-- name: install shard specific autoconfig
-  template: 
-     src=owncloud/autoconfig.php.j2
-     dest=/etc/owncloud/autoconfig.{{ item.shard_name }}.php
-     owner="33" mode="0644"
-  notify: restart ocphp_fpm
-  with_items:
-    - "{{shard_config[service_name]}}"
-  tags:
-    - ocphp_fpm
-    - occonfig
-
-- name: install shard specific config
-  template: 
-     src=owncloud/{{ service_name }}/{{item.config}}.j2
-     dest=/etc/owncloud/config.{{ item.shard_name }}.php
-     owner="33" mode="0644"
-  notify: restart ocphp_fpm
-  with_items:
-    - "{{shard_config[service_name]}}"
-  tags:
-    - ocphp_fpm
-    - occonfig
+- include: install_occonfig.yml
+  with_items: "{{shard_config[service_name]}}"
+  loop_control:
+    loop_var: shards
 
 - name: ocphp_fpm docker 
   docker:
-    name: php_fpm_{{OWNCLOUD_VERSION}}
-    image: "{{ocphp_fpm_docker_name}}:{{OWNCLOUD_VERSION}}"
+    name: "php_fpm_{{item.oc_major_version}}.{{item.oc_minor_version}}"
+    image: "{{ocphp_fpm_docker_name}}:{{item.oc_major_version}}.{{item.oc_minor_version}}"
     restart_policy: always
     state: reloaded
     pull: always
     net: host
     env: 
-       SHARDS: "{{shard_mapping[service_name][OWNCLOUD_VERSION]}}"
+       SHARDS: '{{item.shards | join(" ")}}'
     volumes:
       - "/etc/owncloud:/etc/owncloud"
       - "{{owncloud_logdir}}:/var/log/owncloud"
@@ -70,6 +40,8 @@
       - "/run/shm:/tmp"
       - "{{owncloud_webroot}}:{{owncloud_webroot}}"
     #command: "bash -c 'sleep 3000'"
+  with_items:
+    - "{{shard_mapping[service_name]}}"
   tags:
     - ocphp_fpm
 

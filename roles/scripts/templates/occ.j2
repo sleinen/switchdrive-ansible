@@ -6,4 +6,12 @@ if [ "x$SHARD" == 'x' ]; then
 fi
 
 shift
-docker exec -ti --user www-data php_fpm_{{OWNCLOUD_VERSION}} {{owncloud_webroot}}/${SHARD}/occ "$@"
+
+{% for shard in shard_config[service_name] %}
+OC_VERSION_{{shard.shard_name}}={{shard.version}}
+{% endfor %}
+
+OC_VERSION_VAR="OC_VERSION_${SHARD}"
+OC_VERSION=${!OC_VERSION_VAR}
+
+docker exec -ti --user www-data php_fpm_${OC_VERSION} {{owncloud_webroot}}/${SHARD}/occ "$@"

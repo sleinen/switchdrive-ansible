@@ -104,10 +104,6 @@ nfs2_ip=10.0.28.72
 volumes_inventory_name=stage
 
 # owncloud
-#OWNCLOUD_MAJOR_VERSION='9.0'
-#OWNCLOUD_VERSION='{{OWNCLOUD_MAJOR_VERSION}}.7'
-OWNCLOUD_MAJOR_VERSION='9.1'
-OWNCLOUD_VERSION='{{OWNCLOUD_MAJOR_VERSION}}.3'
 enterprise=true
 stage_or_test_system=True
 rails_environment=production

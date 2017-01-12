@@ -1,0 +1,17 @@
+---
+
+# owner www-data = 33
+- name: "install configs for php_fpm_{{shards.oc_major_version}}.{{shards.oc_minor_version}}"
+  template: 
+     src={{item.src}}
+     dest={{item.dest}}
+     owner={{item.owner}} mode={{item.mode}}
+  notify: "restart ocphp_fpm"
+  with_items:
+    - { src: "fpm/pool.d/owncloud.conf.j2", dest: "/etc/owncloud/fpm_pool_owncloud.{{shards.oc_major_version}}.{{shards.oc_minor_version}}.conf", owner: "root", mode: "0644" }
+    - { src: "fpm/php-fpm.{{shards.oc_major_version}}.conf", dest: "/etc/owncloud/php-fpm.{{shards.oc_major_version}}.{{shards.oc_minor_version}}.conf", owner: "root", mode: "0644" }
+    - { src: "fpm/{{php_ini_file}}", dest: "/etc/owncloud/php.fpm.{{shards.oc_major_version}}.{{shards.oc_minor_version}}.ini", owner: "root", mode: "0644" }
+    - { src: "cli/{{php_ini_file}}", dest: "/etc/owncloud/php.cli.{{shards.oc_major_version}}.{{shards.oc_minor_version}}.ini", owner: "root", mode: "0644" }
+  tags:
+    - ocphp_fpm
+    - phpconfig

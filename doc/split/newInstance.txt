@@ -15,7 +15,7 @@ FLUSH PRIVILEGES ;
 
 ### run ansible:
 
-ansible-playbook -i inventories/tldrive playbooks/webservers.yml -t ocapache,ocphp_fpm,cron
+ansible-playbook -i inventories/tldrive playbooks/webservers.yml -t ocapache,ocphp_fpm,cron,scripts
 
 ### run install 
  /root/occ seems broken, it does not pick up autoconf.php

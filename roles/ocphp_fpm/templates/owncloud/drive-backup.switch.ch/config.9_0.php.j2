@@ -1,12 +1,12 @@
 <?php
 $CONFIG = array (
-  'instanceid' => '{{item.instanceid}}',
+  'instanceid' => '{{shards.instanceid}}',
   'passwordsalt' => '{{owncloud_passwordsalt}}',
   'datadirectory' => '/mnt/data',
-  "overwritehost"     => "{{item.overwritehost}}",
+  "overwritehost"     => "{{shards.overwritehost}}",
 
   'dbtype' => 'mysql',
-  'dbname' => '{{item.shard_name}}',
+  'dbname' => '{{shards.shard_name}}',
   'dbtableprefix' => 'oc_',
   'dbuser' => 'owncloud',
 #  'dbhost' => '{{hostvars[groups["mariadb"][0]].inventory_hostname}}',
@@ -15,7 +15,7 @@ $CONFIG = array (
 
 
   'version' => '9.0.7.1',
-  'installed' => {{item.installed}},
+  'installed' => {{shards.installed}},
   'ldapIgnoreNamingRules' => false,
   
   'log_type' => 'owncloud',
@@ -23,7 +23,7 @@ $CONFIG = array (
   'log_query' => false,
   'cron_log' => true,
   'log_authfailip' => false,
-  'logfile' => '/var/log/owncloud/{{item.shard_name}}.{{owncloud_logfile_name}}',
+  'logfile' => '/var/log/owncloud/{{shards.shard_name}}.{{owncloud_logfile_name}}',
   'logdateformat' => 'U.u',
   'logtimezone' => 'Europe/Berlin',
   'log_rotate_size' => 104857600,
@@ -44,7 +44,7 @@ $CONFIG = array (
   'filesystem_check_changes' => 0,
   'trusted_domains' => 
   array (
-    0 => '{{item.shard_name}}.{{ service_name }}',
+    0 => '{{shards.shard_name}}.{{ service_name }}',
     1 => '{{ service_name }}',
   ),
   'customclient_desktop' => 'https://help.switch.ch/drive/downloads/',
@@ -58,7 +58,7 @@ $CONFIG = array (
   'shared_folder' => '/',
   'share_folder' => '/',
   'secret' => '{{oc_config_secret}}',
-  'overwrite.cli.url' => 'https://{{item.shard_name}}.{{ service_name }}',
+  'overwrite.cli.url' => 'https://{{shards.shard_name}}.{{ service_name }}',
   'maintenance' => false,
   'singleuser' => false,
   'minimum.supported.desktop.version' => '1.7',

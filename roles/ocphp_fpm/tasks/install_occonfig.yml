@@ -1,0 +1,14 @@
+---
+
+- name: "install config for shard: {{shards.shard_name}}"
+  template: 
+     src={{item.src}}.j2
+     dest={{item.dest}}
+     owner="33" mode="0644"
+  notify: restart ocphp_fpm
+  with_items:
+    - { src: 'owncloud/autoconfig.php', dest: '/etc/owncloud/autoconfig.{{ shards.shard_name }}.php' }
+    - { src: 'owncloud/{{ service_name }}/{{shards.config}}', dest: '/etc/owncloud/config.{{ shards.shard_name }}.php' }
+  tags:
+    - ocphp_fpm
+    - occonfig

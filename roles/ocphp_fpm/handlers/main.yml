@@ -1,5 +1,9 @@
 ---
 
-- name: restart ocphp_fpm
-  shell: "docker restart php_fpm_{{OWNCLOUD_VERSION}}"
+- name: "restart ocphp_fpm"
+  shell: "docker restart php_fpm_{{item.oc_major_version}}.{{item.oc_minor_version}}"
+  with_items:
+    - "{{shard_mapping[service_name]}}"
+  
+
 
