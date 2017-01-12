@@ -26,10 +26,10 @@ php_config:
 php_ini_file: "php.ini"
 
 
-#owncloud_major_version: "9.1"
-#owncloud_version: "{{owncloud_major_version}}.1"
-owncloud_major_version: "9.0"
-owncloud_version: "{{owncloud_major_version}}.7"
+owncloud_major_version: "9.1"
+owncloud_version: "{{owncloud_major_version}}.3"
+#owncloud_major_version: "9.0"
+#owncloud_version: "{{owncloud_major_version}}.7"
 #owncloud_major_version: "8.2"
 #owncloud_version: "{{owncloud_major_version}}.8"
 owncloud_repo_base_url: "{{vault_owncloud_repo_base_url[owncloud_major_version]}}"

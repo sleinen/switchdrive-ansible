@@ -1,6 +1,6 @@
 ---
 
-owncloud_logfile_name: "owncloud.{{OWNCLOUD_VERSION}}.log"
+owncloud_logfile_name: "owncloud.log"
 owncloud_logdir: "/run/shm/"
 owncloud_logfile: "{{owncloud_logdir}}/{{owncloud_logfile_name}}"
 

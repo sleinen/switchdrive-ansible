@@ -40,7 +40,7 @@
 
 - name: install shard specific config
   template: 
-     src=owncloud/{{ service_name }}/config.php.j2
+     src=owncloud/{{ service_name }}/{{item.config}}.j2
      dest=/etc/owncloud/config.{{ item.shard_name }}.php
      owner="33" mode="0644"
   notify: restart ocphp_fpm
