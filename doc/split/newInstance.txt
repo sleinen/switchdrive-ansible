@@ -15,7 +15,7 @@ FLUSH PRIVILEGES ;
 
 ### run ansible:
 
-ansible-playbook -i inventories/tldrive playbooks/webservers.yml -t ocapache,ocphp_fpm
+ansible-playbook -i inventories/tldrive playbooks/webservers.yml -t ocapache,ocphp_fpm,cron
 
 ### run install 
  /root/occ seems broken, it does not pick up autoconf.php
@@ -44,7 +44,24 @@ delete from a05.oc_appconfig where appid = 'user_ldap';
 INSERT INTO a05.oc_appconfig select * from a01.oc_appconfig where appid = 'user_ldap';
 
 fix filter:
-/root/occ a05 ldap:set-config '' ldapUserFilter '(&(&(objectclass=inetOrgPerson)(isMemberOf=ownCloud))(o=epfl.ch))'
+#/root/occ a05 ldap:set-config '' ldapUserFilter '(&(&(objectclass=inetOrgPerson)(isMemberOf=ownCloud))(o=epfl.ch))'
+/root/occ a05 ldap:set-config '' ldapUserFilter '(&(&(objectclass=inetOrgPerson)(isMemberOf=ownCloud))(isMemberOf=oc:shard:a05))'
 verify
 
 /root/occ a05 ldap:search '*@epfl.ch'
+
+
+-----------
+LDAP: 
+
+LDIF change record:
+dn: uid=christian.schnidrig@gmail.ch,ou=Users,dc=cloud,dc=switch,dc=ch
+changetype: modify
+delete: isMemberOf
+isMemberOf: ownCloud
+-
+add: isMemberOf
+isMemberOf: ownCloud
+isMemberOf: oc:shard:a05
+-
+
