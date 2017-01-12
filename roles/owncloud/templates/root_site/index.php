@@ -41,12 +41,18 @@ class OC_Central {
 	}
 
 	private function mapSubdomain() {
-		if (preg_match('/^a[0-9]{2}$/', $this->authUser)) {
-			return $this->authUser;
+		if (preg_match('/^(a[0-9]{2}).*$/', $this->authUser, $matches)) {
+			return $matches[1];
 		} elseif ($this->parseEmailDomain() == "switch.ch") {
 			return "a01";
-		} else {
+		} elseif ($this->parseEmailDomain() == "unil.ch") {
 			return "a02";
+		} elseif ($this->parseEmailDomain() == "epfl.ch") {
+			return "a03";
+		} elseif ($this->parseEmailDomain() == "unige.ch") {
+			return "a04";
+		} else {
+			return "a05";
 		}
 	}
 	private function parseEmailDomain() {
