@@ -1,5 +1,6 @@
 global
-    log         {{ hostvars[groups['elk'][0]].inventory_hostname }} local1
+    #log         {{ hostvars[groups['elk'][0]].inventory_hostname }} local1
+    log         /dev/log local1
 
     chroot      /var/lib/haproxy
     pidfile     /var/run/haproxy.pid
@@ -8,7 +9,7 @@ global
     group       root
     daemon
 
-    server-state-file /tmp/haproxy_state
+    server-state-file /var/lib/haproxy/state
     
     # turn on stats unix socket
     stats socket /var/lib/haproxy/stats level admin
@@ -17,13 +18,15 @@ global
     ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AES:RSA+3DES:!ADH:!AECDH:!MD5:!DSS
     ssl-default-bind-options no-sslv3 no-tls-tickets
     tune.ssl.default-dh-param 2048
+    
+    lua-load /etc/haproxy/lua/userToShardLookup.lua
+    
 
 defaults
-    mode                    {{ mode }}
+    mode                    http
     log                     global
     option                  httplog
     option                  dontlognull
-
 
     option http-server-close
     option                  redispatch
@@ -49,8 +52,6 @@ frontend internstats
     bind 0.0.0.0:8080
     stats                   enable
     stats                   auth {{ HAPROXY_USER }}:{{ HAPROXY_PASSWORD }}
-
-
 
 frontend http
     bind 0.0.0.0:80
@@ -94,41 +95,69 @@ backend ldap_backend
 
 frontend ssl
     bind 0.0.0.0:443 ssl crt /etc/haproxy/ssl/{{service_name}}.pem
-
-    http-request del-header Proxy
-
-    acl mirall hdr_reg(User-Agent) mirall
-    acl deprecated_clients hdr_reg(User-Agent) /1.1 /1.2 /1.3 /1.4 /1.5 /1.6
-    http-request deny if mirall deprecated_clients
-
-    reqadd X-Forwarded-Proto:\ https
-
-    # check for desktop or sync clients and send them to their own server group
-    acl acl_syncclient hdr_reg(User-Agent) mirall csyncoC
-    # acl switch src 130.59.0.0/16
-
-    # use_backend owncloud if !acl_syncclient !switch
-    use_backend sync if acl_syncclient  #  switch
-
-    # block if !switch acl_syncclient
-
-    default_backend owncloud
     mode http
     # option httpclose
     option forwardfor
 
+    #########
+    # check for desktop or sync clients and send them to their own server group
+    acl syncclient hdr_reg(User-Agent) mirall csyncoC
+    acl andoidclient hdr_reg(User-Agent) ownCloud-android
+    acl iosclient hdr_reg(User-Agent) ownCloud-iOS
+    # acl switch src 130.59.0.0/16
+    #########
+    # webdav ?
+    acl webdav url_beg /remote.php
+    acl has_basic_auth req.hdr(Authorization) -m found
+
+    #########
+    # sharding
+    acl shard_a01 cook(shard) a01
+    acl shard_a02 cook(shard) a02
+    acl shard_a03 cook(shard) a03
+    acl shard_a04 cook(shard) a04
+    acl shard_a05 cook(shard) a05
+    acl has_shard_cookie cook(shard) -m found
+
+    # set shard cookie if not present yet (only for sync clients) 
+    # commented out -> better do this with php to take load away from haproxy.
+    #redirect prefix / set-cookie shard=%[lua.userToShardLookup] if !has_shard_cookie syncclient
+    
+    http-request set-header Host %[lua.userToShardLookup].{{ service_name }} if has_basic_auth !has_shard_cookie webdav !syncclient !iosclient
+    http-request set-header Host %[lua.userToShardLookup].{{ service_name }} if has_basic_auth andoidclient 
+
+    http-request set-header Host a01.{{ service_name }} if shard_a01
+    http-request set-header Host a02.{{ service_name }} if shard_a02
+    http-request set-header Host a03.{{ service_name }} if shard_a03
+    http-request set-header Host a04.{{ service_name }} if shard_a04
+    http-request set-header Host a05.{{ service_name }} if shard_a05
+
+    # debug stuff
+    #http-request set-header X-Test "%[req.hdr(Authorization),field(2,' ')]"
+    #http-request set-header X-Test2 "%[req.hdr(Authorization),field(2,' '),lua.base64decode,field(1,':'),lua.ldapUserLookup]"
+    #http-request set-header X-Test3 %[lua.userToShardLookup]
+    
+    #########
+    # session cookie also valid on subdomains:
     #rspirep ^(set-cookie:.*)  "\1; Domain={{ service_name }};"
 
-    acl is_cookie_a01 hdr_sub(cookie) shard=a01
-    acl is_cookie_a02 hdr_sub(cookie) shard=a02
-    acl is_cookie_a03 hdr_sub(cookie) shard=a03
-    acl is_cookie_a04 hdr_sub(cookie) shard=a04
-    acl is_cookie_a05 hdr_sub(cookie) shard=a05
-    http-request set-header Host a01.{{ service_name }} if is_cookie_a01
-    http-request set-header Host a02.{{ service_name }} if is_cookie_a02
-    http-request set-header Host a03.{{ service_name }} if is_cookie_a03
-    http-request set-header Host a04.{{ service_name }} if is_cookie_a04
-    http-request set-header Host a05.{{ service_name }} if is_cookie_a05
+    #########
+    # misc
+    http-request del-header Proxy
+    reqadd X-Forwarded-Proto:\ https
+
+
+    #########
+    # choose backend
+ 
+    # use_backend owncloud if !syncclient !switch
+    use_backend sync if syncclient  #  switch
+
+    # block if !switch syncclient
+
+    default_backend owncloud
+
+
 
 frontend ssl_dev
     bind 0.0.0.0:4443 ssl crt /etc/haproxy/ssl/{{ service_name }}.pem
@@ -149,7 +178,7 @@ backend owncloud
     option httpchk GET /foo.php
 
     load-server-state-from-file global
-
+    
     # http://comments.gmane.org/gmane.comp.web.haproxy/14720, closes
     # NVT: Missing Secure Attribute SSL Cookie Information Disclosure Vulnerability (OID: 1.3.6.1.4.1.25623.1.0.902661)
     acl secure res.hdr(Set-Cookie),lower -m sub secure
@@ -217,3 +246,4 @@ backend sync
 
 backend letsencrypt
     server localhost localhost:8888
+

@@ -1,43 +1,74 @@
-# This role installs HAProxy and configures it.
+---
 
-- name: haproxy ppa
-  apt_repository: repo="ppa:vbernat/haproxy-1.6"
-
-- name: install haproxy
-  apt:  name={{item}} 
-        state=installed
-        update_cache={{apt_config.update_cache}}
-        cache_valid_time={{apt_config.cache_valid_time}}
+- name: Create dirs
+  file: path="{{item}}" state=directory group=107 owner=105
   with_items:
+    - "/etc/haproxy"
+    - "/etc/haproxy/lua"
+    - "/etc/haproxy/ssl"
+    - "/var/lib/haproxy"
+    - "/var/log/haproxy"
+  tags:
     - haproxy
 
-- name: enable haproxy
-  template: src=haproxy.default dest=/etc/default/haproxy
-  notify:
-    - restart haproxy
-  tags:
-    - config
 
-- name: Configure the haproxy cnf file with hosts
-  template: src=haproxy.cfg.j2 dest=/etc/haproxy/haproxy.cfg
+- name: haproxy config
+  template: src={{item}}.j2 dest=/etc/haproxy/{{item}}
   notify:
     - reload haproxy
+  with_items:
+    - haproxy.cfg
+    - 503maintenance.html
   tags:
     - config
+    - haproxy
     - haconfig
 
+- name: lua stuff
+  template: src={{item}}.lua dest=/etc/haproxy/lua/{{item}}.lua
+  notify:
+    - restart haproxy
+  with_items:
+    #- lbase64
+    #- ldapUserLookup
+    - userToShardLookup
+  tags:
+    - haproxy
+    - lua
+
+- name: maps
+  template: src={{item}}.map dest=/etc/haproxy/{{item}}.map
+  notify:
+    - restart haproxy
+  with_items:
+    - domain_shard
+    - user_shard
+  tags:
+    - haproxy
+    - map
+
 - name: upload ssl pem
-  copy: content="{{ service_cert[service_name] }}" dest=/etc/haproxy/{{ service_name }}.pem
+  copy: content="{{ service_cert[service_name] }}" dest=/etc/haproxy/ssl/{{ service_name }}.pem
   ignore_errors: yes
   notify:
     - restart haproxy
   tags:
-    - config
+    - haproxy
     - certificate
 
-- name: upload 503 Maintenance page
-  copy: src=503maintenance.html dest=/etc/haproxy/503maintenance.html
+- name: haproxy container
+  docker:
+    name: haproxy
+    image: "{{haproxy_docker_image}}"
+    restart_policy: always
+    net: host
+    state: reloaded
+    pull: always
+    volumes:
+      - "/etc/haproxy:/etc/haproxy"
+      - "/var/lib/haproxy:/var/lib/haproxy"
+      - "/var/log/haproxy:/var/log/haproxy"
+      - "/dev/log:/dev/log"
   tags:
-    - maint
-
+    - haproxy
 

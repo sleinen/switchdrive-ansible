@@ -2,9 +2,9 @@
 # Handlers for HAproxy
 
 - name: restart haproxy
-  service: name=haproxy state=restarted
+  shell: docker restart haproxy
 
 - name: reload haproxy
-  service: name=haproxy state=reloaded
+  shell: docker restart haproxy
 
 

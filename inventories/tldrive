@@ -21,7 +21,11 @@
 # the first one in the list has to be the provider!
 #10.0.28.51 ansible_ssh_user=ubuntu provider=True
 # the one from "drive"
+
+# production
 86.119.34.136
+# test (from Renato)
+86.119.30.169
 
 [elk]
 #10.0.26.151 ansible_ssh_user=ubuntu vols="{{volumes_elk1}}"

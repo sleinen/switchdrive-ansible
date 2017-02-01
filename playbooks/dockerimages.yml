@@ -10,6 +10,7 @@
     - graphite_image
     - ocphp_fpm_image
     - ocapache_image
+    - haproxy_image
   become: true
   gather_facts: no
   environment:

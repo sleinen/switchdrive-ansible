@@ -97,3 +97,10 @@ ocapache_docker_name: "{{registry_url}}/ocapache"
 ocapache_docker_tag: "latest"
 ocapache_docker_image: "{{ocapache_docker_name}}:{{ocapache_docker_tag}}"
 
+
+####################
+# haproxy
+
+haproxy_docker_name: "{{registry_url}}/haproxy"
+haproxy_docker_tag: "1.7.2"
+haproxy_docker_image: "{{haproxy_docker_name}}:{{haproxy_docker_tag}}"

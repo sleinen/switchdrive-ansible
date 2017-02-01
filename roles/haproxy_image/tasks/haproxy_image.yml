@@ -1,0 +1,43 @@
+---
+
+- name: copy haproxy build instructions to remote host
+  synchronize:
+    src: haproxy
+    dest: /tmp
+    delete: yes
+  tags:
+    - haproxy
+
+
+- name: copy haproxy configs to remote host
+  template:
+    src={{item.name}}
+    dest=/tmp/haproxy/{{item.name}}
+    mode={{item.mode}}
+  with_items:
+    - { name: Dockerfile, mode: "0644" }
+  tags:
+    - haproxy
+
+
+- name: build haproxy
+  docker_image: 
+    path="/tmp/haproxy" 
+    name="{{haproxy_docker_name}}"
+    tag="{{haproxy_docker_tag}}"
+    dockerfile="Dockerfile"
+    state=present
+    force=true
+    pull=true
+    tls_hostname=localhost
+  tags:
+    - haproxy
+
+- name: push haproxy image
+  shell: docker push "{{haproxy_docker_image}}"
+  tags:
+    - haproxy
+
+
+
+

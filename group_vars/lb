@@ -1,9 +1,6 @@
 ---
 # Variables for the HAproxy configuration
 
-# HAProxy supports "http" and "tcp". For SSL, SMTP, etc, use "tcp".
-mode: http
-
 # Port on which HAProxy should listen
 listenport: 80
 
