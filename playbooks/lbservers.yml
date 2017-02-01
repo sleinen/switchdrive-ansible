@@ -27,4 +27,5 @@
     - common
     - nagios
     - haproxy
+    - scripts
   become: true

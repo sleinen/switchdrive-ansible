@@ -5,6 +5,4 @@
 - include: network.yml
 
 
-- include: install_scripts.yml
-
 

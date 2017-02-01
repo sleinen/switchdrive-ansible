@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [ "x$1" == "x" ]; then 
+    echo "Usage: `basename $0` <id|list>
+.      e.g.:  `basename $0` list
+.      e.g.:  `basename $0` 0
+"
+    exit
+fi
+
+ARG=''
+
+if [[ "$1" != 'list' ]]; then
+    ARG="#$1"
+fi
+
+socat /var/lib/haproxy/stats - <<< "show map $ARG"
+

@@ -34,3 +34,7 @@ iptables:
 
 collectd_processes: 
    - haproxy
+
+scripts:
+   - { name: "ha_update", path: "/root", mode: "0550" }
+   - { name: "ha_show_map", path: "/root", mode: "0550" }
