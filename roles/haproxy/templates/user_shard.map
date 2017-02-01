@@ -1,7 +1,6 @@
 # shard admins:
 # format: base64encode(<user_name>:<password>)
-YTAxOnNwbGl0 a01
-YTAyOnNwbGl0 a02
-YTAzOnNwbGl0 a03
-YTA0OnNwbGl0 a04
-YTA1OnNwbGl0 a05
+{% for shard in shard_config[service_name] %}
+{% set auth_string = shard.shard_name + ':' + admin_pass %}
+{{auth_string | b64encode }} {{shard.shard_name}}
+{% endfor %}
