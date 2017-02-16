@@ -13,5 +13,5 @@ fi
 
 
 
-docker run --rm -ti --net=host mariadb bash -c "mysql -u$USER -p'{{mariadb_passwd}}' -h $HOST.drive --default-character-set=utf8 $@"
-
+#docker run --rm -ti --net=host mariadb bash -c "mysql -u$USER -p'{{mariadb_passwd}}' -h $HOST.drive --default-character-set=utf8 $@"
+docker exec -ti mariadb bash -c "mysql -u$USER -p'{{mariadb_passwd}}' -h $HOST.drive --default-character-set=utf8 $@"
