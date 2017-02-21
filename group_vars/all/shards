@@ -3,17 +3,17 @@
 # config deployment (ocapache, ocphp_fpm, cron)
 shard_config: 
   drive-backup.switch.ch:
-    - {shard_name: 'a01', config: 'config.9_0.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.0.7', hour: "*", minute: "5,20,35,50",  overwritehost: "a01.drive-backup.switch.ch" }
-    - {shard_name: 'a02', config: 'config.9_0.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.0.7', hour: "*", minute: "5,20,35,50",  overwritehost: "a02.drive-backup.switch.ch" }
-    - {shard_name: 'a03', config: 'config.9_0.php', instanceid: 'oceacd978fac', installed: 'true', version: '9.0.7', hour: "*", minute: "10,25,40,55", overwritehost: "drive-backup.switch.ch" }
-    - {shard_name: 'a04', config: 'config.9_0.php', instanceid: 'oceacd978fad', installed: 'true', version: '9.0.7', hour: "*", minute: "10,25,40,55", overwritehost: "drive-backup.switch.ch" }
-    - {shard_name: 'a05', config: 'config.9_1.php', instanceid: 'oceacd978fae', installed: 'true', version: '9.1.3', hour: "*", minute: "0,15,30,45",  overwritehost: "a05.drive-backup.switch.ch" }
+    - {shard_name: 'a01', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch" }
+    - {shard_name: 'a02', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch" }
+    - {shard_name: 'a03', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fac', installed: 'true', version: '9.1.4', hour: "*", minute: "10,25,40,55", overwritehost: "drive-backup.switch.ch" }
+    - {shard_name: 'a04', cluster_config: 'cluster.config.9_1.php', config: 'config.9_0.php', instanceid: 'oceacd978fad', installed: 'true', version: '9.0.7', hour: "*", minute: "10,25,40,55", overwritehost: "a04.drive-backup.switch.ch" }
+    - {shard_name: 'a05', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fae', installed: 'true', version: '9.1.4', hour: "*", minute: "0,15,30,45",  overwritehost: "drive-backup.switch.ch" }
 
 # ocphp_fpm container deployment
 shard_mapping:
   drive-backup.switch.ch:
-     - { oc_major_version: '9.0', oc_minor_version: '7', shards: [a01, a02, a03, a04] }
-     - { oc_major_version: '9.1', oc_minor_version: '3', shards: [a05] }
+     - { oc_major_version: '9.0', oc_minor_version: '7', shards: [a04] }
+     - { oc_major_version: '9.1', oc_minor_version: '4', shards: [a01, a02, a03, a05] }
 
 # 15768000 = 6 months
 strict_transport_security_max_age:

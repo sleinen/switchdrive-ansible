@@ -9,6 +9,7 @@
   with_items:
     - { src: 'owncloud/autoconfig.php', dest: '/etc/owncloud/autoconfig.{{ shards.shard_name }}.php' }
     - { src: 'owncloud/{{ service_name }}/{{shards.config}}', dest: '/etc/owncloud/config.{{ shards.shard_name }}.php' }
+    - { src: 'owncloud/{{ service_name }}/{{shards.cluster_config}}', dest: '/etc/owncloud/cluster.config.{{ shards.shard_name }}.php' }
   tags:
     - ocphp_fpm
     - occonfig

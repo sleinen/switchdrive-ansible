@@ -1,0 +1,26 @@
+<?php
+$CONFIG = array (
+    'cluster.share_link_cookie' => 'share_link_shard',
+    'cluster.cookie' => 'shard',
+    'cluster.nodes' => [
+        'a01' => [ // used as cookie
+            'url' => 'http://a01.{{ service_name }}',
+            'users' => '/^a01.*/' // a regex
+        ],
+        'a02' => [
+            'url' => 'http://a02.{{ service_name }}',
+            'users' => '/^a02.*/' // a regex
+        ],
+        'a03' => [
+            'url' => 'http://a03.{{ service_name }}',
+            'users' => '/^a03.*/' // a regex
+        ],
+        'a05' => [
+            'url' => 'http://a05.{{ service_name }}',
+            'users' => '/^a05.*/' // a regex
+        ],
+    ],
+    'node.url'     => 'http://{{shards.shard_name}}.{{ service_name }}', // the local node url
+    #'node.url'     => 'https://{{ service_name }}', // the local node url
+    'node.name' => '{{shards.shard_name}}' // the local node name, used as the cluster cookie value 
+);
