@@ -15,6 +15,7 @@ RUN set -x \
         gcc \
         build-base
 
-RUN /usr/bin/luarocks-5.3 install lbase64
+RUN /usr/bin/luarocks-5.3 install lbase64 \
+    && /usr/bin/luarocks-5.3 install redis-lua
 
 
