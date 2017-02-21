@@ -49,6 +49,15 @@ RUN curl -L https://schnidrig:G69vebbaaH@github.com/switch-ch/switch-owncloud-th
     && mv /var/www/owncloud/themes/switch-owncloud-theme-master/ /var/www/owncloud/themes/switch \
     && rm /tmp/themes.zip
 
+###########
+# install from a branch
+
+RUN curl -L https://github.com/owncloud/core/archive/stable9.1-federated-cluster.zip > /tmp/branch.zip \
+    && unzip -d /tmp /tmp/branch.zip \
+    && cd /tmp/core*/ \
+    && rm -rf autotest* build/ tests/ \
+    && tar -cf - * | tar -xf - -C /var/www/owncloud \
+    && rm -rf /tmp/branch.zip /tmp/core*/
 
 ###########
 # config

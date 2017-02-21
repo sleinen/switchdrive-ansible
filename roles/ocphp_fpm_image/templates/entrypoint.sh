@@ -14,7 +14,8 @@ for shard in $SHARDS; do
 		tar cf - --one-file-system -C "/var/www/owncloud" . | tar xf - -C "{{owncloud_webroot}}/${shard}"
 	fi
 	cp "/etc/owncloud/autoconfig.${shard}.php" "{{owncloud_webroot}}/${shard}/config/autoconfig.php"
-	cp "/etc/owncloud/config.${shard}.php" "{{owncloud_webroot}}/${shard}/config/config.php"
+    cp "/etc/owncloud/config.${shard}.php" "{{owncloud_webroot}}/${shard}/config/config.php"
+    cp "/etc/owncloud/cluster.config.${shard}.php" "{{owncloud_webroot}}/${shard}/config/cluster.config.php"
 	chown -R www-data:www-data "{{owncloud_webroot}}/${shard}/config"
 	rm "{{owncloud_webroot}}/${shard}.php-fpm.sock"
 	ln -s "/var/run/php/php-fpm.{{owncloud_version}}.sock" "{{owncloud_webroot}}/${shard}.php-fpm.sock"
