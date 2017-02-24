@@ -6,3 +6,4 @@ backups/*
 .vagrant
 
 vault_password
+personal_credentials

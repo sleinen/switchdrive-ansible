@@ -44,7 +44,7 @@ RUN curl -L https://github.com/owncloud/impersonate/archive/master.zip > /tmp/im
 ###########
 # themes
 
-RUN curl -L https://schnidrig:G69vebbaaH@github.com/switch-ch/switch-owncloud-theme/archive/master.zip > /tmp/themes.zip \
+RUN curl -L https://{{git_hub_user}}:{{git_hub_passwd}}@github.com/switch-ch/switch-owncloud-theme/archive/master.zip > /tmp/themes.zip \
     && unzip -d /var/www/owncloud/themes /tmp/themes.zip \
     && mv /var/www/owncloud/themes/switch-owncloud-theme-master/ /var/www/owncloud/themes/switch \
     && rm /tmp/themes.zip
@@ -52,12 +52,13 @@ RUN curl -L https://schnidrig:G69vebbaaH@github.com/switch-ch/switch-owncloud-th
 ###########
 # install from a branch
 
-RUN curl -L https://github.com/owncloud/core/archive/stable9.1-federated-cluster.zip > /tmp/branch.zip \
-    && unzip -d /tmp /tmp/branch.zip \
+ENV ARCHIVE=/tmp/branch.zip
+RUN curl -L https://github.com/owncloud/core/archive/stable9.1-federated-cluster.zip > $ARCHIVE \
+    && unzip -d /tmp /$ARCHIVE \
     && cd /tmp/core*/ \
     && rm -rf autotest* build/ tests/ \
     && tar -cf - * | tar -xf - -C /var/www/owncloud \
-    && rm -rf /tmp/branch.zip /tmp/core*/
+    && rm -rf $ARCHIVE /tmp/core*/
 
 ###########
 # config

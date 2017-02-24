@@ -13,6 +13,7 @@ local redis_servers = { {% for host in groups['redis'] %} "{{ hostvars[host].inv
 local redis_server_id = 0;
 
 domain_shard_map = Map.new("/etc/haproxy/domain_shard.map", Map.str);
+user_shard_map = Map.new("/etc/haproxy/user_shard.map", Map.str);
 
 ------------------
 -- utilities
@@ -136,10 +137,15 @@ core.register_action("userToShardLookup", {"http-req"}, function(txn)
     local user = auth_string:before(':');
     
     -- try fetching cached value
-    local shard = get_from_redis(user);
+    -- locally defined user ?
+    local shard = user_shard_map:lookup(user);
+    -- chached in redis?
+    if (not shard) then
+        shard = get_from_redis(user);
+    end
 
     -- fetch from ldap if not found in cache
-    if (shard == nil) then
+    if (not shard ) then
         shard = get_from_ldap(user);
         put_to_redis(user, shard);  
     end

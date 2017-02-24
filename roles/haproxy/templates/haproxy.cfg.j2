@@ -124,17 +124,18 @@ frontend ssl
     # commented out -> better do this with php to take load away from haproxy.
     #redirect prefix / set-cookie shard=%[lua.userToShardLookup] if !has_shard_cookie syncclient
     
-    # default
-    http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie !has_basic_auth
-    http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth !webdav
-    http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth syncclient
-    http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth iosclient
+    # default for non webdav clients
+    http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie !webdav
+    #http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth syncclient
+    #http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth iosclient
 
+    # webdav client -> let them go to root site where a cookie will be set for them.
+    # -> works for syncclients and iosclients
     # special clients not capable of handling cookies
     http-request lua.userToShardLookup if has_basic_auth !has_shard_cookie webdav !syncclient !iosclient
     http-request lua.userToShardLookup if has_basic_auth andoidclient
 
-    # based on cookie already present
+    # based on cookie already present    
     http-request set-header Host a01.{{ service_name }} if shard_a01
     http-request set-header Host a02.{{ service_name }} if shard_a02
     http-request set-header Host a03.{{ service_name }} if shard_a03
@@ -155,7 +156,7 @@ frontend ssl
     # choose backend
  
     # use_backend owncloud if !syncclient !switch
-    use_backend sync if syncclient  #  switch
+    #use_backend sync if syncclient  #  switch
 
     # block if !switch syncclient
 

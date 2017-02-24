@@ -47,14 +47,15 @@
     - haproxy
     - map
 
-- name: upload ssl pem
-  copy: content="{{ service_cert[service_name] }}" dest=/etc/haproxy/ssl/{{ service_name }}.pem
-  ignore_errors: yes
-  notify:
-    - restart haproxy
-  tags:
-    - haproxy
-    - certificate
+# we use letsencrypt certificate
+#- name: upload ssl pem
+#  copy: content="{{ service_cert[service_name] }}" dest=/etc/haproxy/ssl/{{ service_name }}.pem
+#  ignore_errors: yes
+#  notify:
+#    - restart haproxy
+#  tags:
+#    - haproxy
+#    - certificate
 
 - name: haproxy container
   docker:
