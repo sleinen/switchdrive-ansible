@@ -104,10 +104,12 @@ frontend ssl
     acl syncclient hdr_reg(User-Agent) mirall csyncoC
     acl andoidclient hdr_reg(User-Agent) ownCloud-android
     acl iosclient hdr_reg(User-Agent) ownCloud-iOS
+    #acl pyocclient hdr_reg(User-Agent) python-requests
     # acl switch src 130.59.0.0/16
     #########
-    # webdav ?
+    # webdav / ocs / etc ?
     acl webdav url_beg /remote.php
+    acl ocs url_beg /ocs/ 
     acl has_basic_auth req.hdr(Authorization) -m found
 
     #########
@@ -134,6 +136,8 @@ frontend ssl
     # special clients not capable of handling cookies
     http-request lua.userToShardLookup if has_basic_auth !has_shard_cookie webdav !syncclient !iosclient
     http-request lua.userToShardLookup if has_basic_auth andoidclient
+    http-request lua.userToShardLookup if has_basic_auth ocs
+    #http-request lua.userToShardLookup if has_basic_auth pyocclient
 
     # based on cookie already present    
     http-request set-header Host a01.{{ service_name }} if shard_a01
