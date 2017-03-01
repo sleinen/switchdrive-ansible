@@ -4,10 +4,12 @@ $CONFIG = array (
     'cluster.cookie' => 'shard',
     'cluster.nodes' => [
 {%for peer in shard_config[service_name] %}
+{%if peer.part_of_cluster %}
         '{{ peer.shard_name }}' => [ // used as cookie
             'url' => 'http://{{ peer.shard_name }}.{{ service_name }}',
             'users' => '/^{{ peer.shard_name }}.*/' // a regex
         ],
+{% endif %}    
 {% endfor %}    
     ],
     'node.url'     => 'http://{{shards.shard_name}}.{{ service_name }}', // the local node url

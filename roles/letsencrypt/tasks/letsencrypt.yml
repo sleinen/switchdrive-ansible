@@ -22,7 +22,8 @@
       - 80
     ports:
       - 8888:80
-    command: "certonly --standalone {{letsencrypt.domains[service_name]}} --agree-tos --email {{letsencrypt.email}} --standalone-supported-challenges http-01 --rsa-key-size 4096"
+    #command: "certonly --standalone {{letsencrypt.domains[service_name]}} --agree-tos --email {{letsencrypt.email}} --standalone-supported-challenges http-01 --rsa-key-size 4096"
+    command: "certonly --standalone {{letsencrypt.domains[service_name]}} --expand --agree-tos --email {{letsencrypt.email}} --standalone-supported-challenges http-01 --rsa-key-size 4096"
   tags:
      - letsencrypt
 
@@ -30,5 +31,4 @@
   shell: "cat /etc/letsencrypt/live/{{service_name}}/fullchain.pem /etc/letsencrypt/live/{{service_name}}/privkey.pem > /etc/haproxy/ssl/{{service_name}}.pem"
   tags:
      - letsencrypt
-
 

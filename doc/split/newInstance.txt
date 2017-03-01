@@ -1,19 +1,17 @@
 
 ### add instance to group_vars/all/shards
 
-make sure to set "installed" to false
-
-
 ### create new DB
 
 docker exec -ti mariadb bash -c 'mysql -u root -h localhost -p$MYSQL_ROOT_PASSWORD --default-character-set=utf8 '
 
-CREATE DATABASE IF NOT EXISTS `a03` ; 
+CREATE DATABASE IF NOT EXISTS `a06` ; 
 
-GRANT ALL ON `a03`.* TO 'owncloud'@'%' ;
+GRANT ALL ON `a06`.* TO 'owncloud'@'%' ;
 FLUSH PRIVILEGES ;
 
 ### run ansible:
+# update  group_vars/all/shards and redeploy:
 
 ansible-playbook -i inventories/tldrive playbooks/webservers.yml -t ocapache,ocphp_fpm,cron,scripts
 
@@ -26,7 +24,7 @@ instead install from web
 
 ### setup apps
 
-SHARD=a05
+SHARD=a06
 
 /root/occ $SHARD app:enable  user_ldap
 /root/occ $SHARD app:disable activity
@@ -40,11 +38,11 @@ SHARD=a05
 
 ### set up ldap (only run after fully setting up owncloud instance)
 
-delete from a05.oc_appconfig where appid = 'user_ldap';
-INSERT INTO a05.oc_appconfig select * from a01.oc_appconfig where appid = 'user_ldap';
+delete from a06.oc_appconfig where appid = 'user_ldap';
+INSERT INTO a06.oc_appconfig select * from a01.oc_appconfig where appid = 'user_ldap';
 
 fix filter:
-#/root/occ a05 ldap:set-config '' ldapUserFilter '(&(&(objectclass=inetOrgPerson)(isMemberOf=ownCloud))(o=epfl.ch))'
+#/root/occ a06 ldap:set-config '' ldapUserFilter '(&(&(objectclass=inetOrgPerson)(isMemberOf=ownCloud))(o=switch.ch))'
 /root/occ a05 ldap:set-config '' ldapUserFilter '(&(&(objectclass=inetOrgPerson)(isMemberOf=ownCloud))(isMemberOf=oc:shard:a05))'
 verify
 

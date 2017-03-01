@@ -48,9 +48,11 @@ maxscale_password: "{{vault_maxscale_password[site]}}"
 # root password
 enc_root_passwd: "{{vault_enc_root_passwd[site]}}"
 
+
+domain_list: [a01, a02, a03, a04, a05, a06, a07, a08, a09, a10, a11, a12, a13, a14, a15, a16, a17, a18, a19, a20, "{{service_name}}"]
 letsencrypt:
   domains: 
-    drive-backup.switch.ch: "-d drive-backup.switch.ch -d a01.drive-backup.switch.ch -d a02.drive-backup.switch.ch -d a03.drive-backup.switch.ch -d a04.drive-backup.switch.ch -d a05.drive-backup.switch.ch"
-    drive-stage.switch.ch: "-d drive-stage.switch.ch -d a01.drive-stage.switch.ch -d a02.drive-stage.switch.ch -d a03.drive-stage.switch.ch -d a04.drive-stage.switch.ch -d a05.drive-stage.switch.ch"
+    drive-backup.switch.ch: '-d {{ domain_list | join(".drive-backup.switch.ch -d ") }}'
+    drive-stage.switch.ch: '-d {{ domain_list | join(".drive-stage.switch.ch -d ") }}'
   email: "christian.schnidrig@gmail.com"
 
