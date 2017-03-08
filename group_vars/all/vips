@@ -1,0 +1,56 @@
+---
+ # use `openstack port list` to find ports
+# verify settings with: `openstack port show <port>`
+
+vrrp_password: "{{vault_vrrp_password}}"
+
+
+
+vips:
+  drive:
+    network: "drive"
+    ips:
+      - { name: "lb_vip1", ip: "10.0.23.11" }
+      - { name: "lb_vip2", ip: "10.0.23.12" }
+    ports:
+      - { name: 'drive-lb1-port_drive-elqn4vq5vsyj', ips: [ { ip_address: "10.0.23.11" }, { ip_address: "10.0.23.12" } ] }
+      - { name: 'drive-lb2-port_drive-w5qjkdj2ayvw', ips: [ { ip_address: "10.0.23.11" }, { ip_address: "10.0.23.12" } ] }               
+    hosts:
+      tldrive-lb1:
+        - { name: 'vip1_1', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 10, ip: "10.0.23.11", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}" }
+        - { name: 'vip1_2', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 11, ip: "10.0.23.12", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}"  }
+      tldrive-lb2:
+        - { name: 'vip2_1', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 10, ip: "10.0.23.11", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"  }
+        - { name: 'vip2_2', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 11, ip: "10.0.23.12", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"  }
+  sldrive:
+    network: "sldrive-drive"
+    ips:
+      - { name: "lb_vip1", ip: "10.0.26.11" }
+      - { name: "lb_vip2", ip: "10.0.26.12" }
+    ports:
+      - { name: 'sldrive-lb1-port_drive-otqpa4aodmvd', ips: [ { ip_address: "10.0.26.11" }, { ip_address: "10.0.26.12" } ] }
+      - { name: '??????', ips: [ { ip_address: "10.0.26.11" }, { ip_address: "10.0.26.12" } ] }               
+    hosts:
+      tldrive-lb1:
+        - { name: 'vip1_1', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 10, ip: "10.0.26.11", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}" }
+        - { name: 'vip1_2', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 11, ip: "10.0.26.12", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}"  }
+      tldrive-lb2:
+        - { name: 'vip2_1', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 10, ip: "10.0.26.11", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"  }
+        - { name: 'vip2_2', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 11, ip: "10.0.26.12", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"  }
+  tldrive:
+    network: "tldrive-drive"
+    ips:
+      - { name: "lb_vip1", ip: "10.0.28.11" }
+      - { name: "lb_vip2", ip: "10.0.28.12" }
+    ports:
+      - { name: 'tldrive-lb1-port_drive-qcaxqdm445jz', ips: [ { ip_address: "10.0.28.11" }, { ip_address: "10.0.28.12" } ] }
+      - { name: 'tldrive-lb2-port_drive-xfoowwx7oj4k', ips: [ { ip_address: "10.0.28.11" }, { ip_address: "10.0.28.12" } ] }               
+    hosts:
+      tldrive-lb1:
+        - { name: 'vip1_1', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 10, ip: "10.0.28.11", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}" }
+        - { name: 'vip1_2', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 11, ip: "10.0.28.12", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}"  }
+      tldrive-lb2:
+        - { name: 'vip2_1', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 10, ip: "10.0.28.11", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"  }
+        - { name: 'vip2_2', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 11, ip: "10.0.28.12", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"  }
+
+              

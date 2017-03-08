@@ -1,0 +1,12 @@
+---
+
+- hosts: 
+    - engines
+  vars:
+    #lb_vip: 10.0.28.11
+    #site: tldrive
+  roles:
+    - vip
+  become: false
+  gather_facts: no
+  

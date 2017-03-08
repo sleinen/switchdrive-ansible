@@ -1,0 +1,24 @@
+---
+
+- name: add keepalived packages
+  apt: 
+    name: "{{item}}"
+    state: present
+    update_cache: "{{apt_config.update_cache}}"
+    cache_valid_time: "{{apt_config.cache_valid_time}}"
+  with_items:
+    - keepalived
+  tags:
+    - keepalived
+
+- name: install keepalived config
+  template:
+    src: "keepalived.conf"
+    dest: "/etc/keepalived/keepalived.conf"
+    mode: 0550
+  notify: restart keepalived
+  tags:
+    - keepalived
+
+
+

@@ -16,6 +16,7 @@
 
 [lb]
 10.0.28.21 ansible_ssh_user=ubuntu
+10.0.28.22 ansible_ssh_user=ubuntu
 
 [ldap]
 # the first one in the list has to be the provider!
@@ -47,6 +48,7 @@
 86.119.31.73 ansible_ssh_user=ubuntu
 
 [engines]
+controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass}}"
 
 [graphite]
 10.0.28.6 ansible_ssh_user=ubuntu
@@ -77,6 +79,7 @@ reg
 cmd
 redis
 jumphost
+
 
 [production:vars]
 
@@ -131,3 +134,5 @@ mariadb_wsrep_cluster_address=gcomm://10.0.28.31
 docker_registry="docker.drive.switch.ch"
 graphite_host_floating_ip=86.119.31.74
 
+# lb
+lb_vip=10.0.28.11
