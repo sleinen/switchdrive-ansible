@@ -1,0 +1,58 @@
+---
+
+# owncloud repo for enterprise customers
+# repo info is from here: https://customer.owncloud.com/owncloud/index.php/apps/files/?dir=%2FownCloud-Enterprise
+#      login: user:pass
+vault_owncloud_repo_base_url: 
+    "8.2": "https://user:pass@repo_url.owncloud.com/"
+    "9.0": "https://user:pass@repo_url.owncloud.com/"
+    "9.1": "https://user:pass@repo_url.owncloud.com/"
+
+
+vault_ldap_password:
+    tldrive: "my_pass"
+
+vault_ldap_cn_config_password:
+    tldrive: "my_pass"
+
+vault_admin_pass:
+    tldrive: "my_pass"
+
+vault_haproxy_user:
+    tldrive: "my_user_name"
+
+vault_haproxy_passwd:
+    tldrive: "my_pass"
+
+vault_cloudid_db_passwd:
+    tldrive: "my_pass"
+
+vault_mariadb_passwd: 
+    tldrive: "my_pass"
+
+vault_maxscale_password:
+    tldrive: "my_pass"
+    
+# generate encrypted password with: mkpasswd --method=sha-512
+vault_enc_root_passwd:
+    tldrive: "my_secret"
+
+vault_license_key: "Owncloud_licence-1234567-1234567-1234567"
+
+vault_oc_config_secret: 
+    tldrive: 'my_secret'
+
+# Openstack
+
+vault_snapshot_user: ""
+vault_snapshot_user_password: ""
+vault_snapshot_project_id: ""
+
+vault_grafana_admin_passwd: "grafana_pass"
+
+# kibana
+vault_kibana_user: kibana_user
+vault_kibana_password: kibana_pass
+
+vault_vrrp_password: vrrp_pass
+
