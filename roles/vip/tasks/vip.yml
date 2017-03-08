@@ -1,0 +1,38 @@
+---
+
+- name: Create a port with a static VIP
+  os_port:
+    auth:
+      auth_url: "{{ os_auth_url }}"
+      username: "{{ os_username }}"
+      password: "{{ os_password }}"
+      project_name: "{{ os_tenant }}"
+    region_name: "{{ os_region }}"
+    state: present
+    name: "{{ item.name }}"
+    network: "{{ vips[site].network }}"
+    fixed_ips:
+      - ip_address: "{{ item.ip }}"
+  with_items:
+    - "{{ vips[site]['ips'] }}"
+  tags:
+    - vip
+
+- name: Make VIP ip assignable to vm-ports
+  os_port:
+    auth:
+      auth_url: "{{ os_auth_url }}"
+      username: "{{ os_username }}"
+      password: "{{ os_password }}"
+      project_name: "{{ os_tenant }}"
+    region_name: "{{ os_region }}"
+    state: present
+    network: "{{ vips[site].network }}"
+    name: "{{ item.name }}"
+    allowed_address_pairs: "{{ item.ips }}"
+  with_items:
+    - "{{ vips[site]['ports'] }}"
+  tags:
+    - vip
+
+
