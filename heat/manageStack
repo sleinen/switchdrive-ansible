@@ -75,7 +75,7 @@ for ACTION in $ACTIONS; do
 		STATUS="not yet run"
 		while [ "$STATUS" != "CREATE_COMPLETE" ] && [ "$STATUS" != "CREATE_FAILED" ] && [ "x$STATUS" != "x" ] ; do
 		    echo -n "."
-		    STATUS=`heat stack-list | awk "/ $1 / { print \\\$6 }"`
+		    STATUS=`$OPENSTACK stack list | awk "/ $1 / { print \\\$6 }"`
 	        sleep 1
 		done
 		if [ "$STATUS" != "CREATE_COMPLETE" ] && [ "x$STATUS" != "x" ]; then
@@ -95,17 +95,17 @@ for ACTION in $ACTIONS; do
 	for rsc in $RESOURCES; do
 		if [ $rsc == 'networks' ] || [ $rsc == 'jumpip' ]; then  
 			if [ $ACTION == 'create' ]; then
-				$HEAT stack-create -f $TEMPL_DIR/$rsc.yaml -P "$STACK_PARAMS_NETWORK" $NAME_PREFIX-$rsc || exit 1
+				$OPENSTACK stack create -t $TEMPL_DIR/$rsc.yaml --parameter "$STACK_PARAMS_NETWORK" $NAME_PREFIX-$rsc || exit 1
 				wait_complete $NAME_PREFIX-$rsc
 				if [ $rsc == 'networks' ]; then 
-					NET=`heat output-show "$NAME_PREFIX-$rsc" network_drive`
+					NET=`$OPENSTACK stack output show -f value -c output_value "$NAME_PREFIX-$rsc" network_drive`
 					$GIT config -f $INIFILE --replace-all default.driveNetworkId ${NET//\"/}
-					SUBNET=`heat output-show "$NAME_PREFIX-$rsc" subnet_drive`
+					SUBNET=`$OPENSTACK stack output show -f value -c output_value "$NAME_PREFIX-$rsc" subnet_drive`
 					$GIT config -f $INIFILE --replace-all default.driveSubnetId ${SUBNET//\"/}
 				else
-					NET=`heat output-show "$NAME_PREFIX-$rsc" floating_ip_address`
+					NET=`$OPENSTACK stack output show -f value -c output_value "$NAME_PREFIX-$rsc" floating_ip_address`
 					$GIT config -f $INIFILE --replace-all default.floatingIp ${NET//\"/}
-					SUBNET=`heat output-show "$NAME_PREFIX-$rsc" floating_ip_id`
+					SUBNET=`$OPENSTACK stack output show -f value -c output_value "$NAME_PREFIX-$rsc" floating_ip_id`
 					$GIT config -f $INIFILE --replace-all default.floatingIpId ${SUBNET//\"/}
 										
 				fi
@@ -113,7 +113,7 @@ for ACTION in $ACTIONS; do
 				for rsc in $WAIT; do
 					wait_complete $rsc
 				done
-				$HEAT stack-delete -y $NAME_PREFIX-$rsc  || exit 2
+				$OPENSTACK stack delete --yes $NAME_PREFIX-$rsc  || exit 2
 				WAIT="$NAME_PREFIX-$rsc"
 			fi
 		else
@@ -156,22 +156,22 @@ for ACTION in $ACTIONS; do
 				# create root volume if none registred in ini file
 				ROOT_VOLUME=`$GIT config -f $INIFILE --get default.${rsc}RootVolume`
 				if [ "x$ROOT_VOLUME" == "x" ]; then
-					$HEAT stack-create -f $TEMPL_DIR/root_volume.yaml -P "$STACK_PARAMS;hostname=$NAME_PREFIX-${rsc};volume_size=${VOLUME_SIZE};base_image=${BASE_IMAGE}" $NAME_PREFIX-${rsc}-root-volume || exit 3
+					$OPENSTACK stack create -t $TEMPL_DIR/root_volume.yaml --parameter "$STACK_PARAMS;hostname=$NAME_PREFIX-${rsc};volume_size=${VOLUME_SIZE};base_image=${BASE_IMAGE}" $NAME_PREFIX-${rsc}-root-volume || exit 3
 					wait_complete $rsc-root-volume
 					while [ "x$ROOT_VOLUME" == "x" ] ; do
-						ROOT_VOLUME=`heat output-show "$NAME_PREFIX-${rsc}-root-volume" volume_id`
+						ROOT_VOLUME=`$OPENSTACK stack output show -f value -c output_value "$NAME_PREFIX-${rsc}-root-volume" volume_id`
 					done
 					ROOT_VOLUME="${ROOT_VOLUME//\"/}"
 					$GIT config -f $INIFILE --replace-all "default.${rsc}RootVolume" ${ROOT_VOLUME}
 				fi
 				
 				# create vm
-				$HEAT stack-create -f $TEMPL_DIR/${TEMPLATE}.yaml -P "$STACK_PARAMS;$RSC_NETWORKS;root_volume_id=$ROOT_VOLUME;hostname=$NAME_PREFIX-$rsc;$IP_ADDRESSES;flavor=$FLAVOR" $NAME_PREFIX-$rsc || exit 3
+				$OPENSTACK stack create -t $TEMPL_DIR/${TEMPLATE}.yaml --parameter "$STACK_PARAMS;$RSC_NETWORKS;root_volume_id=$ROOT_VOLUME;hostname=$NAME_PREFIX-$rsc;$IP_ADDRESSES;flavor=$FLAVOR" $NAME_PREFIX-$rsc || exit 3
 			else
-				$HEAT stack-delete -y $NAME_PREFIX-$rsc
+				$OPENSTACK stack delete --yes $NAME_PREFIX-$rsc
 				if [ $DELETE_ROOT_VOLUME == true ]; then
 					wait_complete $NAME_PREFIX-$rsc
-					$HEAT stack-delete -y $NAME_PREFIX-${rsc}-root-volume
+					$OPENSTACK stack delete --yes $NAME_PREFIX-${rsc}-root-volume
 					WAIT="$WAIT $NAME_PREFIX-${rsc}-root-volume"
 					$GIT config -f $INIFILE --unset-all "default.${rsc}RootVolume"
 				fi

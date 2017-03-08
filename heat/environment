@@ -30,5 +30,6 @@ TEMPL_DIR=${BASEDIR}/templates
 RSC_DIR=${BASEDIR}/resources
 
 HEAT=heat
+OPENSTACK=openstack
 NEUTRON=neutron
 GIT=git
