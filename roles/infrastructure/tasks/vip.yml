@@ -2,11 +2,7 @@
 
 - name: Create a port with a static VIP
   os_port:
-    auth:
-      auth_url: "{{ os_auth_url }}"
-      username: "{{ os_username }}"
-      password: "{{ os_password }}"
-      project_name: "{{ os_tenant }}"
+    auth: "{{ os_auth }}"
     region_name: "{{ os_region }}"
     state: present
     name: "{{ item.name }}"
@@ -20,11 +16,7 @@
 
 - name: Make VIP ip assignable to vm-ports
   os_port:
-    auth:
-      auth_url: "{{ os_auth_url }}"
-      username: "{{ os_username }}"
-      password: "{{ os_password }}"
-      project_name: "{{ os_tenant }}"
+    auth: "{{ os_auth }}"
     region_name: "{{ os_region }}"
     state: present
     network: "{{ os_network[site] }}"

@@ -12,3 +12,8 @@ os_region: '{{vault_os_region[site]}}'
 os_auth_url: 'https://keystone.cloud.switch.ch:5000/v2.0'
 os_ssh_key: "{{vault_os_ssh_key[site]}}"
 
+os_auth: 
+  auth_url: "{{ os_auth_url }}"
+  username: "{{ os_username }}"
+  password: "{{ os_password }}"
+  project_name: "{{ os_tenant }}"

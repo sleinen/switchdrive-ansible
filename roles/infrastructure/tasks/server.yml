@@ -3,11 +3,7 @@
 - name: "{{ os_action }} a server"
   os_server:
     state: "{{ os_vm_state }}"
-    auth:
-      auth_url: "{{ os_auth_url }}"
-      username: "{{ os_username }}"
-      password: "{{ os_password }}"
-      project_name: "{{ os_tenant }}"
+    auth: "{{ os_auth }}"
     region_name: "{{ os_region }}"
     name: "{{ os_server[site][item].name }}"
     boot_volume: "{{ os_server[site][item].name }}_root"

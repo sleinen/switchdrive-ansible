@@ -3,11 +3,7 @@
 
 - name: "{{ os_action }} a network port"
   os_port:
-    auth:
-      auth_url: "{{ os_auth_url }}"
-      username: "{{ os_username }}"
-      password: "{{ os_password }}"
-      project_name: "{{ os_tenant }}"
+    auth: "{{ os_auth }}"
     region_name: "{{ os_region }}"
     state: "{{ os_vm_state }}"
     name: "{{ os_server[site][item].name }}-port_{{ os_network[site] }}"

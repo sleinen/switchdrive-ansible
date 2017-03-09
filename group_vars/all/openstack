@@ -22,6 +22,11 @@ os_image:
 # server groups
 
 os_server_group:
+  drive:
+    list: 
+      - { name: "load_balancers", policies: ['anti-affinity'] }
+    # look up id after they were created: `openstack server group list`
+    load_balancers: "49b089f0-7987-4d7e-843c-0818efbaaa38"
   tldrive:
     list: 
       - { name: "load_balancers", policies: ['anti-affinity'] }
@@ -33,6 +38,9 @@ os_server_group:
 # servers
 
 os_server:
+  drive:
+    lb1: { name: "{{site}}-lb1", ip: "{{ hostvars[groups['lb'][0]].inventory_hostname}}", flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,development,ldap,web", hints: { group: "{{ os_server_group[site]['load_balancers'] }}" } }
+    lb2: { name: "{{site}}-lb2", ip: "{{ hostvars[groups['lb'][1]].inventory_hostname}}", flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,development,ldap,web", hints: { group: "{{ os_server_group[site]['load_balancers'] }}" } }
   tldrive:
     lb1: { name: "{{site}}-lb1", ip: "{{ hostvars[groups['lb'][0]].inventory_hostname}}", flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,web,tldrive-ssh", hints: { group: "{{ os_server_group[site]['load_balancers'] }}" } }
     lb2: { name: "{{site}}-lb2", ip: "{{ hostvars[groups['lb'][1]].inventory_hostname}}", flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,web,tldrive-ssh", hints: { group: "{{ os_server_group[site]['load_balancers'] }}" } }
@@ -50,23 +58,23 @@ os_vip:
     - { name: "lb_vip1", ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }
     - { name: "lb_vip2", ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" }
   ports:
-    - { name: 'tldrive-lb1-port_tldrive-drive', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
-    - { name: 'tldrive-lb2-port_tldrive-drive', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }               
+    - { name: '{{ site }}-lb1-port_{{ os_network[site] }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
+    - { name: '{{ site }}-lb2-port_{{ os_network[site] }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }               
   drive:
     hosts:
-      tldrive-lb1:
+      drive-lb1:
         - { name: 'vip1_1', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 10, ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}" }
-        - { name: 'vip1_2', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 11, ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}"  }
-      tldrive-lb2:
-        - { name: 'vip2_1', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 10, ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"  }
-        - { name: 'vip2_2', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 11, ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"  }
+        - { name: 'vip1_2', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 11, ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}" }
+      drive-lb2:
+        - { name: 'vip2_1', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 10, ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}" }
+        - { name: 'vip2_2', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 11, ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}" }
   tldrive:
     hosts:
       tldrive-lb1:
         - { name: 'vip1_1', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 10, ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}" }
-        - { name: 'vip1_2', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 11, ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}"  }
+        - { name: 'vip1_2', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 11, ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}" }
       tldrive-lb2:
-        - { name: 'vip2_1', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 10, ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"  }
-        - { name: 'vip2_2', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 11, ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}"  }
+        - { name: 'vip2_1', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 10, ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}" }
+        - { name: 'vip2_2', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 11, ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}" }
 
               
