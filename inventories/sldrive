@@ -56,6 +56,11 @@
 10.0.26.181 ansible_ssh_user=ubuntu
 10.0.26.182 ansible_ssh_user=ubuntu
 
+[lb_vip]
+10.0.26.11
+10.0.26.12
+
+
 [production:children]
 mariadb
 nfs

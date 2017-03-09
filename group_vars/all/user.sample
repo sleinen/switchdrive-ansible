@@ -7,5 +7,16 @@
 
 #vault_os_username: 'myOSUsername'
 #vault_os_password: 'IWontTellYou'
-#vault_os_tenant: 'projectXYZ'
+#vault_os_tenant: '
+#    drive: 'projectXYZ''
+#    sldrive: 'projectXY2'
+#    tldrive: 'projectXYZ3'
+#vault_os_region:
+#    drive: 'ZH'
+#    sldrive: 'LS'
+#    tldrive: 'LS'
+#vault_os_ssh_key: 
+#    drive: "myKeyName"
+#    sldrive: "myKeyName"
+#    tldrive: "myKeyName"
 

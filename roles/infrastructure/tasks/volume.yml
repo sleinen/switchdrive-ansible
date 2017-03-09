@@ -1,0 +1,19 @@
+---
+
+- name: "{{ os_action }} a root volume"
+  os_volume:
+    auth:
+      auth_url: "{{ os_auth_url }}"
+      username: "{{ os_username }}"
+      password: "{{ os_password }}"
+      project_name: "{{ os_tenant }}"
+    region_name: "{{ os_region }}"
+    state: "{{ os_volume_state }}"
+    size: "{{ item.root_size }}"
+    display_name: "{{ item.name }}_root"
+    image: "{{ item.image }}"
+  with_items: "{{ server_list }}"
+  when: server != ""
+  tags:
+    - os_volume
+

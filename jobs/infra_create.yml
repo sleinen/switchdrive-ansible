@@ -1,0 +1,15 @@
+---
+
+- hosts: 
+    - engines
+  vars:
+    os_vm_state: present
+    os_volume_state: present
+    server: ""
+    server_list:  "{{ server.split(',')  }}"
+    os_action: "create"
+  roles:
+    - infrastructure
+  become: false
+  gather_facts: no
+  

@@ -1,0 +1,22 @@
+---
+
+
+- name: "{{ os_action }} a network port"
+  os_port:
+    auth:
+      auth_url: "{{ os_auth_url }}"
+      username: "{{ os_username }}"
+      password: "{{ os_password }}"
+      project_name: "{{ os_tenant }}"
+    region_name: "{{ os_region }}"
+    state: "{{ os_vm_state }}"
+    name: "{{ os_server[site][item].name }}-port_{{ os_network[site] }}"
+    network: "{{ os_network[site] }}"
+    fixed_ips:
+      - ip_address: "{{ os_server[site][item].ip }}"
+    security_groups: "{{ os_server[site][item].security_groups }}"
+  with_items: "{{ server_list }}"
+  when: server != ""
+  tags:
+    - os_port
+  

@@ -59,6 +59,10 @@ controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass
 [test]
 10.0.28.181 ansible_ssh_user=ubuntu
 
+[lb_vip]
+10.0.28.11
+10.0.28.12
+
 [production:children]
 mariadb
 nfs

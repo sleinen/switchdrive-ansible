@@ -1,0 +1,9 @@
+---
+
+- include: server_group.yml
+- include: port.yml
+- include: volume.yml
+- include: server.yml
+- include: vip.yml
+  when: os_action == "create"
+

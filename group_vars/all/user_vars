@@ -10,4 +10,5 @@ os_password: '{{vault_os_password}}'
 os_tenant: '{{vault_os_tenant[site]}}'
 os_region: '{{vault_os_region[site]}}'
 os_auth_url: 'https://keystone.cloud.switch.ch:5000/v2.0'
+os_ssh_key: "{{vault_os_ssh_key[site]}}"
 

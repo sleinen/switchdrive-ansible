@@ -10,13 +10,13 @@
     region_name: "{{ os_region }}"
     state: present
     name: "{{ item.name }}"
-    network: "{{ vips[site].network }}"
+    network: "{{ os_network[site] }}"
     fixed_ips:
       - ip_address: "{{ item.ip }}"
   with_items:
-    - "{{ vips[site]['ips'] }}"
+    - "{{ os_vip['ips'] }}"
   tags:
-    - vip
+    - os_vip
 
 - name: Make VIP ip assignable to vm-ports
   os_port:
@@ -27,12 +27,12 @@
       project_name: "{{ os_tenant }}"
     region_name: "{{ os_region }}"
     state: present
-    network: "{{ vips[site].network }}"
+    network: "{{ os_network[site] }}"
     name: "{{ item.name }}"
     allowed_address_pairs: "{{ item.ips }}"
   with_items:
-    - "{{ vips[site]['ports'] }}"
+    - "{{ os_vip['ports'] }}"
   tags:
-    - vip
+    - os_vip
 
 

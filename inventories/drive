@@ -84,6 +84,11 @@ controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass
 [test]
 10.0.23.15 ansible_ssh_user=ubuntu
 
+[lb_vip]
+10.0.23.11
+10.0.23.12
+
+
 [production:children]
 mariadb
 maxscale

@@ -1,0 +1,15 @@
+---
+
+- hosts: 
+    - engines
+  vars:
+    os_vm_state: absent
+    os_volume_state: absent
+    server: ""
+    server_list:  "{{ server.split(',')  }}"
+    os_action: "delete"
+  roles:
+    - infrastructure
+  become: false
+  gather_facts: no
+  
