@@ -1,12 +1,12 @@
 ---
 
-- name: copy grafana build instructions to remote host
-  synchronize:
-    src: grafana
-    dest: /tmp
-    delete: yes
-  tags:
-    - grafana
+#- name: copy grafana build instructions to remote host
+#  synchronize:
+#    src: grafana
+#    dest: /tmp
+#    delete: yes
+#  tags:
+#    - grafana
 
 - name: copy grafana configs to remote host
   template:
@@ -25,7 +25,8 @@
     name="{{grafana_docker_name}}"
     tag="{{grafana_docker_tag}}"
     dockerfile="Dockerfile"
-    state=build
+    state=present
+    force=yes
     tls_hostname=localhost
   tags:
     - grafana
