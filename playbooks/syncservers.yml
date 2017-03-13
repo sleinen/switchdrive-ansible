@@ -16,7 +16,8 @@
     - exim
     - nagios
     - logstash_forwarder
-    - owncloud
+    - role: owncloud
+      tags: owncloud
     - ocphp_fpm
     - ocapache
     - scripts

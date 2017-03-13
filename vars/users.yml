@@ -1,15 +1,11 @@
 ---
 
 user:
-  # peta
+  # InDa
   fischer:
     comment: "Jens-Christian Fischer"
     uid: 1070
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDFRFUYN8WEFxHWkhKfaGS6Gqs+NKt+4eVqHb+s1IwT17g0PcnF3VoT30KgSqFsvVrvYnE6BCcIoJZnCgIcbzJccjdsXcF4v/40yYfuFsuk6nCnNI3fdaZjcizgdtgytBsj/kW42PJ6d6dIXLftF6dKJkBNYf4MsD1Yws4qpmMvIiV54ml7eh5nG7C1xbYuYJUTEebFGEPIkQXKMm7maNVvH4ppqRlIK27ayrTVfXSbbJJw+kPYn59p8vY8CAtTUkJ5wkiwAenZe+IfCMYGw29ZkTbahmzBVCtm+PMllUNggsEQABp9uGo9n2HukbvSBjqus5shqb808oK+c/asb4Wb fischer@peta-dhcp-13.switch.ch"
-  usai:
-    comment: "Alessandro Usai"
-    uid: 989
-    key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA9zD6fdwOASm7RcheEGUJGCi2oh6ryHEX7CebhKGeshsh4ez8W+ovU4aq6gG+IDSOrP9b2QpRTdUHz+fDWf0F6TBUFzermljudccinEsORPdl/T4XzaLcWZ4aL8AsiaLQ2X8IvThTQqpQfeMxFVmSI++Z5NdXO2EfZ9nWZjlsgjgUL8UlIWd/uwlBwwIyRmXywcOoy71Qw99RLjJefvlJiYnKDfU2YSw8zO/Py3ptaJeBdBxXA/ph8REJtwapry5ugvkxb6UYZAKqMcC9WoIAYtDyJWexSMF6SUNe2c8jSK24jDZIFyp6Ju+dYBcBx3J1gxetY2uZz9Yiqd19gtWU0w== usai@macau.switch.ch"
   tschopp:
     comment: "Valery Tschopp"
     uid: 959
@@ -26,12 +22,8 @@ user:
     comment: "Saverio Proto"
     uid: 1110
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD6iCEu+Nj3RrDwYpM3rQZysouVPriE8a1SITXmN6T8S8+4qYJugzAHhmWs49Bj0iHmy4srPmeiu+h6n6nHFNLFHSIYrfsihutEnF4zA80mH19WyqkO+ZvWB3KkmLkx/H36lVVFJwZEGKPCzI+tRaxThEcKNEDoj/+rrtvoo9OQ5mJD14kWirRHLFm3lbxssDEfaFLqZGFQjCLklBcZQQXV3GgbOixZMhS5pNC3xQJh9UEbgCYht0hVD3FueY6JOc/nPXg+ETBhDkMXkJPKfKz5U+r2Vf9lJ9J91uYcHeoAdhaPs1aO+zVFa+wJ91cCRF300FVZNCiqszaGDSVa6KcF proto@macfp.switch.ch"
-  # SePl
-  bleh:
-    comment: "Stephan Bleh"
-    uid: 1093
-    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCjeafYt+uCCyJmPhWZxerK/fr0KFswtgD19msn/I+GkEUTI7ZqQqqo0mgKQ99bEy9QGkXT3FG7iQgie+XUp6ahIEFzgyhOf8MIc2DfbZbUww09mv2zhlmkkSJPSWafq7RVEI92Hwf0+qTtei4KOBn3dNtqO4doXcUoiZNL9LJfZMWx3JNCnM/lNVb/oNdzFgzI+Syht6aR8JKnh+NilEKHNDgPBjwoZ7iPposjMGTPB+Fqp9RWQSOYKx2RE6MUEGnbDJodJSanJq+CTJEJyWlrD//zIv/DVJGj46pGWALYKdzYSq4hwW+FgIFSx2JmhsH7VFGd882OWh78GSgJKrz2fLkUkVILvd8ZKVtfClnLMmSWZ+iHxh4mK65KSfWa37jvDep+WCzLoncps4GEchEHW32m1zPKpvl8ZndV+2KQj5BBHAcZmd+gT/IOMRTNFTNUd38LAR9UkBrv+/cUAvTSief/Y2Y3xNG8vDp9cQApwkFel/JkHkzkoSCeFSTOoDi0vwmg3HKKeC4elZ9zVgaIl5Jnwy5w/naxskQ0KR6aE2bJ7V3ukJ7p12Zze088KDdp3Mx2kKOTFYbuB8lub+hYSkqmq/GtrzVG24bRWJYVxki9Kq2+yknGMwJGovb4rKLoRvS05E4dJdCiFbA2Aok9/hZYvGlrEtjQ5BncayM5Zw== stephan.bleh@switch.ch"
-  # InEn
+  # InIt
+  # Coll
   furter:
     comment: "Renato Furter"
     uid: 996
@@ -44,11 +36,15 @@ user:
     comment: "Daniel Fritschi"
     uid: 992
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA6T2rSWXCdd7hSC7zbq8cBkzwMjwstK1eYVArJniysF6ICVNVYEYdDbwoQmckf0sUMV6jr6eaY0LNoXvOgWmSAWNc8YAaWHgN6+uMRW9q+VEqNvm5Zn+WIYPoGjpTbgM41E4pL6vNUa6/uAVlpY75g6CqNC7S9dyKD7fc7uTRhf7K5OYBCSJ7mgYt2xAsPKateYD+8u3+yzDWrYAd1JUx/Q/M/dHfR2nkBhJZC2KD03DMUBoS0hkErtF86G4W3RhMaOQbw3ghRpEps04kjOZAW/61+g9Je41NJUz5WsM5uPdoZYFXwXC/DDGbjmeLKDUpMYQ6y4HDtwICUncNolS6DQ== fritschi@ho-174.switch.ch"
-  # SeSu
+  schmid2:
+    comment: "Urs Schmid"
+    uid: 1089
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDlt89iKefsza8SnzD/tcCk9oWFaK9bn3SekGvVFOEu8m8HuuNv0qEUqs1AKVwgthUNwBLsvuBlu0s2alQgZH2fyxOuaP9bKzAAHGY9ytPZmHfgbJZ7J5Vq2EC5gPOAXx6f1d5EshYoVmSctv3eMf3Wcc4ZMFH7V96nyqSVmA8pUD3fxTKQWwhyDD6+dXqd3xj3efyM4MmdlIPy563WTcQXLIqNMsS+f3dKiPRX5XIEeGXvNxERDgfc0J1yOsVIN7Bw3a67dAxQI+ccpjaFPGKyMA47Y24P9HKalahY+AY93uyWJ8sXMrd/ETsQNYAczA9P8pRCfoFb/aTpJJ/oaAnH schmid2@Urs-Schmids-Computer.local"
+  # SeDe
   wieting:
     comment: "Paola Wieting"
     uid: 913 
-    key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAwVuIxGxS6HIIqRQVQEoD4jJR5aDYiq7L+XZXFw376I3OwR/n6uqRduX1e+diRkPXv4mNTFvvyH1lPMl5zQr5tVHV/P1WsEOHwEjmw0ivJx5Za+9k9EvFmRlvztFl92nnDqfCyKPA1XknRc/XLMBTl29zV3b/Ax2mglKT5/uNYUOS5GKhwW0iZ7CGs5T0Gz7x5eeUnBXKVfNiP0x7nBlHsEMVTWO2FSUy6zFkPSCxtgxEAjcKPMfya8XahGwpBhIlPsHDX9sUL65ufggj1zZCpaTU/egiDaCKH1jnShZZt4ah6/U3sR69N8h+jFmYFdYEwGph71aFYna0LSsmM+FN/w== wieting@nmq-242.switch.ch"
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDKrQagGrTkSjnJbTLOHur3PMG9b2IS5Qn0fnsTs8mG2gJ8vnIKW3T3JaS4GEBrYbiDVP2XpSoyHprGnLwTYtz4Bg2xO7FtMWGrCZs3rfpGxPMBSiLsRKjuVHU2Dte3TD7bD9NHwM7xkObclMJ/0/wZVigP7Td3df+gAhLkQrOQ2ZuIl86Ve4ZIBqLJqiV7FebsWkj+mvdRgZuxFmMOZf5gV7zavAxIIo1Dl54WUOsqZzkjVENlD1KyoUYsyOkRRLjFifO0W24ywZdF3pNRBzNS+HmBSg2M5+43SLt49/xiLl9iPqaNtiPCWm8HVBf9Ye6aVTbPfkPrEXktJuKMzzm/GMQ+YToTN21bLRt1aAXn5z4upVbYltUYeMGRAlZID3NfNeaw5SrPf5b203uSEOX42M7XvvCxfaCSJtUXEAAPQGdGCfSCgV6VfIlDQbvBJGVUfij3vs3EsS8EOR+g+m5lE2z249CF85xHTd/ZSD131Yy6rI9xeDLjSWiuxjGy+x6fdwumrxTFImW1S63LN0We8Oxo8l5R2mQxfrsP+Abui5IRlKxFdJtXT/5dHzguo5I7GmY72KoEipOkLUFTLI0mbgWKjnp2x7NJEcrwJfY8VcETiGdwFi6mPiqgO8YF6uZJriAa5RF35nraMuycRcpGI3es5vhV8EEl8uga6SOOKQ== wieting@macpw.switch.ch"
   malmborg:
     comment: "Helena von Malmborg"
     uid: 974
@@ -61,16 +57,28 @@ user:
     comment: "Florian Müller"
     uid: 1126
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC+pGe+JqyCO2sr7zIHP8v7SzE6/YBLO39q/zJcBa+XiEcP2LDxiSxgpENXwYlVfq8NdTCQzXtoYheBilU+nYkQyUBkvMaUI/XfXT6KcsTbWPUA4Ah7sE13JIhvLDiEpei/aPm6i9z0MdInWU/sx2RDs0afrVhcNnLLVrG4i7/MrLNIxbgN8KxFZalmJG+sJYrxrFrC16k7W0MkS3EyLkrjeGQHGSAySwgEpNYGDRymLJItkb94AHz+wd1vmhCtz+EmHJDkVaA1gD7d0JcP3fOEXzPakAUAALt5pJsY5qvG/RvGWubg2HyW++rm71spiMmnO/PsaSsZUh02nsf1qRKlCb9NmjJwCuUaR55CTRpQLbV6uxFO5OdSf8Dzy5kN1qglUKmVDxAUIwbnElUNCtnl7fcHjPrsgNWYSrrTVW/EtjsmRgI5tHplJV33BRjM9NjTcH8KrpjQx+laoz8HL/U2zh5PjtShP6Ti6Stamb0V9ML5tRONspEMyL0xUBtyTd2oT4foud+TcZJg6Hy1Few2kmo3hXeaVVw1OHMxmA6XrEFGyjVaWB85E6aX5sryIeC9E8xu4JGuaFa4gZS7nUoIcw4tfvFmGsFFpUEMypEF3oB79uRyTz51ID1kpMyzpCVv48MLzuiQNZM4KEOJUwvw8sx88uxGUONDt6U3M0BqBw== mueller2@macfm.switch.ch"
-  # OC
-  felix:
-    comment:
-    uid: 5001
-    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDLFJviVB/qUL1qk9XFLrMbB4oleM+xjl10AMgooTD6nkONvaHZyvmhkfn4G6eFkqHIZbndIhD1Lw6Vuu1Bg1Fb/zz0AF15KA8z7JmuWnJ2ZrqK4kejotbedcGH4X+vhA7XtacNrjx+wUVKQUQVCAkdx6Ty0x2w9xhMe2O0EHEEK/9IpTaOX6mQ2EsjbSYqXtPXMjGeBfXNmIM0OkWoaAlg0+nN9nadJDa/NrKhBONE4pyhywZLDmgWdw5jVJGu1tLexwyfErZAgdtYFXNKLQIgI+/KPM1Db2ufAb8YxSDPb1i/Zc30YR1quDBl4IaFb/tKnjCdN1KAqbhXoGWyUQGl felix@chump"
-  jfd:
-    comment:
-    uid: 5002
-    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDI3qzcsA2ZGXkCKa4gQ/Q1HwzpvNkY5rtx7U8v0Zow6GSRrDzuvzvg2eC8z4+knJnr/rZzrYGUrQY5MXTldig5qqTKxv23SqyLjRPwozEdWK4cnEwjJ+P8L2/SaCW9AfDs+ow1K/4wBWfHXt8+/fMVP0LA7AvEA8eiKfSyYWwJBdeTEnttbLaHKd0uDbSipiIPmOOuoPScbs1wkXVyP/oCiaH6R6md2/jZiiXj6RXcTyc73uQPXcCQRWASoio8NgvGUALz7nBHWvv932PMYT0IV4xVH0cdbT+7hIikCggnZAIOu9MS6PHTgeLnbiTzX4GgpIA9MOAmaLtXQGgcDnwz jfd@lance"
 
+  # removed
+  vernon:
+    comment: "Greg Vernon"
+    uid: 1004
+    key: "ssh-dss AAAAB3NzaC1kc3MAAACBAP5Gzt8T7WoRnHZocbnxHOU+16RyhehKtY862qv7YPDeGtSLEAaWSvHgjp62N8oDsHKXqXwegnlbBDBy/+jsMPqQDROboDUF2tyuwH+ZJNmgSFuUafxJ4RA23gfodFoNqz1Vjg/j0QfkxMgxbIP9kQQGi5/JLzcpHI4F1qAv6wgZAAAAFQCqnnP4FOgYaeaQd/l/RfutHUzhSQAAAIBZlMbNxk+DX7prQt8/hgxJWNOz7p/YKRz4FpLfaIh8u0Qlds+y2sG2ay+S02Djcs5XOT8Av8dYKheLUrHBju/jLWHyZ13cQjos6esrdWgLQyW+dSASkxwvMfooMLhgjHmjoMBqwr2teLwx4/WBGT8B504sMHuGC+M9tUoXykrX9QAAAIEAvxA1zkkbpB7pL2z2+EqE0HG2r1PGMreXHTEh0duA51+fdaZJrj9AcfwziFXucgRzCEjPxCCJ9bfJL2FilAENfvF/p5LhDqvJfMUb27QFeSu9McC5yzWQPSleAKGs4Po+hLm/eikrZ/akfFW6PnFUFK2A6pcH3BUPkNhUkiFhnHo= vernon@macgv.switch.ch"
+  kerins:
+    comment: "Fergus Kerins"
+    uid: 998
+    key: "ssh-dss AAAAB3NzaC1kc3MAAACBAOv8z42K0pd95Y1VKBaAoB058homZiDmPdOVRIBgNWDJfKyfPHNPZm37KVkvUpN7XLUQVDb9N/f/QOh4J5/Y4m8cRgFqNORGj36A4EGwy580Qf1sV6ZePynvv1N38WysYT7Xt1nEHT66BaUQRorXxqGxmo7LmqjQF48/z3XZM4XtAAAAFQCbdpBySIpTZJekakVHJJdEo9/IPQAAAIEAtL8N2BtajWIvia+A0EiWxGq5aQfq15DOmM445kapy+Vm5rrQXzMbNuvlmpeOPYgrnqiFHSBghErMLFVi8JPNvSA3hU1CEenSsQsZe4iHpNiyjOBYWNSto2sdoKqzILD9LZT3oNqlniuLw4Xf2HgoeUzKbKM68xoK/zwcwwEDkOoAAACBAJYJnsrLYtqndjJmjkQHMkfgV6wbcmN3GCkVqMsz8QIie/N3nqlanpfS2yuR32mUCCuPSlO2X5A6lB1yNvaJpgW1xLOfrHsEyIWAJkGA+FJIGMBALhNoOicvT/1rvDjAPdAg81dS5kmTAT1b5Gw8SZUyOLNoRdcPmWeb73L2SAaI kerins@macfke.switch.ch"
+  helmle:
+    comment: "Bernd Helmle von Credativ"
+    uid: 5000
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAudA6lnk4dJapMj9bGb8aXlBdZ33nHnNGO818bpJ7G/H5O59laK6FIhLNrRfmgo4wxJezWseeImVJvZ+Ie8FP5PPVN0spJIF9XgVHniKsBVUHUK3DzcjNFsl8IrnMr7mUdwHf+5g/O+liTWW5ikA++C265QP+3nXvDxXtmVKnG3l9ejUhuhUAXoQ+Fc57AVs4Re4GEN9VeiMV0PEcXjIaUoIc8+fBB4gxDe94Sy3ZGZGlpqtwqsQaUFVDv+eISKRMhCxZRkhpoUEzhOvuJLVdBOjRFNt4JBNazUI+B56TAFTzJyXt1K8udrgxxxvqd82aScEJcid1FFeudp9DE+6nbrT68NkV8+qFCH2Zg3soLDZwiDutGST37SmClAoAoLHUVG1jBHQPY7TxQr4ya2u9z1jvHUnXUt1Bn0KlSi5GiHVwsuocRFPWcwEm7l9JT3H04o5Apuha73usryRATZxqVnRXSzsKcocERh/ZmYSrhY8EhKoMEHwUmFZjiqsMia7zsluszIngFPJl68jiJHEu87+snKSKoA04pEzC3hqj1AgBEww70lZWYqI88qw2xcTV97eZKoiA9rThbV9qm1Qzzk6wcBSkSPLWRcZMeFX3KqgwsFiSsRvQPz8zaKKs0qpfn/ahOt9CQk3zDFDeNP64j/ZTNGcIdqz2uE2sVQsWGSc= SSH-Key for Bernd Helmle"
+  bleh:
+    comment: "Stephan Bleh"
+    uid: 1093
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCjeafYt+uCCyJmPhWZxerK/fr0KFswtgD19msn/I+GkEUTI7ZqQqqo0mgKQ99bEy9QGkXT3FG7iQgie+XUp6ahIEFzgyhOf8MIc2DfbZbUww09mv2zhlmkkSJPSWafq7RVEI92Hwf0+qTtei4KOBn3dNtqO4doXcUoiZNL9LJfZMWx3JNCnM/lNVb/oNdzFgzI+Syht6aR8JKnh+NilEKHNDgPBjwoZ7iPposjMGTPB+Fqp9RWQSOYKx2RE6MUEGnbDJodJSanJq+CTJEJyWlrD//zIv/DVJGj46pGWALYKdzYSq4hwW+FgIFSx2JmhsH7VFGd882OWh78GSgJKrz2fLkUkVILvd8ZKVtfClnLMmSWZ+iHxh4mK65KSfWa37jvDep+WCzLoncps4GEchEHW32m1zPKpvl8ZndV+2KQj5BBHAcZmd+gT/IOMRTNFTNUd38LAR9UkBrv+/cUAvTSief/Y2Y3xNG8vDp9cQApwkFel/JkHkzkoSCeFSTOoDi0vwmg3HKKeC4elZ9zVgaIl5Jnwy5w/naxskQ0KR6aE2bJ7V3ukJ7p12Zze088KDdp3Mx2kKOTFYbuB8lub+hYSkqmq/GtrzVG24bRWJYVxki9Kq2+yknGMwJGovb4rKLoRvS05E4dJdCiFbA2Aok9/hZYvGlrEtjQ5BncayM5Zw== stephan.bleh@switch.ch"
+  usai:
+    comment: "Alessandro Usai"
+    uid: 989
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA9zD6fdwOASm7RcheEGUJGCi2oh6ryHEX7CebhKGeshsh4ez8W+ovU4aq6gG+IDSOrP9b2QpRTdUHz+fDWf0F6TBUFzermljudccinEsORPdl/T4XzaLcWZ4aL8AsiaLQ2X8IvThTQqpQfeMxFVmSI++Z5NdXO2EfZ9nWZjlsgjgUL8UlIWd/uwlBwwIyRmXywcOoy71Qw99RLjJefvlJiYnKDfU2YSw8zO/Py3ptaJeBdBxXA/ph8REJtwapry5ugvkxb6UYZAKqMcC9WoIAYtDyJWexSMF6SUNe2c8jSK24jDZIFyp6Ju+dYBcBx3J1gxetY2uZz9Yiqd19gtWU0w== usai@macau.switch.ch"
 
 
 users_admin:
@@ -80,6 +88,7 @@ users_admin:
   - fritschi
   - herzog
   - furter
+  - schmid2
 
 users_mgmt:
   - wieting
@@ -107,6 +116,7 @@ remove_users:
   - schnidrig
   - rissman
   - vernon
+  - helmle
   - kerins
   - bleh
   - usai
@@ -117,9 +127,10 @@ ubuntu_keys:
   - fischer
   - furter
   - fritschi
-  - felix
-  - jfd
 
 deleted_ubuntu_keys:
+  - vernon
+  - helmle
+  - kerins
   - usai
   

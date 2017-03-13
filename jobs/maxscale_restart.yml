@@ -1,0 +1,12 @@
+---
+
+- hosts:
+    - sync
+    - web
+    - dev
+    - mgmt
+  become: true
+  gather_facts: no
+  tasks:
+    - command: docker restart maxscale
+  

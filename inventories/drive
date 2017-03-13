@@ -3,7 +3,12 @@
 10.0.23.31 ansible_ssh_user=ubuntu
 10.0.23.32 ansible_ssh_user=ubuntu
 10.0.23.33 ansible_ssh_user=ubuntu
-10.0.23.34 ansible_ssh_user=ubuntu
+#10.0.23.34 ansible_ssh_user=ubuntu
+#10.0.23.35 ansible_ssh_user=ubuntu
+#10.0.23.36 ansible_ssh_user=ubuntu
+#10.0.23.37 ansible_ssh_user=ubuntu
+#10.0.23.38 ansible_ssh_user=ubuntu
+#10.0.23.39 ansible_ssh_user=ubuntu
 
 [maxscale]
 10.0.23.246 ansible_ssh_user=ubuntu
@@ -26,12 +31,22 @@
 10.0.23.102 ansible_ssh_user=ubuntu active=True
 10.0.23.103 ansible_ssh_user=ubuntu active=True
 10.0.23.104 ansible_ssh_user=ubuntu active=True
-10.0.23.105 ansible_ssh_user=ubuntu active=True
-10.0.23.106 ansible_ssh_user=ubuntu active=True
-10.0.23.107 ansible_ssh_user=ubuntu active=True
-10.0.23.108 ansible_ssh_user=ubuntu active=True
-10.0.23.109 ansible_ssh_user=ubuntu active=True
-10.0.23.110 ansible_ssh_user=ubuntu active=True
+#10.0.23.105 ansible_ssh_user=ubuntu active=True
+#10.0.23.106 ansible_ssh_user=ubuntu active=True
+#10.0.23.107 ansible_ssh_user=ubuntu active=True
+#10.0.23.108 ansible_ssh_user=ubuntu active=True
+#10.0.23.109 ansible_ssh_user=ubuntu active=True
+#10.0.23.110 ansible_ssh_user=ubuntu active=True
+#10.0.23.111 ansible_ssh_user=ubuntu active=True
+#10.0.23.112 ansible_ssh_user=ubuntu active=True
+#10.0.23.113 ansible_ssh_user=ubuntu active=True
+#10.0.23.114 ansible_ssh_user=ubuntu active=True
+#10.0.23.115 ansible_ssh_user=ubuntu active=True
+#10.0.23.116 ansible_ssh_user=ubuntu active=True
+#10.0.23.117 ansible_ssh_user=ubuntu active=True
+#10.0.23.118 ansible_ssh_user=ubuntu active=True
+#10.0.23.119 ansible_ssh_user=ubuntu active=True
+#10.0.23.120 ansible_ssh_user=ubuntu active=True
 
 [mgmt]
 10.0.23.10 ansible_ssh_user=ubuntu admin_users={{mgmt_users}}
@@ -130,7 +145,7 @@ backbone_ipv6_prefix=2001:620:5ca1:131:
 
 # LDAP
 ldap_ip=10.0.23.17
-ldap_host=box-ldap1
+ldap_host=ldap1.{{internal_domain}}
 stats_send_to=jens-christian.fischer@switch.ch
 stats_from=jens-christian.fischer@switch.ch
 
@@ -145,8 +160,8 @@ volumes_inventory_name=production
 # owncloud
 #OWNCLOUD_MAJOR_VERSION='9.0'
 #OWNCLOUD_VERSION='{{OWNCLOUD_MAJOR_VERSION}}.5'
-OWNCLOUD_MAJOR_VERSION='8.2'
-OWNCLOUD_VERSION='{{OWNCLOUD_MAJOR_VERSION}}.8'
+OWNCLOUD_MAJOR_VERSION='8.1'
+OWNCLOUD_VERSION='{{OWNCLOUD_MAJOR_VERSION}}.12'
 enterprise=true
 stage_or_test_system=False
 rails_environment=production

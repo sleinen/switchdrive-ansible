@@ -28,7 +28,7 @@ php_config:
   memory_limit: 512M
   upload_tmp_dir: /tmp
   max_php_processes: 25
-  pm.max_requests: 0
+  pm_max_requests: 0
 
 scripts:
    - { name: "occ", path: "/root", mode: "0550" }

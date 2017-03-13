@@ -16,10 +16,12 @@
     - exim
     - nagios
     - logstash_forwarder
-    - owncloud
+    - role: owncloud
+      tags: owncloud
     - ocphp_fpm
     - ocapache
     - scripts
+  become: true
   #tasks:
   #  - name: setup cronjob
   #    cron: name="owncloud" user=www-data minute="*/15" job="php -f /var/www/owncloud/cron.php"
@@ -29,5 +31,4 @@
   #      - app
   #      - config
   #      - cron
-  become: true
 

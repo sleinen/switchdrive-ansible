@@ -8,8 +8,7 @@ L_check_http /usr/lib/nagios/plugins/check_http -w 5 -c 10  -I {{ inventory_host
 # L_check_ldap_bind checks an ldap bind (ldapsearch) to the ldap server on port 636 with 'ou=Users,dc=cloud,dc=switch,dc=ch'
 # -3 [--ver3] use ldap protocol version 3 (default protocol version: 2)
 ##
-L_check_ldap_bind /usr/lib/nagios/plugins/check_ldap -p 636 -H {{ ldap_host }}.novalocal -b 'ou=Users,dc=cloud,dc=switch,dc=ch' -3
-
+L_check_ldap_bind /usr/lib/nagios/plugins/check_ldap -p 389 -H {{ ldap_host }} -b 'ou=Users,dc=cloud,dc=switch,dc=ch' -3
 ##
 # L_check_tcp_nfs_port111 checks the tcp connection to the nfs server on port 111
 ##
