@@ -1,6 +1,6 @@
 ---
 
-- hosts: 
+- hosts:
     - engines
   vars:
     os_vm_state: present
@@ -8,8 +8,9 @@
     server: ""
     server_list:  "{{ server.split(',')  }}"
     os_action: "create"
+  vars_files:
+    - ../vars/servers.{{ site }}.yml
   roles:
     - infrastructure
   become: false
   gather_facts: no
-  

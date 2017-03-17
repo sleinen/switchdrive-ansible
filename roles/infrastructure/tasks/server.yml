@@ -5,15 +5,15 @@
     state: "{{ os_vm_state }}"
     auth: "{{ os_auth }}"
     region_name: "{{ os_region }}"
-    name: "{{ os_server[site][item].name }}"
-    boot_volume: "{{ os_server[site][item].name }}_root"
+    name: "{{ site }}-{{ item }}"
+    boot_volume: "{{ site }}-{{ item }}_root"
     key_name: "{{ os_ssh_key }}"
     timeout: 200
-    flavor: "{{ os_server[site][item].flavor }}"
+    flavor: "{{ os_server[item].flavor }}"
     auto_ip: false
     nics:
-      - port-name: "{{os_server[site][item].name}}-port_{{ os_network[site] }}"
-    scheduler_hints: "{{ os_server[site][item].hints }}"
+      - port-name: "{{ site }}-{{ item }}-port_{{ os_network }}"
+    scheduler_hints: "{{ os_server[item].hints }}"
   with_items: "{{ server_list }}"
   when: server != ""
   tags:

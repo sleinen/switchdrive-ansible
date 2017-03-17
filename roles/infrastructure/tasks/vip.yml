@@ -6,7 +6,7 @@
     region_name: "{{ os_region }}"
     state: present
     name: "{{ item.name }}"
-    network: "{{ os_network[site] }}"
+    network: "{{ os_network }}"
     fixed_ips:
       - ip_address: "{{ item.ip }}"
   with_items:
@@ -19,12 +19,10 @@
     auth: "{{ os_auth }}"
     region_name: "{{ os_region }}"
     state: present
-    network: "{{ os_network[site] }}"
+    network: "{{ os_network }}"
     name: "{{ item.name }}"
     allowed_address_pairs: "{{ item.ips }}"
   with_items:
     - "{{ os_vip['ports'] }}"
   tags:
     - os_vip
-
-

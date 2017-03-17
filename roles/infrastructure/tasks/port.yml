@@ -1,18 +1,16 @@
 ---
 
-
 - name: "{{ os_action }} a network port"
   os_port:
     auth: "{{ os_auth }}"
     region_name: "{{ os_region }}"
     state: "{{ os_vm_state }}"
-    name: "{{ os_server[site][item].name }}-port_{{ os_network[site] }}"
-    network: "{{ os_network[site] }}"
+    name: "{{ site }}-{{ item }}-port_{{ os_network }}"
+    network: "{{ os_network }}"
     fixed_ips:
-      - ip_address: "{{ os_server[site][item].ip }}"
-    security_groups: "{{ os_server[site][item].security_groups }}"
+      - ip_address: "{{ os_server[item].ip }}"
+    security_groups: "{{ os_server[item].security_groups }}"
   with_items: "{{ server_list }}"
   when: server != ""
   tags:
     - os_port
-  

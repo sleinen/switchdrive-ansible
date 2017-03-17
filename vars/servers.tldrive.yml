@@ -1,0 +1,33 @@
+---
+
+#####################
+# networks
+os_network: "tldrive-drive"
+
+#####################
+# server groups
+os_server_group:
+  list:
+    - { name: "load_balancers", policies: ['anti-affinity'] }
+  # look up id after they were created: `openstack server group list`
+  load_balancers: "07f65717-f005-4561-b06d-f1ee02c389ab"
+
+#####################
+# servers
+os_server:
+  lb1:    { name: "{{site}}-lb1",    ip: "{{ hostvars[groups['lb'][0]].inventory_hostname}}", flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
+  lb2:    { name: "{{site}}-lb2",    ip: "{{ hostvars[groups['lb'][1]].inventory_hostname}}", flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
+
+#####################
+# vips
+
+# use `openstack port list` to find ports
+# verify settings with: `openstack port show <port>`
+
+os_vip:
+  ips:
+    - { name: "lb_vip1", ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }
+    - { name: "lb_vip2", ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" }
+  ports:
+    - { name: '{{ site }}-lb1-port_{{ os_network }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
+    - { name: '{{ site }}-lb2-port_{{ os_network }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
