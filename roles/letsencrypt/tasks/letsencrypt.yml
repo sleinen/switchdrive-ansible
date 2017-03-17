@@ -5,15 +5,17 @@
   with_items:
     - "/etc/letsencrypt"
     - "/var/lib/letsencrypt"
+  when: letsencrypt_master
   tags:
     - letsencrypt
 
-- name: letsencrypt
-  docker:
+- name: letsencrypt docker container
+  docker_container:
     name: letsencrypt
     image: quay.io/letsencrypt/letsencrypt
     hostname: letsencrypt
     state: present
+    pull: true
     volumes:
       - "/etc/letsencrypt:/etc/letsencrypt"
       - "/var/lib/letsencrypt:/var/lib/letsencrypt"
@@ -24,11 +26,77 @@
       - 8888:80
     #command: "certonly --standalone {{letsencrypt.domains[service_name]}} --agree-tos --email {{letsencrypt.email}} --standalone-supported-challenges http-01 --rsa-key-size 4096"
     command: "certonly --standalone {{letsencrypt.domains[service_name]}} --expand --agree-tos --email {{letsencrypt.email}} --standalone-supported-challenges http-01 --rsa-key-size 4096"
+  when: letsencrypt_master
   tags:
      - letsencrypt
 
-- name: create cert for haproxy
-  shell: "cat /etc/letsencrypt/live/{{service_name}}/fullchain.pem /etc/letsencrypt/live/{{service_name}}/privkey.pem > /etc/haproxy/ssl/{{service_name}}.pem"
+#- name: create cert for haproxy
+#  shell: "cat /etc/letsencrypt/live/{{service_name}}/fullchain.pem /etc/letsencrypt/live/{{service_name}}/privkey.pem > /etc/haproxy/ssl/{{service_name}}.pem"
+#  #shell: "cat /etc/letsencrypt/live/a01.{{service_name}}/fullchain.pem /etc/letsencrypt/live/a01.{{service_name}}/privkey.pem > /etc/haproxy/ssl/{{service_name}}.pem"
+#  tags:
+#     - letsencrypt
+
+- name: "install letsencrypt cronjob"
+  cron:
+     name: "letsencrypt docker"
+     day: 10
+     hour: 3
+     minute: 30
+     user: root
+     job: "docker start letsencrypt"
+     cron_file: letsencrypt
+  when: letsencrypt_master
+  tags:
+      - letsencrypt
+
+- name: "install letsencrypt cronjob"
+  cron:
+    name: "letsencrypt create pem file for haproxy"
+    day: 10
+    hour: 4
+    minute: 0
+    user: root
+    job: "cat /etc/letsencrypt/live/{{service_name}}/fullchain.pem /etc/letsencrypt/live/{{service_name}}/privkey.pem > /etc/haproxy/ssl/{{service_name}}.pem"
+    cron_file: letsencrypt
+  when: letsencrypt_master
   tags:
      - letsencrypt
 
+- name: "install letsencrypt cronjob"
+  cron:
+    name: "letsencrypt restart haproxy"
+    day: 10
+    hour: 4
+    minute: 5
+    user: root
+    job: "docker restart haproxy"
+    cron_file: letsencrypt
+  when: letsencrypt_master
+  tags:
+     - letsencrypt
+
+- name: "install letsencrypt cronjob"
+  cron:
+    name: "letsencrypt copy to other server"
+    day: 10
+    hour: 4
+    minute: 5
+    user: root
+    job: "scp /etc/haproxy/ssl/{{service_name}}.pem {{ hostvars[groups['lb'][1]].inventory_hostname }}:/etc/haproxy/ssl/{{service_name}}.pem "
+    cron_file: letsencrypt
+  when: letsencrypt_master
+  tags:
+     - letsencrypt
+
+- name: "install letsencrypt cronjob"
+  cron:
+    name: "letsencrypt restart haproxy"
+    day: 11
+    hour: 4
+    minute: 5
+    user: root
+    job: "docker restart haproxy"
+    cron_file: letsencrypt
+  when: not letsencrypt_master
+  tags:
+     - letsencrypt

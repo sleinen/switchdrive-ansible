@@ -2,8 +2,17 @@
 # handles the webservers
 
 - hosts: lb[0]
+  vars:
+    letsencrypt_master: true
   roles:
     - docker
     - letsencrypt
   become: true
 
+- hosts: lb[1]
+  vars:
+    letsencrypt_master: false
+  roles:
+    - docker
+    - letsencrypt
+  become: true
