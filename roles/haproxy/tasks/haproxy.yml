@@ -1,7 +1,7 @@
 ---
 
 - name: Create dirs
-  file: path="{{item}}" state=directory group=107 owner=105
+  file: path="{{ item }}" state=directory group=root owner=root
   with_items:
     - "/etc/haproxy"
     - "/etc/haproxy/lua"
@@ -11,21 +11,20 @@
   tags:
     - haproxy
 
-
 - name: haproxy config
-  template: src={{item}}.j2 dest=/etc/haproxy/{{item}}
+  template: src={{ item.src }} dest=/etc/haproxy/{{ item.dest }}
   notify:
     - reload haproxy
   with_items:
-    - haproxy.cfg
-    - 503maintenance.html
+  - { src: "{{ service_name }}/haproxy.cfg.j2", dest: "haproxy.cfg"}
+  - { src: "503maintenance.html.j2",            dest: "503maintenance.html"}
   tags:
     - config
     - haproxy
     - haconfig
 
 - name: lua stuff
-  template: src={{item}}.lua dest=/etc/haproxy/lua/{{item}}.lua
+  template: src=lua/{{ item }}.lua dest=/etc/haproxy/lua/{{ item }}.lua
   notify:
     - restart haproxy
   with_items:
@@ -37,7 +36,7 @@
     - lua
 
 - name: maps
-  template: src={{item}}.map dest=/etc/haproxy/{{item}}.map
+  template: src={{ service_name }}/{{ item }}.map dest=/etc/haproxy/{{ item }}.map
   notify:
     - restart haproxy
   with_items:
@@ -47,29 +46,35 @@
     - haproxy
     - map
 
-# we use letsencrypt certificate
-#- name: upload ssl pem
-#  copy: content="{{ service_cert[service_name] }}" dest=/etc/haproxy/ssl/{{ service_name }}.pem
-#  ignore_errors: yes
-#  notify:
-#    - restart haproxy
-#  tags:
-#    - haproxy
-#    - certificate
+- name: create self singed certificate (bootstrap letsencrypt)
+  command: 'openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "/etc/haproxy/ssl/{{ service_name }}.key" -out "/etc/haproxy/ssl/{{ service_name }}.crt" -subj "/C=CH/ST=AG/L=Zürich/O=none/OU=none/CN={{ service_name }}"'
+  args:
+    creates: "/etc/haproxy/ssl/{{ service_name }}.crt"
+  tags:
+    - haproxy
+    - cert
+
+
+- name: create cert for haproxy
+  shell: "cat '/etc/haproxy/ssl/{{ service_name }}.crt' '/etc/haproxy/ssl/{{ service_name }}.key' > '/etc/haproxy/ssl/{{service_name}}.pem'"
+  args:
+    creates: "/etc/haproxy/ssl/{{ service_name }}.pem"
+  tags:
+     - haproxy
+     - cert
 
 - name: haproxy container
-  docker:
+  docker_container:
     name: haproxy
     image: "{{haproxy_docker_image}}"
-    restart_policy: always
-    net: host
-    state: reloaded
-    pull: always
+    network_mode: host
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
     volumes:
       - "/etc/haproxy:/etc/haproxy"
       - "/var/lib/haproxy:/var/lib/haproxy"
       - "/var/log/haproxy:/var/log/haproxy"
-      - "/dev/log:/dev/log"
+      - "/run/systemd/journal/dev-log:/dev/log"
   tags:
     - haproxy
-
