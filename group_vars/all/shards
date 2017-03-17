@@ -1,7 +1,9 @@
 ---
 
 # config deployment (ocapache, ocphp_fpm, cron)
-shard_config: 
+shard_config:
+  drive-staging.switch.ch:
+    - {shard_name: 'a01', cluster_config: 'cluster.config.9_0.php', config: 'config.9_0.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.0.8', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-stage.switch.ch", part_of_cluster: false }
   drive-backup.switch.ch:
     - {shard_name: 'a01', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true }
     - {shard_name: 'a02', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true }
@@ -12,21 +14,22 @@ shard_config:
 
 # ocphp_fpm container deployment
 shard_mapping:
+  drive-staging.switch.ch:
   drive-backup.switch.ch:
      #- { oc_major_version: '9.0', oc_minor_version: '7', shards: [a04] }
      - { oc_major_version: '9.1', oc_minor_version: '4', shards: [a01, a02, a03, a05, a06] }
 
 # 15768000 = 6 months
 strict_transport_security_max_age:
-  drive.switch.ch: 15768000
+  drive.switch.ch: 0
   drive-stage.switch.ch: 15768000
   drive-backup.switch.ch: 0
 
 # what ocphp_fpm to take for root site
-php_version_root_site: "9.0.7"
+php_version_root_site: "9.0.8"
 
 # variables in status.php
-owncloud_versionstring_root_site: "9.0.7"
+owncloud_versionstring_root_site: "9.0.8"
 owncloud_version_root_site: "{{owncloud_versionstring_root_site}}.1"
 
 owncloud_passwordsalt: '/JmaEK3g1hMbdJA+QmWGqP9YYGMhpM'
