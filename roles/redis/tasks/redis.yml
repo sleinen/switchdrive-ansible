@@ -1,0 +1,45 @@
+---
+
+- name: set sysctl settings
+  sysctl:
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    sysctl_set: yes
+  with_items:
+  - { name: "vm.overcommit_memory", value: "1" }
+  - { name: "net.core.somaxconn", value: "1024" }
+  tags:
+    - sysctl
+    - redis
+
+
+- name: Create dirs
+  file: path="{{item}}" state=directory group=999 owner=999
+  with_items:
+  - "/etc/redis/"
+  - "/var/lib/redis/data"
+  tags:
+    - redis
+
+- name: install redis configuration
+  template: src=redis.conf.j2 dest=/etc/redis/redis.conf
+  notify: restart redis
+  tags:
+    - redis
+
+- name: redis docker
+  docker_container:
+    name: redis
+    image: "{{redis_docker_image}}"
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
+    network_mode: host
+    volumes:
+      - "/var/lib/redis/data:/data"
+      - "/etc/redis:/etc/redis"
+      - "/run/systemd/journal/dev-log:/dev/log"
+    #command: sleep infinity
+    command: /etc/redis/redis.conf --loglevel verbose
+  tags:
+    - redis

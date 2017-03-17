@@ -1,0 +1,19 @@
+---
+
+- name: "disable transparent hughe pages at boot time"
+  lineinfile:
+     create=yes
+     dest=/etc/default/grub.d/80-drive.cfg
+     regexp="^\s*GRUB_CMDLINE_LINUX_DEFAULT\s*="
+     line='GRUB_CMDLINE_LINUX_DEFAULT="console=tty1 console=ttyS0 transparent_hugepage=never"'
+  notify: rebuild grub
+  tags:
+    - config
+    - grub
+    - thp
+
+- name: "disable transparent hughe pages at runntime"
+  shell: "echo never > /sys/kernel/mm/transparent_hugepage/enabled"
+  tags:
+    - config
+    - thp
