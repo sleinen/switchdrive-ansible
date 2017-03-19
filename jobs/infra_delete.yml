@@ -8,8 +8,8 @@
     server: ""
     server_list:  "{{ server.split(',')  }}"
     os_action: "delete"
-    vars_files:
-      - ../vars/servers.{{ site }}.yml
+  vars_files:
+    - ../vars/servers.{{ site }}.yml
   roles:
     - infrastructure
   become: false
