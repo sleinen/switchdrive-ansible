@@ -1,15 +1,15 @@
 ---
 
-- name: prometheus docker 
-  docker:
+- name: prometheus docker
+  docker_container:
     name: node-exporter
     image: "prom/node-exporter:{{node_exporter_version}}"
-    state: reloaded
-    pull: always
-    net: host
-    ports: 
+    network_mode: host
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
+    ports:
       - "9100:9100"
-    restart_policy: always
     volumes:
       - "/proc:/host/proc"
       - "/sys:/host/sys"
@@ -19,4 +19,3 @@
   tags:
     - prometheus
     - node_exporter
-

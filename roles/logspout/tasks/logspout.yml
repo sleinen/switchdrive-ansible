@@ -1,13 +1,13 @@
 ---
 
-- name: logspout docker 
-  docker:
+- name: logspout docker
+  docker_container:
     name: logspout
     image: "{{logspout_docker_image}}"
-    restart_policy: always
-    state: reloaded
-    pull: always
-    net: host
+    network_mode: host
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
     env:
       ROUTE_URIS: "logstash://{{logstash_host}}:{{logstash_logspout_port}}"
       HTTP_PORT: "{{logspout_http_port}}"
@@ -15,4 +15,3 @@
       - "/var/run/docker.sock:/var/run/docker.sock"
   tags:
     - logspout
-

@@ -1,9 +1,9 @@
 ---
 
 - name: Copy maxscale configuration to /etc
-  template: 
+  template:
       src={{item}}.j2
-      dest=/etc/{{item}} 
+      dest=/etc/{{item}}
       mode=0644 owner=root group=root
   notify:
     - restart maxscale
@@ -17,18 +17,17 @@
   tags: maxscale
 
 
-- name: maxscale docker 
-  docker:
+- name: maxscale docker
+  docker_container:
     name: maxscale
     image: "{{maxscale_docker_image}}"
-    restart_policy: always
-    state: reloaded
-    pull: always
-    net: host
+    network_mode: host
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
     volumes:
       - "/etc/maxscale.cnf:/etc/maxscale.cnf"
       - "/run/mysqld:/run/mysqld"
       - "/run/systemd/journal/syslog:/dev/log"
   tags:
     - maxscale
-

@@ -15,7 +15,7 @@
 
 
 - name: drop apache site configurations
-  template: 
+  template:
     src: "{{ service_name }}.conf.j2"
     dest: "/etc/apache2/sites-enabled/{{item.shard_name}}.conf"
   notify: restart ocapache
@@ -25,13 +25,13 @@
     - ocapache
 
 - name: drop apache root site configurations
-  template: 
+  template:
     src: "root.conf.j2"
     dest: "/etc/apache2/sites-enabled/00_root.conf"
   notify: restart ocapache
   tags:
     - ocapache
-    
+
 - name: drop apache configuration
   template: src=apache2.conf dest=/etc/apache2/apache2.conf
   notify: restart ocapache
@@ -39,14 +39,14 @@
     - ocapache
 
 
-- name: apache docker 
-  docker:
+- name: apache docker
+  docker_container:
     name: ocapache
     image: "{{ocapache_docker_image}}"
-    restart_policy: always
-    state: reloaded
-    pull: always
-    net: host
+    network_mode: host
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
     volumes:
       - "{{owncloud_webroot}}:{{owncloud_webroot}}"
       - "/etc/apache2/sites-enabled:/etc/apache2/sites-enabled"
@@ -55,6 +55,3 @@
       - "/var/run/php:/var/run/php"
   tags:
     - ocapache
-
-
-

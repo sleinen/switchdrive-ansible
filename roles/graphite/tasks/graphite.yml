@@ -12,13 +12,13 @@
     - graphite
 
 - name: graphite container
-  docker:
+  docker_container:
     name: graphite
     image: "{{graphite_docker_image}}"
     hostname: graphite
-    restart_policy: always
-    state: reloaded
-    pull: always
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
     ports:
       - 2003:2003
       - 8080:80
@@ -26,5 +26,3 @@
       - "{{graphite_data_dir}}:/var/lib/graphite"
   tags:
     - graphite
-
-

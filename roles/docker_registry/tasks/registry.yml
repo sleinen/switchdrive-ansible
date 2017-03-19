@@ -23,13 +23,13 @@
     - registry
 
 - name: registry
-  docker:
+  docker_container:
     name: registry
     image: "registry:2"
     hostname: registry
-    restart_policy: always
-    state: reloaded
-    pull: always
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
     env:
       REGISTRY_HTTP_TLS_CERTIFICATE: /certs/{{ docker_registry }}.crt
       REGISTRY_HTTP_TLS_KEY: /certs/{{ docker_registry }}.key
@@ -40,6 +40,3 @@
       - "{{data_mount_point }}/registry/data:/var/lib/registry"
   tags:
     - registry
-
-
-

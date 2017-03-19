@@ -21,9 +21,9 @@
   tags: mariadb
 
 - name: Copy included mariadb configuration to /etc/mysql/conf.d
-  template: 
-      src={{ service_name }}/{{item}} 
-      dest=/etc/mysql/conf.d/{{item}} 
+  template:
+      src={{ service_name }}/{{item}}
+      dest=/etc/mysql/conf.d/{{item}}
       mode=0644 owner=root group=root
   notify:
     - restart mariadb
@@ -31,7 +31,7 @@
     - mariadb.cnf
     - tokudb.cnf
     - mysqld_safe_syslog.cnf
-  tags: 
+  tags:
     - mariadb
     - mariadbconfig
 
@@ -41,18 +41,18 @@
     dest=/etc/mysql/init/maxscale.user.sql
   tags: mariadb
 
-- name: mariadb docker 
-  docker:
+- name: mariadb docker
+  docker_container:
     name: mariadb
     image: "mariadb:{{mariadb_version}}"
-    state: reloaded
-    pull: always
-    net: host
+    network_mode: host
+    state: started
+    pull: true
     expose:
       - "4567"
       - "4568"
       - "4444"
-    ports: 
+    ports:
       # 3306: mysql; 4567: galera; 4568: IST; 4444: SST
       - "3306:3306"
       - "4567:4567"
@@ -73,7 +73,7 @@
     # normal
     command: "{{mariadb_cmdline_options}}"
     restart_policy: "{{mariadb_restart_policy}}"
-    
+
     # get a shell to do maintenance
     # (read this after crash: https://www.percona.com/blog/2014/09/01/galera-replication-how-to-recover-a-pxc-cluster/)
     #command: "bash -c 'sleep 90000'"
@@ -82,4 +82,3 @@
   become: true
   tags:
     - mariadb
-

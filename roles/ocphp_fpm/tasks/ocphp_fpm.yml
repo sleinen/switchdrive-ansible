@@ -14,21 +14,21 @@
   with_items: "{{shard_mapping[service_name]}}"
   loop_control:
     loop_var: shards
-    
+
 - include: install_occonfig.yml
   with_items: "{{shard_config[service_name]}}"
   loop_control:
     loop_var: shards
 
-- name: ocphp_fpm docker 
-  docker:
+- name: ocphp_fpm docker
+  docker_container:
     name: "php_fpm_{{item.oc_major_version}}.{{item.oc_minor_version}}"
     image: "{{ocphp_fpm_docker_name}}:{{item.oc_major_version}}.{{item.oc_minor_version}}"
-    restart_policy: always
-    state: reloaded
-    pull: always
-    net: host
-    env: 
+    network_mode: host
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
+    env:
        SHARDS: '{{item.shards | join(" ")}}'
     volumes:
       - "/etc/owncloud:/etc/owncloud"
@@ -44,6 +44,3 @@
     - "{{shard_mapping[service_name]}}"
   tags:
     - ocphp_fpm
-
-
-
