@@ -10,17 +10,17 @@ global
     daemon
 
     server-state-file /var/lib/haproxy/state
-
+    
     # turn on stats unix socket
     stats socket /var/lib/haproxy/stats level admin
-
+    
     #ssl-default-bind-ciphers AES128+AESGCM+EECDH+SHA256:AES128+EECDH:AES128+AESGCM+DHE:AES128+EDH:AES256+AESGCM+EECDH:AES256+EECDH:AES256+AESGCM+EDH:AES256+EDH:-SHA:AES128+AESGCM+EECDH+SHA256:AES128+EECDH:AES128+AESGCM+DHE:AES128+EDH:AES256+AESGCM+EECDH:AES256+EECDH:AES256+AESGCM+EDH:AES256+EDH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!3DES:!DSS
     ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AES:RSA+3DES:!ADH:!AECDH:!MD5:!DSS
     ssl-default-bind-options no-sslv3 no-tls-tickets
     tune.ssl.default-dh-param 2048
-
+    
     lua-load /etc/haproxy/lua/userToShardLookup.lua
-
+    
 
 defaults
     mode                    http
@@ -59,6 +59,40 @@ frontend http
     http-request redirect scheme https if ! letsencrypt-acl ! { ssl_fc }
     use_backend letsencrypt
 
+frontend ldaps
+    mode                  tcp
+    option                tcplog
+    bind                  0.0.0.0:636 ssl crt /etc/haproxy/ssl/{{ service_name }}.pem
+    description           LDAP Service
+    option                socket-stats
+    option                tcpka
+    timeout client        5s
+    default_backend       ldap_backend
+
+frontend ldap
+    mode                  tcp
+    option                tcplog
+    bind                  0.0.0.0:389
+    description           LDAP Service
+    option                socket-stats
+    option                tcpka
+    timeout client        5s
+    default_backend       ldap_backend
+
+backend ldap_backend
+    {% for host in groups['ldap'] %}
+    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:389 check fall 1 rise 1 inter 2s
+    {% endfor %}
+
+    load-server-state-from-file global
+
+    mode                  tcp
+    balance               roundrobin
+    option                tcpka
+    option                ldap-check
+    timeout server        2s
+    timeout connect       1s
+
 frontend ssl
     bind 0.0.0.0:443 ssl crt /etc/haproxy/ssl/{{service_name}}.pem
     mode http
@@ -75,7 +109,7 @@ frontend ssl
     #########
     # webdav / ocs / etc ?
     acl webdav url_beg /remote.php
-    acl ocs url_beg /ocs/
+    acl ocs url_beg /ocs/ 
     acl has_basic_auth req.hdr(Authorization) -m found
 
     #########
@@ -86,27 +120,61 @@ frontend ssl
     acl shard_a04 cook(shard) a04
     acl shard_a05 cook(shard) a05
     acl has_shard_cookie cook(shard) -m found
-    acl is_cluster_dom hdr_beg(host) -i {{service_name}}
+    acl is_cluster_dom hdr_beg(host) -i drive-backup.switch.ch
 
+    # set shard cookie if not present yet (only for sync clients) 
+    # commented out -> better do this with php to take load away from haproxy.
+    #redirect prefix / set-cookie shard=%[lua.userToShardLookup] if !has_shard_cookie syncclient
+    
     # default for non webdav clients
-    http-request set-header Host a01.{{service_name}} if is_cluster_dom
+    http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie !webdav
+    #http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth syncclient
+    #http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth iosclient
 
-    # based on cookie already present
+    # webdav client -> let them go to root site where a cookie will be set for them.
+    # -> works for syncclients and iosclients
+    # special clients not capable of handling cookies
+    http-request lua.userToShardLookup if has_basic_auth !has_shard_cookie webdav !syncclient !iosclient
+    http-request lua.userToShardLookup if has_basic_auth andoidclient
+    http-request lua.userToShardLookup if has_basic_auth ocs
+    #http-request lua.userToShardLookup if has_basic_auth pyocclient
+
+    # based on cookie already present    
     http-request set-header Host a01.{{ service_name }} if shard_a01
     http-request set-header Host a02.{{ service_name }} if shard_a02
     http-request set-header Host a03.{{ service_name }} if shard_a03
     http-request set-header Host a04.{{ service_name }} if shard_a04
     http-request set-header Host a05.{{ service_name }} if shard_a05
+    
+    #########
+    # session cookie also valid on subdomains:
+    #rspirep ^(set-cookie:.*)  "\1; Domain={{ service_name }};"
 
     #########
     # misc
     http-request del-header Proxy
     reqadd X-Forwarded-Proto:\ https
 
+
     #########
     # choose backend
-    use_backend sync if syncclient
+ 
+    # use_backend owncloud if !syncclient !switch
+    #use_backend sync if syncclient  #  switch
+
+    # block if !switch syncclient
+
     default_backend owncloud
+
+
+
+frontend ssl_dev
+    bind 0.0.0.0:4443 ssl crt /etc/haproxy/ssl/{{ service_name }}.pem
+    reqadd X-Forwarded-Proto:\ https
+
+    default_backend owncloud_dev
+    mode http
+    option forwardfor
 
 
 backend owncloud
@@ -116,11 +184,10 @@ backend owncloud
     {% endfor %}
     balance     roundrobin
     # cookie SRVNAME insert
-    #option httpchk GET /foo.php
-    option httpchk GET /status.php
+    option httpchk GET /foo.php
 
     load-server-state-from-file global
-
+    
     # http://comments.gmane.org/gmane.comp.web.haproxy/14720, closes
     # NVT: Missing Secure Attribute SSL Cookie Information Disclosure Vulnerability (OID: 1.3.6.1.4.1.25623.1.0.902661)
     acl secure res.hdr(Set-Cookie),lower -m sub secure
@@ -128,8 +195,23 @@ backend owncloud
 
     {% for host in groups['web'] %}
     {% if hostvars[host].active -%}
-    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check on-error mark-down fastinter 1500ms
+    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check on-error mark-down fastinter 1500ms  # @zabbix_server({{hostvars[host].ansible_hostname}})
     {% endif -%}
+    {% endfor %}
+
+backend owncloud_dev
+    mode http
+    balance     roundrobin
+    # cookie SRVNAME insert
+    option httpchk GET /foo.php
+
+    acl secure res.hdr(Set-Cookie),lower -m sub secure
+    rspirep ^(Set-cookie:.*) \1;\ Secure if ! secure
+
+    load-server-state-from-file global
+
+    {% for host in groups['dev'] %}
+    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check on-error mark-down fastinter 1500ms  # @zabbix_server({{hostvars[host].ansible_hostname}})
     {% endfor %}
 
 backend sync
@@ -139,8 +221,7 @@ backend sync
     {% endfor -%}
     balance     roundrobin
     # cookie SRVNAME insert
-    #option httpchk GET /foo.php
-    option httpchk GET /status.php
+    option httpchk GET /foo.php
 
     # http://comments.gmane.org/gmane.comp.web.haproxy/14720, closes
     # NVT: Missing Secure Attribute SSL Cookie Information Disclosure Vulnerability (OID: 1.3.6.1.4.1.25623.1.0.902661)
@@ -160,7 +241,7 @@ backend sync
     load-server-state-from-file global
 
     # fullconn should be a bit less than number of server * maxconn
-    #fullconn 700
+    fullconn 700
     #fullconn 1300
     # maxconn depends on {php_config.max_php_processes}
     #default-server inter 3000 downinter 20000 fastinter 1000 rise 4 fall 10 on-error mark-down error-limit 5 minconn 10 maxconn 150
@@ -168,9 +249,10 @@ backend sync
 
     {% for host in groups['sync'] %}
     {% if hostvars[host].active -%}
-    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check
+    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check # @zabbix_server({{hostvars[host].ansible_hostname}})
     {% endif -%}
     {% endfor %}
 
 backend letsencrypt
     server localhost localhost:8888
+

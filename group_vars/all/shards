@@ -2,8 +2,9 @@
 
 # config deployment (ocapache, ocphp_fpm, cron)
 shard_config:
-  drive-staging.switch.ch:
-    - {shard_name: 'a01', cluster_config: 'cluster.config.9_0.php', config: 'config.9_0.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.0.8', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-stage.switch.ch", part_of_cluster: false }
+  drive-stage.switch.ch:
+    - {shard_name: 'a01', cluster_config: 'cluster.config.9_0.php', config: 'config.9_0.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.0.8', version_in_config: '9.0.8.2', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-stage.switch.ch", part_of_cluster: false }
+    #- {shard_name: 'a01', cluster_config: 'cluster.config.9_0.php', config: 'config.9_0.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.0.8', version_in_config: '9.0.7.1', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-stage.switch.ch", part_of_cluster: false }
   drive-backup.switch.ch:
     - {shard_name: 'a01', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true }
     - {shard_name: 'a02', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true }
@@ -14,7 +15,8 @@ shard_config:
 
 # ocphp_fpm container deployment
 shard_mapping:
-  drive-staging.switch.ch:
+  drive-stage.switch.ch:
+     - { oc_major_version: '9.0', oc_minor_version: '8', shards: [a01] }
   drive-backup.switch.ch:
      #- { oc_major_version: '9.0', oc_minor_version: '7', shards: [a04] }
      - { oc_major_version: '9.1', oc_minor_version: '4', shards: [a01, a02, a03, a05, a06] }
@@ -26,10 +28,15 @@ strict_transport_security_max_age:
   drive-backup.switch.ch: 0
 
 # what ocphp_fpm to take for root site
-php_version_root_site: "9.0.8"
+php_version_root_site:
+  drive-stage.switch.ch: "9.0.8"
+  drive-backup.switch.ch: "9.0.8"
 
 # variables in status.php
-owncloud_versionstring_root_site: "9.0.8"
-owncloud_version_root_site: "{{owncloud_versionstring_root_site}}.1"
+owncloud_version_root_site:
+  drive-stage.switch.ch: "{{php_version_root_site[site]}}.2"
+  drive-backup.switch.ch: "{{php_version_root_site[site]}}.2"
 
-owncloud_passwordsalt: '/JmaEK3g1hMbdJA+QmWGqP9YYGMhpM'
+owncloud_passwordsalt:
+  drive-stage.switch.ch: '8ef731b82e3dd7960cab032929763e'
+  drive-backup.switch.ch: '/JmaEK3g1hMbdJA+QmWGqP9YYGMhpM'

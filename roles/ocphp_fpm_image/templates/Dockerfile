@@ -50,15 +50,15 @@ RUN curl -L https://{{git_hub_user}}:{{git_hub_passwd}}@github.com/switch-ch/swi
     && rm /tmp/themes.zip
 
 ###########
-# install from a branch
+# install from a git branch
 
-ENV ARCHIVE=/tmp/branch.zip
-RUN curl -L https://github.com/owncloud/core/archive/stable9.1-federated-cluster.zip > $ARCHIVE \
-    && unzip -d /tmp /$ARCHIVE \
-    && cd /tmp/core*/ \
-    && rm -rf autotest* build/ tests/ \
-    && tar -cf - * | tar -xf - -C /var/www/owncloud \
-    && rm -rf $ARCHIVE /tmp/core*/
+{{ comment_out_git_include }}ENV ARCHIVE=/tmp/branch.zip
+{{ comment_out_git_include }}RUN curl -L {{ git_branch }} > $ARCHIVE \
+{{ comment_out_git_include }}    && unzip -d /tmp /$ARCHIVE \
+{{ comment_out_git_include }}    && cd /tmp/core*/ \
+{{ comment_out_git_include }}    && rm -rf autotest* build/ tests/ \
+{{ comment_out_git_include }}    && tar -cf - * | tar -xf - -C /var/www/owncloud \
+{{ comment_out_git_include }}    && rm -rf $ARCHIVE /tmp/core*/
 
 ###########
 # config
@@ -93,5 +93,3 @@ COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
 
 CMD ["{{owncloud_php_fpm[owncloud_major_version]}}", "-F"]
-
-

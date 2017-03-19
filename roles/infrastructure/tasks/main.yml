@@ -1,9 +1,24 @@
 ---
 
-- include: server_group.yml
-- include: port.yml
-- include: volume.yml
+# deletion
 - include: server.yml
-- include: vip.yml
+  when: os_action == "delete"
+- include: port.yml
+  when: os_action == "delete"
+- include: volume.yml
+  when: os_action == "delete"
+
+# creation
+- include: volume.yml
+  when: os_action == "create"
+- include: port.yml
+  when: os_action == "create"
+- include: server.yml
   when: os_action == "create"
 
+
+# order does not matter
+- include: server_group.yml
+  when: os_action == "create"
+- include: vip.yml
+  when: os_action == "create"

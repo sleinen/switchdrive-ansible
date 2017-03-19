@@ -23,11 +23,10 @@
     - root_site
 
 - name: php_fpm link
-  file: 
+  file:
     state: link
     path: "{{owncloud_webroot}}/root.php-fpm.sock"
-    src: "/var/run/php/php-fpm.{{php_version_root_site}}.sock"
+    src: "/var/run/php/php-fpm.{{php_version_root_site[site]}}.sock"
     force: true
   tags:
     - root_site
-    

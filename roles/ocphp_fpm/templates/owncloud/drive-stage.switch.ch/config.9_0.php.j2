@@ -1,37 +1,40 @@
 <?php
 $CONFIG = array (
-  'instanceid' => 'oceacd978fb9',
-  'passwordsalt' => '8ef731b82e3dd7960cab032929763e',
+  'instanceid'    => '{{shards.instanceid}}',
+  'passwordsalt'  => '{{owncloud_passwordsalt[service_name]}}',
   'datadirectory' => '/mnt/data',
+  "overwritehost" => "{{shards.overwritehost}}",
+  "overwrite.cli.url" => "https://{{shards.overwritehost}}",
 
   'dbtype' => 'mysql',
   'dbname' => 'owncloud',
+  #'dbname' => '{{shards.shard_name}}',
   'dbtableprefix' => 'oc_',
   'dbuser' => 'owncloud',
-#  'dbhost' => '{{hostvars[groups["mariadb"][0]].inventory_hostname}}',
+  #  'dbhost' => '{{hostvars[groups["mariadb"][0]].inventory_hostname}}',
   'dbhost' => 'localhost',
   'dbpassword' => '{{mariadb_passwd}}',
 
-  'version' => '9.0.7.1',
-  'installed' => true,
+  'version' => '{{shards.version_in_config}}',
+  'installed' => {{shards.installed}},
   'ldapIgnoreNamingRules' => false,
-  
+
   'log_type' => 'owncloud',
   'loglevel' => '0',
   'log_query' => false,
   'cron_log' => true,
   'log_authfailip' => false,
-  'logfile' => '/var/log/owncloud/{{owncloud_logfile_name}}',
+  'logfile' => '/var/log/owncloud/{{shards.shard_name}}.{{owncloud_logfile_name}}',
   'logdateformat' => 'U.u',
   'logtimezone' => 'Europe/Berlin',
   'log_rotate_size' => 104857600,
-  
+
   'mail_domain' => 'switch.ch',
   'mail_smtpdebug' => false,
   'mail_smtpmode' => 'smtp',
   'mail_smtphost' => 'localhost',
   'mail_smtpport' => 25,
-  'theme' => '',
+  'theme' => 'switch',
   'check_for_working_webdav' => false,
   'check_for_working_htaccess' => false,
   'updatechecker' => false,
@@ -42,9 +45,8 @@ $CONFIG = array (
   'filesystem_check_changes' => 0,
     'trusted_domains' =>
       array (
-        0 => 'drive-stage.switch.ch',
-        1 => '{{inventory_hostname}}',
-        2 => '{{hostvars[groups["lb"][0]].inventory_hostname}}',
+        0 => '{{ service_name }}',
+        1 => '{{shards.shard_name}}.{{ service_name }}',
       ),
   'customclient_desktop' => 'https://help.switch.ch/drive/downloads/',
   'customclient_android' => 'https://play.google.com/store/apps/details?id=ch.switchdrive.androidclient',
@@ -53,24 +55,20 @@ $CONFIG = array (
   'supportedDatabases' =>
     array (
         0 => 'mysql',
-        1 => 'pgsql',
-        2 => 'oci',
     ),
   'shared_folder' => '/',
   'share_folder' => '/',
   'secret' => '{{oc_config_secret}}',
-  'overwrite.cli.url' => 'https://drive-stage.switch.ch',
   'maintenance' => false,
   'singleuser' => false,
-  'minimum.supported.desktop.version' => '1.7',
+  'minimum.supported.desktop.version' => '2.0',
   'memcache.local' => '\OC\Memcache\APCu',
   'memcache.distributed' => '\OC\Memcache\Redis',
   'memcache.locking' => '\OC\Memcache\Redis',
   'filelocking.enabled' => true,
   'redis' => array(
-     'host' => '{{ hostvars[groups['redis'][0]].inventory_hostname }}',
+     'host' => '{{ hostvars[groups['redis'][1]].inventory_hostname }}',
      'port' => 6379,
-     'timeout' => 0.0,
       ),
   'enabledPreviewProviders' =>
   array (
@@ -83,5 +81,5 @@ $CONFIG = array (
     6 => 'OC\\Preview\\MarkDown',
   ),
   'trashbin_retention_obligation' => 'auto',
-
+  'enable_certificate_management' => true,
 );

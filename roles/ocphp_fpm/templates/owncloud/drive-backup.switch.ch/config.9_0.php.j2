@@ -1,7 +1,7 @@
 <?php
 $CONFIG = array (
   'instanceid' => '{{shards.instanceid}}',
-  'passwordsalt' => '{{owncloud_passwordsalt}}',
+  'passwordsalt' => '{{owncloud_passwordsalt[site]}}',
   'datadirectory' => '/mnt/data',
   "overwritehost"     => "{{shards.overwritehost}}",
 
@@ -17,7 +17,7 @@ $CONFIG = array (
   'version' => '9.0.7.1',
   'installed' => {{shards.installed}},
   'ldapIgnoreNamingRules' => false,
-  
+
   'log_type' => 'owncloud',
   'loglevel' => '0',
   'log_query' => false,
@@ -27,7 +27,7 @@ $CONFIG = array (
   'logdateformat' => 'U.u',
   'logtimezone' => 'Europe/Berlin',
   'log_rotate_size' => 104857600,
-  
+
   'mail_domain' => 'switch.ch',
   'mail_smtpdebug' => false,
   'mail_smtpmode' => 'smtp',
@@ -42,7 +42,7 @@ $CONFIG = array (
   'enable_previews' => false,
   'asset-pipeline.enabled' => true,
   'filesystem_check_changes' => 0,
-  'trusted_domains' => 
+  'trusted_domains' =>
   array (
     0 => '{{shards.shard_name}}.{{ service_name }}',
     1 => '{{ service_name }}',
@@ -51,7 +51,7 @@ $CONFIG = array (
   'customclient_android' => 'https://play.google.com/store/apps/details?id=ch.switchdrive.androidclient',
   'customclient_ios' => 'https://itunes.apple.com/en/app/switchdrive/id847336453?mt=8',
   'has_internet_connection' => true,
-  'supportedDatabases' => 
+  'supportedDatabases' =>
   array (
     0 => 'mysql',
   ),
@@ -66,13 +66,13 @@ $CONFIG = array (
   'memcache.distributed' => '\\OC\\Memcache\\Redis',
   'memcache.locking' => '\\OC\\Memcache\\Redis',
   'filelocking.enabled' => true,
-  'redis' => 
+  'redis' =>
   array (
     'host' => '{{ hostvars[groups['redis'][0]].inventory_hostname }}',
     'port' => 6379,
     'timeout' => 0.0,
   ),
-  'enabledPreviewProviders' => 
+  'enabledPreviewProviders' =>
   array (
     0 => 'OC\\Preview\\PNG',
     1 => 'OC\\Preview\\JPEG',
@@ -83,24 +83,24 @@ $CONFIG = array (
     6 => 'OC\\Preview\\MarkDown',
   ),
   'trashbin_retention_obligation' => 'auto',
-  'objectstore_disabled' => 
+  'objectstore_disabled' =>
   array (
     'class' => 'OCA\\ObjectStore\\S3',
-    'arguments' => 
+    'arguments' =>
     array (
       'bucket' => 'SWITCHdrive-test',
       'autocreate' => true,
-      'options' => 
+      'options' =>
       array (
         'version' => '2006-03-01',
         'region' => '',
-        'credentials' => 
+        'credentials' =>
         array (
           'key' => '055303dc7cb8449ab97ade40b7709ef9',
           'secret' => '23a800e5074a48019c25d70ab1de8c19',
         ),
         'endpoint' => 'https://os.unil.cloud.switch.ch',
-        'command.params' => 
+        'command.params' =>
         array (
           'PathStyle' => true,
         ),

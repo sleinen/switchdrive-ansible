@@ -26,12 +26,18 @@ php_config:
 php_ini_file: "php.ini"
 
 
-owncloud_major_version: "9.1"
-owncloud_version: "{{owncloud_major_version}}.4"
-#owncloud_major_version: "9.0"
-#owncloud_version: "{{owncloud_major_version}}.7"
+comment_out_git_include: '#'
+git_branch: "https://github.com/owncloud/core/archive/stable9.1-federated-cluster.zip"
+
+#owncloud_major_version: "9.1"
+#owncloud_version: "{{owncloud_major_version}}.4"
+
+owncloud_major_version: "9.0"
+owncloud_version: "{{owncloud_major_version}}.8"
+
 #owncloud_major_version: "8.2"
 #owncloud_version: "{{owncloud_major_version}}.8"
+
 owncloud_repo_base_url: "{{vault_owncloud_repo_base_url[owncloud_major_version]}}"
 owncloud_php_conf_dir:
     "8.2": "/etc/php5"

@@ -10,8 +10,7 @@
     - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
   roles:
     - common
-    - role: docker_14_06
-      tags: docker
+    - docker
     - maxscale
     - exim
     - nagios
@@ -22,5 +21,3 @@
     - ocapache
     - scripts
   become: true
-
-
