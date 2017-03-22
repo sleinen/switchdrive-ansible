@@ -24,8 +24,8 @@
       - 80
     ports:
       - 8888:80
-    #command: "certonly --standalone {{letsencrypt.domains[service_name]}} --agree-tos --email {{letsencrypt.email}} --standalone-supported-challenges http-01 --rsa-key-size 4096"
-    command: "certonly --standalone {{letsencrypt.domains[service_name]}} --expand --agree-tos --email {{letsencrypt.email}} --standalone-supported-challenges http-01 --rsa-key-size 4096"
+    command: "certonly --standalone {{letsencrypt.domains[service_name]}} --agree-tos --email {{letsencrypt.email}} --standalone-supported-challenges http-01 --rsa-key-size 4096"
+    #command: "certonly --standalone {{letsencrypt.domains[service_name]}} --expand --agree-tos --email {{letsencrypt.email}} --standalone-supported-challenges http-01 --rsa-key-size 4096"
   when: letsencrypt_master
   tags:
      - letsencrypt
