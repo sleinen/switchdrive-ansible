@@ -8,3 +8,4 @@ backups/*
 vault_password
 personal_credentials
 user
+vault_password.owncloud
