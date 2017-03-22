@@ -1,5 +1,16 @@
 ---
 
+- name: add packages
+  apt:
+    name: "{{item}}"
+    state: present
+    update_cache: "{{apt_config.update_cache}}"
+    cache_valid_time: "{{apt_config.cache_valid_time}}"
+  with_items:
+    - libpython2.7
+  tags:
+    - collectd
+
 - name: install redis script for collectd
   copy:
      src=redis_info.py
@@ -12,10 +23,9 @@
   template:
     src=collectd_redis.conf.j2
     dest=/etc/collectd/collectd.conf.d/collectd_redis.conf
-  notify: 
+  notify:
     - kill collectd
     - restart collectd
   tags:
     - collectd
     - config
-

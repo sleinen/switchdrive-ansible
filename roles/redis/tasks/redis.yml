@@ -40,6 +40,7 @@
       - "/etc/redis:/etc/redis"
       - "/run/systemd/journal/dev-log:/dev/log"
     #command: sleep infinity
-    command: /etc/redis/redis.conf --loglevel verbose
+    #command: /etc/redis/redis.conf --loglevel verbose
+    command: /etc/redis/redis.conf
   tags:
     - redis

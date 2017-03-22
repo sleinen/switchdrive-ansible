@@ -114,7 +114,8 @@ haproxy_docker_image: "{{haproxy_docker_name}}:{{haproxy_docker_tag}}"
 ####################
 # redis
 
-redis_version: "3.0.7"
+#redis_version: "3.0.7"
+redis_version: "3.2.8"
 redis_docker_name: "redis"
 redis_docker_tag: "{{redis_version}}"
 redis_docker_image: "{{redis_docker_name}}:{{redis_docker_tag}}"
