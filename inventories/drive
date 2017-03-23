@@ -1,112 +1,77 @@
 [mariadb]
 # the first one is the master on cluster-reboot.
-10.0.23.31 ansible_ssh_user=ubuntu
-10.0.23.32 ansible_ssh_user=ubuntu
-10.0.23.33 ansible_ssh_user=ubuntu
-#10.0.23.34 ansible_ssh_user=ubuntu
-#10.0.23.35 ansible_ssh_user=ubuntu
-#10.0.23.36 ansible_ssh_user=ubuntu
-#10.0.23.37 ansible_ssh_user=ubuntu
-#10.0.23.38 ansible_ssh_user=ubuntu
-#10.0.23.39 ansible_ssh_user=ubuntu
-
-[maxscale]
-10.0.23.246 ansible_ssh_user=ubuntu
+10.0.23.[31:33]
 
 [nfs]
-10.0.23.71 ansible_ssh_user=ubuntu vols="{{volumes_nfs1}}"
-10.0.23.72 ansible_ssh_user=ubuntu vols="{{volumes_nfs2}}"
-10.0.23.73 ansible_ssh_user=ubuntu vols="{{volumes_nfs3}}"
-10.0.23.74 ansible_ssh_user=ubuntu vols="{{volumes_nfs4}}"
-10.0.23.75 ansible_ssh_user=ubuntu vols="{{volumes_nfs5}}"
+10.0.23.[71:75] vols="{{volumes_nfs1}}"
 
 [web]
-10.0.23.201 ansible_ssh_user=ubuntu active=True
-10.0.23.202 ansible_ssh_user=ubuntu active=True
-10.0.23.203 ansible_ssh_user=ubuntu active=True
-10.0.23.204 ansible_ssh_user=ubuntu active=True
+10.0.23.[201:204] active=True
+10.0.23.[205:210] active=False
+10.0.23.[211:214] active=True
 
 [sync]
-10.0.23.101 ansible_ssh_user=ubuntu active=True
-10.0.23.102 ansible_ssh_user=ubuntu active=True
-10.0.23.103 ansible_ssh_user=ubuntu active=True
-10.0.23.104 ansible_ssh_user=ubuntu active=True
-#10.0.23.105 ansible_ssh_user=ubuntu active=True
-#10.0.23.106 ansible_ssh_user=ubuntu active=True
-#10.0.23.107 ansible_ssh_user=ubuntu active=True
-#10.0.23.108 ansible_ssh_user=ubuntu active=True
-#10.0.23.109 ansible_ssh_user=ubuntu active=True
-#10.0.23.110 ansible_ssh_user=ubuntu active=True
-#10.0.23.111 ansible_ssh_user=ubuntu active=True
-#10.0.23.112 ansible_ssh_user=ubuntu active=True
-#10.0.23.113 ansible_ssh_user=ubuntu active=True
-#10.0.23.114 ansible_ssh_user=ubuntu active=True
-#10.0.23.115 ansible_ssh_user=ubuntu active=True
-#10.0.23.116 ansible_ssh_user=ubuntu active=True
-#10.0.23.117 ansible_ssh_user=ubuntu active=True
-#10.0.23.118 ansible_ssh_user=ubuntu active=True
-#10.0.23.119 ansible_ssh_user=ubuntu active=True
-#10.0.23.120 ansible_ssh_user=ubuntu active=True
+10.0.23.[101:104] active=True
+10.0.23.[105:110] active=False
+10.0.23.[111:114] active=True
 
 [mgmt]
-10.0.23.10 ansible_ssh_user=ubuntu admin_users={{mgmt_users}}
+10.0.23.10 admin_users={{mgmt_users}}
 
 [registry]
-#docker.drive.switch.ch ansible_ssh_user=ubuntu
-10.0.23.251 ansible_ssh_user=ubuntu vols="{{volumes_elk1}}"
+#docker.drive.switch.ch
+10.0.23.251 vols="{{volumes_elk1}}"
 
 [elk]
-10.0.23.151 ansible_ssh_user=ubuntu vols="{{volumes_elk1}}"
+10.0.23.151 vols="{{volumes_elk1}}"
 
 [lb]
-10.0.23.51 ansible_ssh_user=ubuntu
-10.0.23.52 ansible_ssh_user=ubuntu
+10.0.23.[51:52]
 
 [ldap]
 # the first one in the list has to be the provider!
-10.0.23.17 ansible_ssh_user=ubuntu provider=True
-10.0.23.63 ansible_ssh_user=ubuntu consumer=True
-10.0.23.65 ansible_ssh_user=ubuntu consumer=True
+10.0.23.17 provider=True
+10.0.23.63 consumer=True
+10.0.23.65 consumer=True
 
 [monitoring]
 #10.0.23.18 ansible_ssh_user=ubuntu
 
 [dev]
-10.0.23.161 ansible_ssh_user=ubuntu
+10.0.23.161
 
 [reg]
-10.0.23.21 ansible_ssh_user=ubuntu
+10.0.23.21
 
 [cmd]
 localhost ansible_connection=local
 
 [redis]
-10.0.23.241 ansible_ssh_user=ubuntu
+# the first one is active. Just run `ansible-playbook -i inventories/drive playbooks/(web|sync|dev|mgmt)servers.yml -t ocphp_fpm`
+10.0.23.241
+10.0.23.242
 
 [jumphost]
-86.119.34.135 ansible_ssh_user=ubuntu admin_users={{mgmt_users}}
+86.119.34.135 admin_users={{mgmt_users}}
 
 [engines]
 controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass}}"
 
 [graphite]
-10.0.23.6 ansible_ssh_user=ubuntu
+10.0.23.6
 #10.0.23.51 graphite_host_floating_ip=86.119.35.101
 
 [backup]
-10.0.23.9 ansible_ssh_user=ubuntu
+10.0.23.9
 
 [test]
-10.0.23.15 ansible_ssh_user=ubuntu
+10.0.23.15
 
 [lb_vip]
-10.0.23.11
-10.0.23.12
-
+10.0.23.[11:12]
 
 [production:children]
 mariadb
-maxscale
 nfs
 web
 sync
@@ -182,5 +147,3 @@ mariadb_wsrep_cluster_address=gcomm://10.0.23.31,10.0.23.32,10.0.23.33
 # misc
 docker_registry="docker.drive.switch.ch"
 graphite_host_floating_ip=grafana.drive.switch.ch
-
-

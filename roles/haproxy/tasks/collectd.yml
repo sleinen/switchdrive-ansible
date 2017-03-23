@@ -1,13 +1,15 @@
 ---
 
 - name: install packages
-  apt:  name={{item}} 
+  apt:  name={{item}}
         state=installed
         update_cache={{apt_config.update_cache}}
         cache_valid_time={{apt_config.cache_valid_time}}
   with_items:
     - libpython2.7
     - socat
+  tags:
+    - collectd
 
 - name: install haproxy script for collectd
   copy:
@@ -25,5 +27,3 @@
   tags:
     - config
     - collectd
-    
-

@@ -26,7 +26,7 @@
   file:
     state: link
     path: "{{owncloud_webroot}}/root.php-fpm.sock"
-    src: "/var/run/php/php-fpm.{{php_version_root_site[site]}}.sock"
+    src: "/var/run/php/php-fpm.{{php_version_root_site[service_name]}}.sock"
     force: true
   tags:
     - root_site

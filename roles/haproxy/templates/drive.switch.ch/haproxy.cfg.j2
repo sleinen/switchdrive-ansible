@@ -1,6 +1,6 @@
 global
-    #log         {{ hostvars[groups['elk'][0]].inventory_hostname }} local1
-    log         /dev/log local1
+    log         {{ hostvars[groups['elk'][0]].inventory_hostname }} local1
+    #log         /dev/log local1
 
     chroot      /var/lib/haproxy
     pidfile     /var/run/haproxy.pid
@@ -9,18 +9,18 @@ global
     group       root
     daemon
 
-    server-state-file /var/lib/haproxy/state
-    
+    server-state-file {{haproxy_state_file}}
+
     # turn on stats unix socket
     stats socket /var/lib/haproxy/stats level admin
-    
+
     #ssl-default-bind-ciphers AES128+AESGCM+EECDH+SHA256:AES128+EECDH:AES128+AESGCM+DHE:AES128+EDH:AES256+AESGCM+EECDH:AES256+EECDH:AES256+AESGCM+EDH:AES256+EDH:-SHA:AES128+AESGCM+EECDH+SHA256:AES128+EECDH:AES128+AESGCM+DHE:AES128+EDH:AES256+AESGCM+EECDH:AES256+EECDH:AES256+AESGCM+EDH:AES256+EDH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!PSK:!aECDH:!3DES:!DSS
     ssl-default-bind-ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AES:RSA+3DES:!ADH:!AECDH:!MD5:!DSS
     ssl-default-bind-options no-sslv3 no-tls-tickets
     tune.ssl.default-dh-param 2048
-    
+
     lua-load /etc/haproxy/lua/userToShardLookup.lua
-    
+
 
 defaults
     mode                    http
@@ -81,7 +81,7 @@ frontend ldap
 
 backend ldap_backend
     {% for host in groups['ldap'] %}
-    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:389 check fall 1 rise 1 inter 2s
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].inventory_hostname }}:389 check fall 1 rise 1 inter 2s
     {% endfor %}
 
     load-server-state-from-file global
@@ -109,7 +109,7 @@ frontend ssl
     #########
     # webdav / ocs / etc ?
     acl webdav url_beg /remote.php
-    acl ocs url_beg /ocs/ 
+    acl ocs url_beg /ocs/
     acl has_basic_auth req.hdr(Authorization) -m found
 
     #########
@@ -122,30 +122,30 @@ frontend ssl
     acl has_shard_cookie cook(shard) -m found
     acl is_cluster_dom hdr_beg(host) -i drive-backup.switch.ch
 
-    # set shard cookie if not present yet (only for sync clients) 
+    # set shard cookie if not present yet (only for sync clients)
     # commented out -> better do this with php to take load away from haproxy.
     #redirect prefix / set-cookie shard=%[lua.userToShardLookup] if !has_shard_cookie syncclient
-    
+
     # default for non webdav clients
-    http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie !webdav
+#    http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie !webdav
     #http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth syncclient
     #http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth iosclient
 
     # webdav client -> let them go to root site where a cookie will be set for them.
     # -> works for syncclients and iosclients
     # special clients not capable of handling cookies
-    http-request lua.userToShardLookup if has_basic_auth !has_shard_cookie webdav !syncclient !iosclient
-    http-request lua.userToShardLookup if has_basic_auth andoidclient
-    http-request lua.userToShardLookup if has_basic_auth ocs
+#    http-request lua.userToShardLookup if has_basic_auth !has_shard_cookie webdav !syncclient !iosclient
+#    http-request lua.userToShardLookup if has_basic_auth andoidclient
+#    http-request lua.userToShardLookup if has_basic_auth ocs
     #http-request lua.userToShardLookup if has_basic_auth pyocclient
 
-    # based on cookie already present    
-    http-request set-header Host a01.{{ service_name }} if shard_a01
-    http-request set-header Host a02.{{ service_name }} if shard_a02
-    http-request set-header Host a03.{{ service_name }} if shard_a03
-    http-request set-header Host a04.{{ service_name }} if shard_a04
-    http-request set-header Host a05.{{ service_name }} if shard_a05
-    
+    # based on cookie already present
+#    http-request set-header Host a01.{{ service_name }} if shard_a01
+#    http-request set-header Host a02.{{ service_name }} if shard_a02
+#    http-request set-header Host a03.{{ service_name }} if shard_a03
+#    http-request set-header Host a04.{{ service_name }} if shard_a04
+#    http-request set-header Host a05.{{ service_name }} if shard_a05
+
     #########
     # session cookie also valid on subdomains:
     #rspirep ^(set-cookie:.*)  "\1; Domain={{ service_name }};"
@@ -158,9 +158,9 @@ frontend ssl
 
     #########
     # choose backend
- 
+
     # use_backend owncloud if !syncclient !switch
-    #use_backend sync if syncclient  #  switch
+    use_backend sync if syncclient  #  switch
 
     # block if !switch syncclient
 
@@ -187,15 +187,15 @@ backend owncloud
     option httpchk GET /foo.php
 
     load-server-state-from-file global
-    
+
     # http://comments.gmane.org/gmane.comp.web.haproxy/14720, closes
     # NVT: Missing Secure Attribute SSL Cookie Information Disclosure Vulnerability (OID: 1.3.6.1.4.1.25623.1.0.902661)
     acl secure res.hdr(Set-Cookie),lower -m sub secure
     rspirep ^(Set-cookie:.*) \1;\ Secure if ! secure
 
     {% for host in groups['web'] %}
-    {% if hostvars[host].active -%}
-    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check on-error mark-down fastinter 1500ms  # @zabbix_server({{hostvars[host].ansible_hostname}})
+    {%- if hostvars[host].active -%}
+    server {{ hostvars[host].inventory_hostname | regex_replace('.*\.20*([1-9][0-9]*)$', 'web\\1') }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].inventory_hostname | regex_replace('.*\.20*([1-9][0-9]*)$', 'web\\1') }} check on-error mark-down fastinter 1500ms
     {% endif -%}
     {% endfor %}
 
@@ -211,7 +211,7 @@ backend owncloud_dev
     load-server-state-from-file global
 
     {% for host in groups['dev'] %}
-    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check on-error mark-down fastinter 1500ms  # @zabbix_server({{hostvars[host].ansible_hostname}})
+    server {{ hostvars[host].inventory_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].inventory_hostname }} check on-error mark-down fastinter 1500ms
     {% endfor %}
 
 backend sync
@@ -241,18 +241,16 @@ backend sync
     load-server-state-from-file global
 
     # fullconn should be a bit less than number of server * maxconn
-    fullconn 700
     #fullconn 1300
     # maxconn depends on {php_config.max_php_processes}
     #default-server inter 3000 downinter 20000 fastinter 1000 rise 4 fall 10 on-error mark-down error-limit 5 minconn 10 maxconn 150
-    default-server inter 3000 downinter 20000 fastinter 1000 rise 4 fall 10 on-error mark-down error-limit 5 minconn 10 maxconn 80
+    default-server inter 3000 downinter 20000 fastinter 1000 rise 4 fall 10 on-error mark-down error-limit 5 minconn 10 maxconn 100
 
     {% for host in groups['sync'] %}
-    {% if hostvars[host].active -%}
-    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check # @zabbix_server({{hostvars[host].ansible_hostname}})
+    {%- if hostvars[host].active -%}
+    server {{ hostvars[host].inventory_hostname | regex_replace('.*\.10*([1-9][0-9]*)$', 'sync\\1') }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].inventory_hostname | regex_replace('.*\.10*([1-9][0-9]*)$', 'sync\\1') }} check
     {% endif -%}
     {% endfor %}
 
 backend letsencrypt
     server localhost localhost:8888
-

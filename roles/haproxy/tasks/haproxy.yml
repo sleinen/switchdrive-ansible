@@ -46,10 +46,22 @@
     - haproxy
     - map
 
+- name: upload ssl pem if it exists
+  copy: content="{{ service_cert[service_name] }}" dest=/etc/haproxy/ssl/{{ service_name }}.pem
+  ignore_errors: yes
+  notify:
+    - restart haproxy
+  tags:
+    - haproxy
+    - config
+    - cert
+  when: not service_cert[service_name] is none
+
 - name: create self singed certificate (bootstrap letsencrypt)
   command: 'openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout "/etc/haproxy/ssl/{{ service_name }}.key" -out "/etc/haproxy/ssl/{{ service_name }}.crt" -subj "/C=CH/ST=AG/L=Zürich/O=none/OU=none/CN={{ service_name }}"'
   args:
     creates: "/etc/haproxy/ssl/{{ service_name }}.crt"
+  when: service_cert[service_name] is none
   tags:
     - haproxy
     - cert
@@ -59,6 +71,7 @@
   shell: "cat '/etc/haproxy/ssl/{{ service_name }}.crt' '/etc/haproxy/ssl/{{ service_name }}.key' > '/etc/haproxy/ssl/{{service_name}}.pem'"
   args:
     creates: "/etc/haproxy/ssl/{{ service_name }}.pem"
+  when: not service_cert[service_name] is none
   tags:
      - haproxy
      - cert
@@ -70,7 +83,7 @@
     network_mode: host
     restart_policy: "unless-stopped"
     state: started
-    pull: true
+    #pull: true
     volumes:
       - "/etc/haproxy:/etc/haproxy"
       - "/var/lib/haproxy:/var/lib/haproxy"

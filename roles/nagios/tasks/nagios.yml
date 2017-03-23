@@ -4,7 +4,7 @@
 ##################
 # setup directories
 - name: create nagios directories
-  file: 
+  file:
     dest="/home/nagios/{{item}}"
     state=directory
     owner="nagios"
@@ -21,22 +21,22 @@
 # install configs
 
 - name: install nagios config file
-  template: 
+  template:
     src="mrpe/{{ node_type }}.j2"
     dest="/home/nagios/etc/mrpe.cfg"
     owner="nagios"
     group="nagios"
-  tags: 
+  tags:
     - nagios
     - config
-    
+
 - name: install check log files config
-  copy: 
+  copy:
     src="check_logfiles_config/{{ node_type }}.cfg"
     dest="/home/nagios/etc/check_logfiles.cfg"
     owner="nagios"
     group="nagios"
-  tags: 
+  tags:
     - nagios
     - config
 
@@ -44,7 +44,7 @@
 # install scripts / plugins
 
 - name: install plugins-dynamic scripts
-  copy: 
+  copy:
     src="check_mk/plugins/{{item}}"
     dest="/home/nagios/check_mk/plugins/{{item}}"
     mode="755"
@@ -54,7 +54,7 @@
   tags: nagios
 
 - name: install plugins-dynamic scripts
-  copy: 
+  copy:
     src="check_mk/{{item.name}}"
     dest="/home/nagios/plugins-dynamic/{{item.name}}"
     mode="{{item.mode}}"
@@ -67,7 +67,7 @@
 
 
 - name: install plugins-static scripts
-  copy: 
+  copy:
     src="plugins-static/{{item}}"
     dest="/home/nagios/plugins-static/{{item}}"
     mode="0755"
@@ -78,9 +78,7 @@
       - check_haproxy.pl
       - check_logfiles
       - check_mountpoints.sh
-      - check_redis.pl
+      - check_redis.py
       - ngowncloud
       - ngpostgres
   tags: nagios
-
-

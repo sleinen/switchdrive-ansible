@@ -3,20 +3,21 @@
 
 # in order to limit run with e.g: --limit=*.52,10.0.23.1*,10.0.23.2*,*6*,*17
 
-- hosts: 
-    - web
-    - sync 
-    - ldap
-    - dev
-  gather_facts: no
-  tasks:
-    - setup:
-      tags:
-        - config
-        - haconfig
-  become: true
+#- hosts:
+  #   - web
+  #   - sync
+  #   - ldap
+  #   - dev
+  # gather_facts: no
+  # tasks:
+  #   - setup:
+  #     tags:
+  #       - config
+  #       - haconfig
+  #       - haproxy
+  # become: true
 
-- hosts: 
+- hosts:
     - lb
     #- lb[1]
     #- 10.0.23.53

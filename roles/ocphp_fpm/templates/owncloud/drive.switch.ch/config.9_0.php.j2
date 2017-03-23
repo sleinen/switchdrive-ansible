@@ -1,20 +1,22 @@
 <?php
 $CONFIG = array (
-  'instanceid' => 'oc641cdd42e0',
-  'passwordsalt' => '4b2df88ca20f48d594d74999694875',
+  'instanceid'    => '{{shards.instanceid}}',
+  'passwordsalt'  => '{{owncloud_passwordsalt[service_name]}}',
   'datadirectory' => '/mnt/data',
-  
+  "overwritehost" => "{{shards.overwritehost}}",
+  "overwrite.cli.url" => "https://{{shards.overwritehost}}",
+
   'dbtype' => 'mysql',
   'dbname' => 'owncloud',
+  #'dbname' => '{{shards.shard_name}}',
   'dbtableprefix' => 'oc_',
   'dbuser' => 'owncloud',
-#  'dbhost' => '{{hostvars[groups["maxscale"][0]].inventory_hostname}}',
-#  'dbhost' => '{{hostvars[groups["mariadb"][0]].inventory_hostname}}',
+  #  'dbhost' => '{{hostvars[groups["mariadb"][0]].inventory_hostname}}',
   'dbhost' => 'localhost',
   'dbpassword' => '{{mariadb_passwd}}',
 
-  'version' => '8.1.12.2',
-  'installed' => true,
+  'version' => '{{shards.version_in_config}}',
+  'installed' => {{shards.installed}},
   'ldapIgnoreNamingRules' => false,
 
   'log_type' => 'owncloud',
@@ -22,7 +24,7 @@ $CONFIG = array (
   'log_query' => false,
   'cron_log' => true,
   'log_authfailip' => false,
-  'logfile' => '/var/log/owncloud/{{owncloud_logfile_name}}',
+  'logfile' => '/var/log/owncloud/{{shards.shard_name}}.{{owncloud_logfile_name}}',
   'logdateformat' => 'U.u',
   'logtimezone' => 'Europe/Berlin',
   'log_rotate_size' => 104857600,
@@ -38,31 +40,28 @@ $CONFIG = array (
   'updatechecker' => false,
   'license-key' => '{{license_key}}',
   'appstoreenabled' => false,
-  'enable_previews' => true,
+  'enable_previews' => false,
   'asset-pipeline.enabled' => true,
   'filesystem_check_changes' => 0,
-  'trusted_domains' =>
-    array (
-      0 => 'drive.switch.ch',
-    ),
+    'trusted_domains' =>
+      array (
+        0 => '{{ service_name }}',
+        1 => '{{shards.shard_name}}.{{ service_name }}',
+      ),
   'customclient_desktop' => 'https://help.switch.ch/drive/downloads/',
   'customclient_android' => 'https://play.google.com/store/apps/details?id=ch.switchdrive.androidclient',
   'customclient_ios' => 'https://itunes.apple.com/en/app/switchdrive/id847336453?mt=8',
   'has_internet_connection' => true,
   'supportedDatabases' =>
     array (
-      0 => 'mysql',
-      1 => 'pgsql',
-      2 => 'oci',
-      3 => 'mssql',
+        0 => 'mysql',
     ),
   'shared_folder' => '/',
   'share_folder' => '/',
   'secret' => '{{oc_config_secret}}',
-  'overwrite.cli.url' => 'https://drive.switch.ch',
   'maintenance' => false,
   'singleuser' => false,
-  'minimum.supported.desktop.version' => '1.7',
+  'minimum.supported.desktop.version' => '2.0',
   'memcache.local' => '\OC\Memcache\APCu',
   'memcache.distributed' => '\OC\Memcache\Redis',
   'memcache.locking' => '\OC\Memcache\Redis',
@@ -70,16 +69,17 @@ $CONFIG = array (
   'redis' => array(
      'host' => '{{ hostvars[groups['redis'][0]].inventory_hostname }}',
      'port' => 6379,
-     'timeout' => 0.0,
       ),
-
-   'enabledPreviewProviders' => array(
-    'OC\Preview\PNG',
-    'OC\Preview\JPEG',
-    'OC\Preview\GIF',
-    'OC\Preview\XBitmap',
-    'OC\Preview\MP3',
-    'OC\Preview\TXT',
-    'OC\Preview\MarkDown'
-   ),
+  'enabledPreviewProviders' =>
+  array (
+    0 => 'OC\\Preview\\PNG',
+    1 => 'OC\\Preview\\JPEG',
+    2 => 'OC\\Preview\\GIF',
+    3 => 'OC\\Preview\\XBitmap',
+    4 => 'OC\\Preview\\MP3',
+    5 => 'OC\\Preview\\TXT',
+    6 => 'OC\\Preview\\MarkDown',
+  ),
+  'trashbin_retention_obligation' => 'auto',
+  'enable_certificate_management' => true,
 );

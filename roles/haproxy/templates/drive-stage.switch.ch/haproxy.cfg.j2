@@ -9,7 +9,7 @@ global
     group       root
     daemon
 
-    server-state-file /var/lib/haproxy/state
+    server-state-file {{haproxy_state_file}}
 
     # turn on stats unix socket
     stats socket /var/lib/haproxy/stats level admin
@@ -128,7 +128,7 @@ backend owncloud
 
     {% for host in groups['web'] %}
     {% if hostvars[host].active -%}
-    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check on-error mark-down fastinter 1500ms
+    server {{ hostvars[host].inventory_hostname | regex_replace('.*\.20*([1-9][0-9]*)$', 'web\\1') }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].inventory_hostname | regex_replace('.*\.20*([1-9][0-9]*)$', 'web\\1') }} check on-error mark-down fastinter 1500ms
     {% endif -%}
     {% endfor %}
 
@@ -168,9 +168,9 @@ backend sync
 
     {% for host in groups['sync'] %}
     {% if hostvars[host].active -%}
-    server {{ hostvars[host].ansible_hostname }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].ansible_hostname }} check
+    server {{ hostvars[host].inventory_hostname | regex_replace('.*\.10*([1-9][0-9]*)$', 'sync\\1') }} {{ hostvars[host].inventory_hostname }}:{{ httpd_port }} cookie {{ hostvars[host].inventory_hostname | regex_replace('.*\.10*([1-9][0-9]*)$', 'sync\\1') }} check
     {% endif -%}
     {% endfor %}
 
 backend letsencrypt
-    server localhost localhost:8888
+    server lb1  {{ hostvars[groups['lb'][0]].inventory_hostname }}:8888

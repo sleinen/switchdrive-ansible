@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "x$2" == "x" ]; then 
+if [ "x$2" == "x" ]; then
     echo "Usage: `basename $0` <enable|disable> <server>
 .      e.g.:  en sync1
 .      e.g.:  di web2
@@ -20,6 +20,5 @@ else
     action="disable"
 fi
 
-echo "$action server $backend/{{internal_domain}}-$2" | sudo socat /var/lib/haproxy/stats stdio
-socat /var/lib/haproxy/stats - <<< "show servers state" > /tmp/haproxy_state
-
+echo "$action server $backend/$2" | sudo socat /var/lib/haproxy/stats stdio
+socat /var/lib/haproxy/stats - <<< "show servers state" > {{ haproxy_state_file }}

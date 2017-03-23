@@ -67,7 +67,7 @@ $CONFIG = array (
   'memcache.locking' => '\OC\Memcache\Redis',
   'filelocking.enabled' => true,
   'redis' => array(
-     'host' => '{{ hostvars[groups['redis'][1]].inventory_hostname }}',
+     'host' => '{{ hostvars[groups['redis'][0]].inventory_hostname }}',
      'port' => 6379,
       ),
   'enabledPreviewProviders' =>

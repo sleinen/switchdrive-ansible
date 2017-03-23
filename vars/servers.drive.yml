@@ -9,15 +9,29 @@ os_network: "drive"
 os_server_group:
   list:
     - { name: "load_balancers", policies: ['anti-affinity'] }
+    - { name: "redis",          policies: ['anti-affinity'] }
   # look up id after they were created: `openstack server group list`
   load_balancers: "49b089f0-7987-4d7e-843c-0818efbaaa38"
+  redis:          "812b5d3c-bce7-423c-9ce9-aea3fd356376"
 
 #####################
 # servers
 os_server:
-  lb1:    { name: "{{site}}-lb1",    ip: "{{ hostvars[groups['lb'][0]].inventory_hostname}}",    flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,development,ldap,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
-  lb2:    { name: "{{site}}-lb2",    ip: "{{ hostvars[groups['lb'][1]].inventory_hostname}}",    flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,development,ldap,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
-  redis2: { name: "{{site}}-redis2", ip: "{{ hostvars[groups['redis'][1]].inventory_hostname}}", flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  lb1:        { ip: "{{ hostvars[groups['lb'][0]].inventory_hostname}}",        flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,development,ldap,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
+  lb2:        { ip: "{{ hostvars[groups['lb'][1]].inventory_hostname}}",        flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,development,ldap,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
+
+  redis1:     { ip: "{{ hostvars[groups['redis'][0]].inventory_hostname}}",     flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['redis'] }}" } }
+  redis2:     { ip: "{{ hostvars[groups['redis'][1]].inventory_hostname}}",     flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['redis'] }}" } }
+
+  web11:      { ip: "{{ hostvars[groups['web'][11]].inventory_hostname}}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  web12:      { ip: "{{ hostvars[groups['web'][11]].inventory_hostname}}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  web13:      { ip: "{{ hostvars[groups['web'][11]].inventory_hostname}}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  web14:      { ip: "{{ hostvars[groups['web'][11]].inventory_hostname}}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+
+  sync11:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname}}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  sync12:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname}}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  sync13:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname}}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  sync14:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname}}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
 
 #####################
 # vips
