@@ -11,7 +11,7 @@
 #  ignore_errors: yes
 
 - name: mount volumes
-  mount: 
+  mount:
     name=/mnt/{{ item.name }}
     src={{ item.src }}
     fstype=xfs
@@ -31,14 +31,11 @@
     - export
 
 - name: setup ocdata link
-  file: dest="/mnt/{{ item.name }}/.ocdata"
-        src="/mnt/{{ item.ocdata_link }}/.ocdata"
+  file: dest="/mnt/{{ item.name }}/._ocdata"
+        src="/mnt/{{ item.ocdata_link }}/._ocdata"
         state=link force=yes
   with_items: "{{vols}}"
   tags:
     - config
     - ocdata
     - mount
-
-
-

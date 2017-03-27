@@ -23,9 +23,9 @@
     - scripts
   post_tasks:
     - name: create ocdata link
-      file: 
+      file:
         dest: "/mnt/data/{{ item.name }}"
-        src: "/mnt/{{ item.link }}/.ocdata"
+        src: "/mnt/{{ item.link }}/._ocdata"
         state: link
         force: yes
       with_items: "{{ocdata_links}}"
@@ -33,4 +33,3 @@
       tags:
         - ocdata
   become: true
-
