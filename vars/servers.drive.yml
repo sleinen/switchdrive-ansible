@@ -10,6 +10,8 @@ os_server_group:
   list:
     - { name: "load_balancers", policies: ['anti-affinity'] }
     - { name: "redis",          policies: ['anti-affinity'] }
+    - { name: "grahite",        policies: ['anti-affinity'] }
+    - { name: "elk",            policies: ['anti-affinity'] }
   # look up id after they were created: `openstack server group list`
   load_balancers: "49b089f0-7987-4d7e-843c-0818efbaaa38"
   redis:          "812b5d3c-bce7-423c-9ce9-aea3fd356376"
@@ -32,6 +34,11 @@ os_server:
   sync12:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname}}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
   sync13:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname}}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
   sync14:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname}}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+
+  grahite1:   { ip: "{{ hostvars[groups['graphite'][0]].inventory_hostname}}",  flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['graphite'] }}" } }
+  grahite2:   { ip: "{{ hostvars[groups['graphite'][0]].inventory_hostname}}",  flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['graphite'] }}" } }
+  elk1:       { ip: "{{ hostvars[groups['elk'][0]].inventory_hostname}}",       flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['elk'] }}" } }
+  elk2:       { ip: "{{ hostvars[groups['elk'][0]].inventory_hostname}}",       flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['elk'] }}" } }
 
 #####################
 # vips

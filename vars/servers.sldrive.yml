@@ -9,22 +9,27 @@ os_network: "sldrive-drive"
 os_server_group:
   list:
     - { name: "load_balancers", policies: ['anti-affinity'] }
+    - { name: "mariadb",        policies: ['anti-affinity'] }
   # look up id after they were created: `openstack server group list`
   load_balancers: "7bae8106-25b5-4c36-99a2-51d85985d334"
+  mariadb:        "9b7ed2cb-c5d4-4fd7-84d9-efced965cf66"
 
 #####################
 # servers
 # create servers with ``
 
 os_server:
-  lb1:        { ip: "{{ hostvars[groups['lb'][0]].inventory_hostname}}",        flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
-  lb2:        { ip: "{{ hostvars[groups['lb'][1]].inventory_hostname}}",        flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
-  redis1:     { ip: "{{ hostvars[groups['redis'][0]].inventory_hostname}}",     flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
-  #redis2:     { ip: "{{ hostvars[groups['redis'][1]].inventory_hostname}}",     flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
-  web1:       { ip: "{{ hostvars[groups['web'][0]].inventory_hostname}}",       flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
-  web2:       { ip: "{{ hostvars[groups['web'][1]].inventory_hostname}}",       flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
-  sync1:      { ip: "{{ hostvars[groups['sync'][0]].inventory_hostname}}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
-  sync2:      { ip: "{{ hostvars[groups['sync'][1]].inventory_hostname}}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  lb1:        { ip: "{{ hostvars[groups['lb'][0]].inventory_hostname}}",             flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
+  lb2:        { ip: "{{ hostvars[groups['lb'][1]].inventory_hostname}}",             flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
+  redis1:     { ip: "{{ hostvars[groups['redis'][0]].inventory_hostname}}",          flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  #redis2:     { ip: "{{ hostvars[groups['redis'][1]].inventory_hostname}}",          flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  web1:       { ip: "{{ hostvars[groups['web'][0]].inventory_hostname}}",            flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  web2:       { ip: "{{ hostvars[groups['web'][1]].inventory_hostname}}",            flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  sync1:      { ip: "{{ hostvars[groups['sync'][0]].inventory_hostname}}",           flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  sync2:      { ip: "{{ hostvars[groups['sync'][1]].inventory_hostname}}",           flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+  db1:        { ip: "{{ hostvars[groups['mariadb'][0]].inventory_hostname}}",        flavor: "drive-100-32-8-100-ssd", image: "{{os_image['xenial']}}", root_size: "80", security_groups: "default", hints: { group: "{{ os_server_group['mariadb'] }}" } }
+  db2:        { ip: "{{ hostvars[groups['mariadb'][1]].inventory_hostname}}",        flavor: "drive-100-32-8-100-ssd", image: "{{os_image['xenial']}}", root_size: "80", security_groups: "default", hints: { group: "{{ os_server_group['mariadb'] }}" } }
+  db3:        { ip: "{{ hostvars[groups['mariadb'][2]].inventory_hostname}}",        flavor: "drive-100-32-8-100-ssd", image: "{{os_image['xenial']}}", root_size: "80", security_groups: "default", hints: { group: "{{ os_server_group['mariadb'] }}" } }
 
 #####################
 # vips
