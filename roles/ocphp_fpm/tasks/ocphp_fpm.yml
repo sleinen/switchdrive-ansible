@@ -23,7 +23,7 @@
 - name: ocphp_fpm docker
   docker_container:
     name: "php_fpm_{{item.oc_major_version}}.{{item.oc_minor_version}}"
-    image: "{{ocphp_fpm_docker_name}}:{{item.oc_major_version}}.{{item.oc_minor_version}}"
+    image: "{{ocphp_fpm_docker_name}}:{{item.oc_major_version}}.{{item.oc_minor_version}}-{{item.oc_image_version}}"
     network_mode: host
     restart_policy: "unless-stopped"
     state: started

@@ -33,7 +33,7 @@ group = www-data
 ;                            (IPv6 and IPv4-mapped) on a specific port;
 ;   '/path/to/unix/socket' - to listen on a unix socket.
 ; Note: This value is mandatory.
-listen = /run/php/php-fpm.{{shards.oc_major_version}}.{{shards.oc_minor_version}}.sock
+listen = /run/php/php-fpm.{{shards.oc_major_version}}.{{shards.oc_minor_version}}-{{shards.oc_image_version}}.sock
 ;listen = 127.0.0.1:9000
 
 ; Set listen(2) backlog.
@@ -455,4 +455,3 @@ php_admin_value[newrelic.capture_params] = on
 ;php_admin_value[session.save_path] = /dev/shm
 php_admin_value[session.save_path] = 'tcp://{{ hostvars[groups['redis'][0]].inventory_hostname }}:6379'
 php_admin_value[session.save_handler] = redis
-

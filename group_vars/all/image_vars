@@ -3,6 +3,24 @@
 registry_url: "{{docker_registry}}:5000"
 
 ####################
+# image to be build
+
+#owncloud_major_version: "9.1"
+#owncloud_version: "{{owncloud_major_version}}.4"
+#owncloud_docker_image_version: 1
+
+owncloud_major_version: "9.0"
+owncloud_version: "{{owncloud_major_version}}.8"
+owncloud_docker_image_version: 1
+
+#owncloud_major_version: "8.2"
+#owncloud_version: "{{owncloud_major_version}}.8"
+#owncloud_docker_image_version: 1
+
+comment_out_git_include: '#'
+git_branch: "https://github.com/owncloud/core/archive/stable9.1-federated-cluster.zip"
+
+####################
 # logspout
 
 logspout_docker_name: "{{registry_url}}/logspout"
@@ -25,19 +43,6 @@ php_config:
   memory_limit: 512M
 php_ini_file: "php.ini"
 
-
-comment_out_git_include: '#'
-git_branch: "https://github.com/owncloud/core/archive/stable9.1-federated-cluster.zip"
-
-#owncloud_major_version: "9.1"
-#owncloud_version: "{{owncloud_major_version}}.4"
-
-owncloud_major_version: "9.0"
-owncloud_version: "{{owncloud_major_version}}.8"
-
-#owncloud_major_version: "8.2"
-#owncloud_version: "{{owncloud_major_version}}.8"
-
 owncloud_repo_base_url: "{{vault_owncloud_repo_base_url[owncloud_major_version]}}"
 owncloud_php_conf_dir:
     "8.2": "/etc/php5"
@@ -57,7 +62,7 @@ owncloud_php_fpm:
     "9.1": "/usr/sbin/php-fpm7.0"
 
 ocphp_fpm_docker_name: "{{registry_url}}/ocphp_fpm"
-ocphp_fpm_docker_tag: "{{owncloud_version}}"
+ocphp_fpm_docker_tag: "{{owncloud_version}}-{{owncloud_docker_image_version}}"
 ocphp_fpm_docker_image: "{{ocphp_fpm_docker_name}}:{{ocphp_fpm_docker_tag}}"
 owncloud_webroot: "/var/webroot"
 

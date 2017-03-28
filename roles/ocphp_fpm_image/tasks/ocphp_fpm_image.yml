@@ -12,25 +12,26 @@
 - name: copy ocphp_fpm configs to remote host
   template:
     src={{item.name}}
-    dest=/tmp/ocphp_fpm/{{item.name}}
+    dest=/tmp/ocphp_fpm/{{item.dest}}
     mode={{item.mode}}
   with_items:
-    - { name: Dockerfile, mode: "0644" }
-    - { name: entrypoint.sh, mode: "0755" }
-    - { name: user.ini, mode: "0644" }
+    - { name: "Dockerfile.{{owncloud_major_version}}", dest: "Dockerfile", mode: "0644" }
+    - { name: "entrypoint.sh", dest: "entrypoint.sh", mode: "0755" }
+    - { name: "user.ini", dest: "user.ini", mode: "0644" }
   tags:
     - ocphp_fpm
 
 
 - name: build ocphp_fpm
-  docker_image: 
-    path="/tmp/ocphp_fpm" 
-    name="{{ocphp_fpm_docker_name}}"
-    tag="{{ocphp_fpm_docker_tag}}"
-    dockerfile="Dockerfile"
-    state=build
-    tls_hostname=localhost
-    force=true
+  docker_image:
+    path: "/tmp/ocphp_fpm"
+    name: "{{ocphp_fpm_docker_name}}"
+    tag: "{{ocphp_fpm_docker_tag}}"
+    dockerfile: "Dockerfile"
+    state: build
+    tls_hostname: localhost
+    force: true
+    pull: true
   tags:
     - ocphp_fpm
 
@@ -38,7 +39,3 @@
   shell: docker push "{{ocphp_fpm_docker_image}}"
   tags:
     - ocphp_fpm
-
-
-
-
