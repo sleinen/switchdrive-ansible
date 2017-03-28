@@ -1,3 +1,23 @@
+#  jumphost=5
+#  --graphite=6
+#  reg=7
+#  backup=9
+#  mgmt=10
+#  vip1=11
+#  vip2=12
+#  lb=21
+#  db=31
+#  ldap=51
+#  nfs=71
+#  sync=101
+#  elk=151
+#  dev=161
+#  test=181
+#  web=201
+#  graphite=231
+#  redis=241
+#  maxscale=246
+
 [mariadb]
 10.0.26.[31:33]
 
@@ -123,7 +143,7 @@ admin_users={{ production_users }}
 cloud_id_service_name=cloud-id.switch.ch
 
 # mariadb
-mariadb_wsrep_cluster_address=gcomm://10.0.26.34,10.0.26.35,10.0.26.36
+mariadb_wsrep_cluster_address=gcomm://10.0.26.31,10.0.26.32,10.0.26.33
 
 # misc
 docker_registry="docker.drive.switch.ch"
