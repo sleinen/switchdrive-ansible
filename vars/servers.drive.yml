@@ -52,6 +52,11 @@ os_vip:
   ips:
     - { name: "lb_vip1", ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }
     - { name: "lb_vip2", ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" }
+    - { name: "carbon_vip", ip: "{{ hostvars[groups['carbon_vip'][0]].inventory_hostname }}" }
   ports:
+    # lb
     - { name: '{{ site }}-lb1-port_{{ os_network }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
     - { name: '{{ site }}-lb2-port_{{ os_network }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
+    # carbon
+    - { name: '{{ site }}-graphite1-port_{{ os_network }}', ips: [ { ip_address: "{{ hostvars[groups['carbon_vip'][0]].inventory_hostname }}" } ] }
+    - { name: '{{ site }}-graphite2-port_{{ os_network }}', ips: [ { ip_address: "{{ hostvars[groups['carbon_vip'][0]].inventory_hostname }}" } ] }

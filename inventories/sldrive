@@ -75,6 +75,8 @@ controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass
 [lb_vip]
 10.0.26.[11:12]
 
+[carbon_vip]
+10.0.23.13
 
 [production:children]
 mariadb

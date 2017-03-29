@@ -8,4 +8,5 @@ prometheus_version: 0.20.0
 prometheus_mount_point: "{{data_mount_point}}/prometheus"
 
 
-
+carbon_relay_destinations: "{{ hostvars[groups['graphite'][0]].inventory_hostname}}:2004, {{ hostvars[groups['graphite'][1]].inventory_hostname}}:2004"
+carbon_relay_replication_factor: 2

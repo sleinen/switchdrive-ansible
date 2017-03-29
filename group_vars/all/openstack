@@ -12,3 +12,10 @@ os_image:
 #####################
 # vrrp
 vrrp_password: "{{vault_vrrp_password}}"
+
+rgw_backup:
+    access_key: "{{vault_rgw_access_key}}"
+    secret_key: "{{vault_rgw_secret_key}}"
+    host_base: "os.unil.cloud.switch.ch"
+    host_bucket: "%(bucket)s.os.unil.cloud.switch.ch"
+    bucket_name: "SWITCHdrive_backup"

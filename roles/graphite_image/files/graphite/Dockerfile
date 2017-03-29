@@ -28,9 +28,9 @@ COPY run.sh /run.sh
 
 ENV TERM=xterm
 
-EXPOSE 80 2003
+EXPOSE 80 2003 2004 2013 2014
 
-VOLUME /var/lib/graphite/
+#VOLUME /var/lib/graphite/
+#VOLUME /var/lib/graphite/log
 
 ENTRYPOINT [ "/run.sh" ]
-

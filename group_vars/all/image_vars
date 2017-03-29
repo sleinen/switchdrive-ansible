@@ -79,7 +79,7 @@ maxscale_socket: "/var/run/mysqld/mysqld.sock"
 ####################
 # grafana
 
-grafana_version: 4.1.2
+grafana_version: 4.2.0
 grafana_docker_name: "{{registry_url}}/grafana"
 grafana_docker_tag: "{{grafana_version}}"
 grafana_docker_image: "{{grafana_docker_name}}:{{grafana_docker_tag}}"

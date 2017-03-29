@@ -1,11 +1,17 @@
 ---
 
-- name: add collectd
-  apt: name=collectd state=present
-      update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
+- name: add collectd packages and dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: "{{apt_config.update_cache}}"
+    cache_valid_time: "{{apt_config.cache_valid_time}}"
+  with_items:
+    - collectd
+    - libpython2.7
   tags:
     - collectd
-    
+
 - name: create collectd.conf.d directory
   file: dest=/etc/collectd/collectd.conf.d state=directory
   tags:
@@ -20,23 +26,24 @@
   tags:
     - collectd
     - config
-    
+
 - name: add collectd_graphite.conf
   template:
     src=collectd/collectd_graphite.conf.j2
     dest=/etc/collectd/collectd.conf.d/collectd_graphite.conf
-  notify: 
+  notify:
     - kill collectd
     - restart collectd
   tags:
     - collectd
+    - collectd_graphite
     - config
- 
+
 - name: add collectd_influxdb.conf
   template:
     src=collectd/collectd_influxdb.conf.j2
     dest=/etc/collectd/collectd.conf.d/collectd_influxdb.conf
-  notify: 
+  notify:
     - kill collectd
     - restart collectd
   tags:
@@ -47,14 +54,14 @@
   template:
     src=collectd/collectd_processes.conf.j2
     dest=/etc/collectd/collectd.conf.d/collectd_processes.conf
-  notify: 
+  notify:
     - kill collectd
     - restart collectd
   tags:
     - collectd
     - config
-  
- 
+
+
 - name: create plugins directory
   file: dest=/opt/collectd/collectd.plugins state=directory
   tags:
@@ -66,21 +73,21 @@
       update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
   tags:
     - collectd
-    
+
 - name: add iostat
   apt: name=ruby1.9.3 state=present
     update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
   when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "14.04"
   tags:
     - collectd
-    
+
 - name: add iostat
   apt: name=ruby state=present
     update_cache={{apt_config.update_cache}} cache_valid_time={{apt_config.cache_valid_time}}
   when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "16.04"
   tags:
     - collectd
-    
+
 - name: add iostat plugin
   copy:
     src=collectd/collectd.plugins/iostat/iostat_collectd_plugin.rb
@@ -89,7 +96,7 @@
   tags:
     - collectd
     - config
- 
+
 - name: add iostat config
   template:
     src=collectd/collectd_iostat.conf.j2
@@ -98,7 +105,7 @@
   tags:
     - collectd
     - config
- 
+
 - name: add nfsv4 plugin
   copy:
     src=collectd/collectd.plugins/nfs/nfsv4.py
@@ -108,7 +115,7 @@
   tags:
     - collectd
     - config
-    
+
 - name: python procfs
   action: apt name={{item}}
   with_items:
@@ -116,7 +123,7 @@
     - python-setuptools
   tags:
     - collectd
-    
+
 - name: fix pip upgrade bug
   command: "pip install --upgrade pip"
   tags:
@@ -125,4 +132,3 @@
 - pip: name=procfs
   tags:
     - collectd
-

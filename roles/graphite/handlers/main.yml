@@ -1,0 +1,4 @@
+---
+
+- name: restart graphite
+  shell: "docker restart graphite"

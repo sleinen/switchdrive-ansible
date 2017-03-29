@@ -1,6 +1,6 @@
 ---
 
-- hosts: 
+- hosts:
     - mariadb
   gather_facts: no
   tasks:
@@ -20,5 +20,5 @@
     - graphite
     - prometheus
     - logspout
+    - keepalived
   become: true
-

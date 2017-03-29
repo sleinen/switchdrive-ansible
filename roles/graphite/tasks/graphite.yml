@@ -4,12 +4,29 @@
 - name: Create dirs
   file: path="{{item}}" state=directory group=107 owner=105
   with_items:
+    - "/etc/carbon"
     - "{{graphite_data_dir}}"
     - "{{graphite_data_dir}}/log"
     - "{{graphite_data_dir}}/carbon"
     - "{{graphite_data_dir}}/whisper"
+    - "/var/log/graphite"
+    - "/var/log/carbon"
   tags:
     - graphite
+
+- name: install graphite configurations
+  template:
+    src: "{{ item }}.conf"
+    dest: "/etc/carbon/{{ item }}.conf"
+  notify: restart graphite
+  with_items:
+    - "carbon"
+    - "storage-schemas"
+    - "storage-aggregation"
+    - "relay-rules"
+  tags:
+    - graphite
+
 
 - name: graphite container
   docker_container:
@@ -20,9 +37,18 @@
     state: started
     pull: true
     ports:
+      - 2004:2004
       - 2003:2003
+      - 2014:2014
+      - 2013:2013
       - 8080:80
     volumes:
+      - "/etc/carbon/carbon.conf:/etc/carbon/carbon.conf"
+      - "/etc/carbon/storage-schemas.conf:/etc/carbon/storage-schemas.conf"
+      - "/etc/carbon/storage-aggregation.conf:/etc/carbon/storage-aggregation.conf"
+      - "/etc/carbon/relay-rules.conf:/etc/carbon/relay-rules.conf"
       - "{{graphite_data_dir}}:/var/lib/graphite"
+      - "/var/log/graphite:/var/lib/graphite/log"
+      - "/var/log/carbon:/var/log/carbon"
   tags:
     - graphite
