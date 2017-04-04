@@ -11,6 +11,8 @@
   when: os_action == "delete"
 
 # creation
+- include: security_group.yml
+  when: os_action == "create"
 - include: server_group.yml
   when: os_action == "create"
 - include: volume.yml

@@ -31,9 +31,11 @@
     - export
 
 - name: setup ocdata link
-  file: dest="/mnt/{{ item.name }}/._ocdata"
-        src="/mnt/{{ item.ocdata_link }}/._ocdata"
-        state=link force=yes
+  file:
+    dest: "/mnt/{{ item.name }}/._ocdata"
+    src: "/mnt/{{ item.ocdata_link }}/._ocdata"
+    state: link
+    force: yes
   with_items: "{{vols}}"
   tags:
     - config

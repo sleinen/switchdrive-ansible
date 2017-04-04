@@ -18,3 +18,4 @@
   when: server != ""
   tags:
     - os_server
+    - os_server_all

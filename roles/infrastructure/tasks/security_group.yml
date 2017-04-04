@@ -1,0 +1,29 @@
+---
+
+- name: Create a security_group
+  os_security_group:
+    auth: "{{ os_auth }}"
+    region_name: "{{ os_region }}"
+    state: present
+    name: "{{ item.name }}"
+    description: "{{ item.description }}"
+  with_items:
+    - "{{ os_security_group }}"
+  tags:
+    - os_sec_group
+
+- name: Create a security_group
+  os_security_group_rule:
+    auth: "{{ os_auth }}"
+    region_name: "{{ os_region }}"
+    state: "{{ item.1.state }}"
+    security_group: "{{ item.0.name }}"
+    protocol: "{{ item.1.protocol }}"
+    port_range_min: "{{ item.1.port_range_min }}"
+    port_range_max: "{{ item.1.port_range_max }}"
+    remote_ip_prefix: "{{ item.1.remote_ip_prefix }}"
+  with_subelements:
+    - "{{ os_security_group }}"
+    - rules
+  tags:
+    - os_sec_group

@@ -11,30 +11,30 @@
     - nagios
   become: true
 
-- hosts: 
-    - mariadb
-    - maxscale
-    - nfs
-    - web
-    - sync
-    - mgmt
-    - elk
-    - lb
-    - ldap
-    - monitoring
-    - dev
-    - reg
-    - graphite
-    - redis
-    - jumphost
-    - backup
-    - test
-    - registry
-  gather_facts: no
-  tasks:
-    - setup:
-  tags:
-    - dns
+# - hosts:
+#     - mariadb
+#     - maxscale
+#     - nfs
+#     - web
+#     - sync
+#     - mgmt
+#     - elk
+#     - lb
+#     - ldap
+#     - monitoring
+#     - dev
+#     - reg
+#     - graphite
+#     - redis
+#     - jumphost
+#     - backup
+#     - test
+#     - registry
+#   gather_facts: no
+#   tasks:
+#     - setup:
+#   tags:
+#     - dns
 
 - hosts: jumphost
   roles:
@@ -42,4 +42,3 @@
   tags:
     - dns
   become: true
-

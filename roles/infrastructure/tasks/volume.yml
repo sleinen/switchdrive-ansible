@@ -12,3 +12,4 @@
   when: server != ""
   tags:
     - os_volume
+    - os_server_all
