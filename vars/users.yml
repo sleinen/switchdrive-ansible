@@ -43,8 +43,8 @@ user:
   # SeDe
   wieting:
     comment: "Paola Wieting"
-    uid: 913 
-    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDKrQagGrTkSjnJbTLOHur3PMG9b2IS5Qn0fnsTs8mG2gJ8vnIKW3T3JaS4GEBrYbiDVP2XpSoyHprGnLwTYtz4Bg2xO7FtMWGrCZs3rfpGxPMBSiLsRKjuVHU2Dte3TD7bD9NHwM7xkObclMJ/0/wZVigP7Td3df+gAhLkQrOQ2ZuIl86Ve4ZIBqLJqiV7FebsWkj+mvdRgZuxFmMOZf5gV7zavAxIIo1Dl54WUOsqZzkjVENlD1KyoUYsyOkRRLjFifO0W24ywZdF3pNRBzNS+HmBSg2M5+43SLt49/xiLl9iPqaNtiPCWm8HVBf9Ye6aVTbPfkPrEXktJuKMzzm/GMQ+YToTN21bLRt1aAXn5z4upVbYltUYeMGRAlZID3NfNeaw5SrPf5b203uSEOX42M7XvvCxfaCSJtUXEAAPQGdGCfSCgV6VfIlDQbvBJGVUfij3vs3EsS8EOR+g+m5lE2z249CF85xHTd/ZSD131Yy6rI9xeDLjSWiuxjGy+x6fdwumrxTFImW1S63LN0We8Oxo8l5R2mQxfrsP+Abui5IRlKxFdJtXT/5dHzguo5I7GmY72KoEipOkLUFTLI0mbgWKjnp2x7NJEcrwJfY8VcETiGdwFi6mPiqgO8YF6uZJriAa5RF35nraMuycRcpGI3es5vhV8EEl8uga6SOOKQ== wieting@macpw.switch.ch"
+    uid: 913
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDPnEhfbrV1FsP5IA8778lgmUGCssCXiVz6E2j2u77eafPR16Gr9oNcnHSU0Z3iZrANvIa4o1uE0IXi+wgiis/6wungZfRwp+/RicfN11KeDTbs4mmGaNcHNUkv13Cemli6qulE4ZZC/iW6N2dbdw1EKVoFalAbEB/8FflWPxkvwa4KgBPMseAxALj+RPeynOI+PIP7TpA3e92SYWsKZf6rnvEspxriesvaXu8TGS/Wp6x4Q6N+UsdWOR7G4mrS7yK9PBjh6SGd1Z0vnWSdTFugV3qYZ64fW3lsqT1fORYrY4VXRYQqOIQGO9487+ZwJYYd6yUG04zHDNKvr7+5D9IWKtST4pdXlTn/VIbdvC04SgQFqc0VvNy6rJoOSvvnExq5emFFlPeObpErM3J2RWaqNP42xAx8xKNe1Skf7clkQp7QBWAfBGfP0DDryw+EzjAtBQ0zSI+O//96sH4L1Lx3xvv9Bkh7tl7RRaIpI87EvNDeJQ5UtDQwt0021G3hW3BagLl2CzU5J+02W+brnhuFxawldIOkoeAWNHsuCBbo83uASPgl+cJNLnimE6LMkQy5kq6afBT/ONcgy7ctbU9B6kAZyFrpUmVTrLk7C92ANa3X/C+rRytSf7v2PG7tOE/jHgNLUxSLWdILllWEDwlpyDEO5kk7sKAXV0e3lJYvnw== wieting@macpw.switch.ch"
   malmborg:
     comment: "Helena von Malmborg"
     uid: 974
@@ -111,7 +111,7 @@ mgmt_users:
 staging_users:
   - '{{ users_admin }}'
   - '{{ users_dev }}'
-  
+
 remove_users:
   - schnidrig
   - rissman
@@ -133,4 +133,3 @@ deleted_ubuntu_keys:
   - helmle
   - kerins
   - usai
-  
