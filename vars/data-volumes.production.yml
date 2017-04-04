@@ -159,16 +159,3 @@ nfs_volumes:
     volumes: "{{volumes_nfs4}}"
   - ip: "{{nfs5_ip}}"
     volumes: "{{volumes_nfs5}}"
-
-
-volumes_elk1:
-     - { name: "000", src: "LABEL=000", state: "mounted" }
-     - { name: "001", src: "LABEL=001", state: "mounted" }
-     - { name: "002", src: "LABEL=002", state: "mounted" }
-     - { name: "003", src: "LABEL=003", state: "mounted" }
-     - { name: "004", src: "LABEL=004", state: "mounted" }
-     - { name: "005", src: "LABEL=005", state: "mounted" }
-     - { name: "006", src: "LABEL=006", state: "mounted" }
-     - { name: "007", src: "LABEL=007", state: "mounted" }
-     - { name: "008", src: "LABEL=008", state: "mounted" }
-     - { name: "009", src: "LABEL=009", state: "mounted" }

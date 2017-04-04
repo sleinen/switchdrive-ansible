@@ -4,11 +4,14 @@
 - hosts: elk
   vars_files:
     - ../vars/users.yml
-    - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+    #- ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+    - ../vars/servers.{{ site }}.yml
   roles:
+    - data_volumes
     - common
-    - role: elk
-      tags:
-         - elk
+    - docker
+    - elasticsearch
+    - kibana
+    - logstash
+    - filebeat
   become: true
-

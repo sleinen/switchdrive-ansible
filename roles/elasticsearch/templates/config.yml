@@ -1,0 +1,50 @@
+##################### Elasticsearch Configuration Example #####################
+
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/settings.html
+
+path.logs: "/var/log/elasticsearch"
+path.data:
+{% for item in os_volumes[server_name] %}
+  - "/mnt/{{item.name}}/elasticsearch"
+{% endfor %}
+
+cluster.name: "{{elasticsearch_cluster_name}}"
+
+bootstrap.memory_lock: "true"
+
+#https://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html#network-interface-values
+#network.host: "_br3_"
+network.host: "0.0.0.0"
+
+discovery.zen.ping.unicast.hosts:
+{% for host in groups['elk'] %}
+  - "{{ hostvars[host].inventory_hostname}}:9300"
+{% endfor %}
+
+#((master_eligible_nodes / 2) + 1)
+discovery.zen.minimum_master_nodes: 2
+
+
+# x-pack: disable security
+
+xpack.security.authc:
+  anonymous:
+    username: anonymous_user
+    roles: superuser
+    authz_exception: true
+
+
+# stuff from version 2.x
+
+#index.number_of_shards: {{elasticsearch_cluster_num_shards}}
+#index.number_of_replicas: {{elasticsearch_cluster_num_replicas}}
+# instead of the above run:
+#curl -XPUT 'http://localhost:9200/_all/_settings?preserve_existing=true' -d '{
+#  "index.number_of_replicas" : "0",
+#  "index.number_of_shards" : "5"
+#}'
+
+
+#script.groovy.sandbox.enabled: true
+#indices.memory.index_buffer_size: 90%
+#indices.fielddata.cache.size: 30%

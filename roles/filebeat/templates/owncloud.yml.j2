@@ -1,0 +1,9 @@
+filebeat:
+  prospectors:
+    - paths:
+        - /run/shm/owncloud.log
+        - /run/shm/owncloud.*.log
+      input_type: log
+      fields:
+        logtype: owncloud
+      fields_under_root: true

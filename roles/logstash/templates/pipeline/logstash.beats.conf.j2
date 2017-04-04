@@ -1,0 +1,17 @@
+input {
+    beats {
+        port => {{logstash_beats_port}}
+    }
+}
+
+filter {
+  if [logtype] == "log" {
+    metrics {
+      meter => [ "logstash.%{beat.name}.metric.beats" ]
+      add_tag => "metric"
+      flush_interval => 10
+      rates => []
+      id => "beats"
+    }
+  }
+}

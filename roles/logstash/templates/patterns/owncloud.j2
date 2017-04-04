@@ -1,0 +1,45 @@
+
+########################
+# audit stuff
+
+OCUSERNAME [@a-zA-Z0-9._-]+
+OCACTION [ a-zA-Z0-9._-]+
+OCPERMISSIONS [ a-zA-Z]+
+
+# admin_audit app
+OCLOGIN User%{SPACE}%{OCUSERNAME:actor}%{SPACE}logged %{WORD:action} ownCloud from IP address: %{IP:actorip}
+OCLOGOUT User%{SPACE}%{OCUSERNAME:actor}%{SPACE}logged %{WORD:action} of ownCloud
+OCLOGINATTEMPT User%{SPACE}%{OCUSERNAME:actor}%{SPACE}%{WORD:action} to log into ownCloud from IP address: %{IP:actorip}
+OCACTIONUSER %{WORD:action}%{SPACE}%{QUOTEDSTRING:path}(?:%{SPACE}to%{SPACE}%{QUOTEDSTRING:pathrenamed})*%{SPACE}by user%{SPACE}%{OCUSERNAME:actor}, owner:%{SPACE}%{OCUSERNAME:owner}
+OCACTIONIP %{WORD:action}%{SPACE}%{QUOTEDSTRING:path}(?:%{SPACE}to%{SPACE}%{QUOTEDSTRING:pathrenamed})*%{SPACE}by IP%{SPACE}%{IP:actor}, owner:%{SPACE}(%{OCUSERNAME:owner})*
+
+
+# sharing_log app
+OCSHARELINK User%{SPACE}%{OCUSERNAME:owner} %{WORD:action} %{QUOTEDSTRING:path} with a public link, token=%{WORD:token}, permissions: %{OCPERMISSIONS:permissions}
+OCSHAREUSER User%{SPACE}%{OCUSERNAME:owner} %{WORD:action} %{QUOTEDSTRING:path} with the user %{OCUSERNAME:sharee}, permissions: %{OCPERMISSIONS:permissions}
+
+OCUNSHAREUSER User%{SPACE}'%{OCUSERNAME:owner}' %{WORD:action} their %{WORD:fileorfolder} \(%{GREEDYDATA:path}\) with user '%{OCUSERNAME:sharee}'
+OCUNSHARELINK User%{SPACE}'%{OCUSERNAME:owner}' %{WORD:action} the share link for their %{WORD:fileorfolder} \(%{GREEDYDATA:path}\)
+
+OCUPDATESHARE User%{SPACE}%{OCUSERNAME:owner} %{WORD:action} the permissions for %{QUOTEDSTRING:path} for , permissions: %{OCPERMISSIONS:permissions}
+
+
+
+########################
+# broken php stuff
+
+# syslog parsing
+OCFACILITY <%{NONNEGINT:facility}.%{NONNEGINT:severity}>
+OCPRIORITY <%{NONNEGINT:priority}>
+OWNCLOUD (%{OCFACILITY}|%{OCPRIORITY})%{SYSLOGTIMESTAMP}%{SPACE}%{HOSTNAME:logsource}%{SPACE}(?:ool%{SPACE})?%{SYSLOGPROG}:%{SPACE}{{'{%'}}{WORD:module}}%{SPACE}%{GREEDYDATA:message}
+
+
+# client version
+OCVERSION \d+(\.\d+)*
+OCUSERAGENT %{WORD}/%{NUMBER}%{SPACE}\(%{WORD:os_name}\)%{SPACE}%{WORD:name}/%{OCVERSION:client_version}(%{SPACE})?(\(%{WORD:ocenterprise}\)|%{GREEDYDATA})|-
+
+
+OCUSERAGENTWEB %{USERNAME:name}/([vV])?%{OCVERSION:client_version}(%{SPACE}\(%{GREEDYDATA}\))?
+
+
+

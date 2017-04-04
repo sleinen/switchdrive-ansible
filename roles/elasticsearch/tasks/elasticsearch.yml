@@ -1,0 +1,90 @@
+---
+
+# https://www.elastic.co/guide/en/elasticsearch/reference/current/docker.html
+
+- name: sysctl settings for elasticsearch
+  sysctl:
+    name: vm.max_map_count
+    value: 262144
+    state: present
+  tags:
+    - elasticsearch
+
+- name: data directories
+  file:
+    dest: "/mnt/{{item.name}}/elasticsearch"
+    state: directory
+    owner: "{{elasticsearch_uid}}"
+    group: "{{elasticsearch_gid}}"
+    mode: "0755"
+  with_items: "{{ os_volumes[server_name] }}"
+  tags:
+    - elasticsearch
+
+- name: config directories
+  file:
+    dest: "{{item}}"
+    state: directory
+    owner: "{{elasticsearch_uid}}"
+    group: "{{elasticsearch_gid}}"
+    mode: "0755"
+  with_items:
+    - "/etc/elasticsearch"
+    - "/etc/elasticsearch/scripts"
+    - "/var/log/elasticsearch"
+  tags:
+    - elasticsearch
+
+- name: install config
+  template:
+    src: "{{item.src}}"
+    dest: "{{item.dest}}"
+    owner: "{{elasticsearch_uid}}"
+  notify: restart elasticsearch
+  with_items:
+    - {src: "config.yml", dest: "/etc/elasticsearch/elasticsearch.yml" }
+    - {src: "log4j2.properties", dest: "/etc/elasticsearch/log4j2.properties" }
+  tags:
+    - elasticsearch
+    - esconfig
+
+
+- name: elasticsearch docker
+  docker_container:
+    name: elasticsearch
+    image: "{{elasticsearch_docker_image}}"
+    network_mode: host
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
+    capabilities:
+      - "IPC_LOCK"
+    ulimits:
+      - "nofile:65536:65536"
+      - "memlock:-1:-1"
+    memory: 34g
+    volumes:
+      - "/etc/elasticsearch:/usr/share/elasticsearch/config"
+      - "/mnt:/mnt"
+      - "/var/log/elasticsearch:/var/log/elasticsearch"
+    env:
+      ES_JAVA_OPTS: "-Xms{{elasticsearch_heap_size}} -Xmx{{elasticsearch_heap_size}}"
+  tags:
+    - elasticsearch
+
+- name: elaticsearch license file
+  copy:
+    dest: "/root/elasticsearch_license.json"
+    content: "{{elasticsearch_license}}"
+    owner: "{{elasticsearch_uid}}"
+    group: "{{elasticsearch_gid}}"
+    mode: "0600"
+  tags:
+    - elasticsearch
+    - elasticsearch_license
+
+- name: install elaticsearch license (this may fail if elasticsearch not ready yet -> just retry)
+  command: 'curl -XPUT "http://localhost:9200/_xpack/license?acknowledge=true" -d @/root/elasticsearch_license.json'
+  tags:
+    - elasticsearch
+    - elasticsearch_license

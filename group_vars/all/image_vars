@@ -32,7 +32,7 @@ logspout_http_port: 8080
 
 # where logspout routes it's logs to
 logstash_host: "elk.drive"
-logstash_logspout_port: 10100
+#logstash_logspout_port: 10100
 
 ####################
 # ocphp_fpm
@@ -124,3 +124,52 @@ redis_version: "3.2.8"
 redis_docker_name: "redis"
 redis_docker_tag: "{{redis_version}}"
 redis_docker_image: "{{redis_docker_name}}:{{redis_docker_tag}}"
+
+####################
+####################
+# elasic stack
+
+elastic_stack_version: "5.3.0"
+elasticsearch_uid: 1000
+elasticsearch_gid: 1000
+
+####################
+# elasticsearch
+
+elasticsearch_version: "{{elastic_stack_version}}"
+elasticsearch_docker_name: "docker.elastic.co/elasticsearch/elasticsearch"
+elasticsearch_docker_tag: "{{elasticsearch_version}}"
+elasticsearch_docker_image: "{{elasticsearch_docker_name}}:{{elasticsearch_docker_tag}}"
+
+elasticsearch_cluster_name: "drive_cluster"
+elasticsearch_cluster_num_shards: 5
+elasticsearch_cluster_num_replicas: 1
+
+####################
+# kibana
+
+kibana_version: "{{elastic_stack_version}}"
+kibana_docker_name: "docker.elastic.co/kibana/kibana"
+kibana_docker_tag: "{{kibana_version}}"
+kibana_docker_image: "{{kibana_docker_name}}:{{kibana_docker_tag}}"
+
+####################
+# filebeat
+
+filebeat_version: "{{elastic_stack_version}}"
+filebeat_docker_name: "docker.elastic.co/beats/filebeat"
+filebeat_docker_tag: "{{filebeat_version}}"
+filebeat_docker_image: "{{filebeat_docker_name}}:{{filebeat_docker_tag}}"
+
+####################
+# logstash
+
+logstash_version: "{{elastic_stack_version}}"
+logstash_docker_name: "docker.elastic.co/logstash/logstash"
+logstash_docker_tag: "{{logstash_version}}"
+logstash_docker_image: "{{logstash_docker_name}}:{{logstash_docker_tag}}"
+
+
+#logstash_forwarder_docker_name: "{{registry_url}}/logstash_forwarder"
+#logstash_forwarder_docker_tag: "scale_latest"
+#logstash_forwarder_docker_image: "{{logstash_forwarder_docker_name}}:{{logstash_forwarder_docker_tag}}"

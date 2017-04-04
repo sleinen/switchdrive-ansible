@@ -1,0 +1,4 @@
+---
+
+- name: restart logstash
+  shell: "docker restart logstash"

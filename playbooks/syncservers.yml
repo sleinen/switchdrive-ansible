@@ -19,5 +19,6 @@
       tags: owncloud
     - ocphp_fpm
     - ocapache
+    - filebeat
     - scripts
   become: true

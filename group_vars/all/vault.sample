@@ -55,3 +55,13 @@
 #vault_kibana_password: kibana_pass
 
 #vault_vrrp_password: vrrp_pass
+
+# s3cmd
+#vault_rgw_access_key: 0123456789abcdefghe2455986224555
+#vault_rgw_secret_key: asdfasdfasdfasdfasdfasdfasdfsadf
+
+#vault_elasticsearch_license: >
+  # license in json format
+
+
+# see https://www.elastic.co/guide/en/x-pack/current/installing-license.html

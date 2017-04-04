@@ -1,0 +1,71 @@
+filter {
+  if [logtype] == "apache-access" {
+    grok {
+      match => { "message" => "%{APLOGSTASH}" }
+      patterns_dir => ["/usr/share/logstash/patterns"]
+    }
+    date {
+        match => ["epoch", "UNIX"]
+        remove_field => ["epoch"]
+    }
+    mutate {
+        convert => {
+            "timestamp" => "string"
+            "response" => "integer"
+            "bytes" => "integer"
+        }
+    }
+    geoip {
+      source => "clientip"
+      target => "geoip"
+      #database => "/etc/logstash/GeoLiteCity.dat"
+    }
+    if [host] =~ /.*sync.*/ {
+        grok {
+            match => { "agent" => "%{OCUSERAGENT}" }
+            patterns_dir => ["/usr/share/logstash/patterns"]
+        }
+    } else {
+        useragent {
+            source => "agent"
+        }
+        if [os_name] == "Other" {
+            grok {
+                match => { "agent" => "%{OCUSERAGENTWEB}|-" }
+                overwrite => ["name"]
+                patterns_dir => ["/usr/share/logstash/patterns"]
+            }
+        }
+    }
+    metrics {
+      meter => [ "logstash.%{host}.metric.apache.access", "logstash.total.metric.apache.access"]
+      add_tag => "metric"
+      flush_interval => 10
+      rates => []
+      id => "apache-access"
+    }
+  }
+  if [logtype] == "apache-error" {
+    grok {
+      match => { "message" => "%{APACHE_ERROR_LOG}" }
+      #remove_field => ["message"]
+      patterns_dir => ["/usr/share/logstash/patterns"]
+    }
+    metrics {
+      meter => [ "logstash.%{host}.metric.apache.error", "logstash.total.metric.apache.error" ]
+      add_tag => "metric"
+      flush_interval => 10
+      rates => []
+      id => "apache-error"
+    }
+  }
+  if [logtype] == "apache-access" or [logtype] == "apache-error" {
+    date {
+        match => [ "timestamp", "EEE MMM dd HH:mm:ss.SSSSSS yyyy" ]
+        remove_field => [ "timestamp" ]
+    }
+    mutate {
+        rename => { "host" => "logsource" }
+    }
+  }
+}

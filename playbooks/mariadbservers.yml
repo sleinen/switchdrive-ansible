@@ -7,7 +7,7 @@
     node_type: mariadb
   roles:
     - common
-    - data_disk
+    - ephemeral_disk
     - docker
     - logspout
     - scripts
@@ -28,4 +28,3 @@
     - mariadb_base
   post_tasks:
     - include: tasks/wait_for_mariadb.yml
-

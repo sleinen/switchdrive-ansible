@@ -1,0 +1,39 @@
+---
+
+- name: config  directories
+  action: file dest="{{item}}" state=directory owner=root group=root mode=755
+  with_items:
+    - "/etc/filebeat"
+    - "/etc/filebeat/conf.d"
+  tags:
+    - filebeat
+
+- name: filebeat conf files
+  template:
+    src="{{item.src}}"
+    dest="/etc/filebeat/{{item.dst}}"
+    owner=root group=root mode=644
+  with_items:
+    - "{{filebeat.configs}}"
+  notify: restart filebeat
+  tags:
+    - fbconfig
+    - filebeat
+
+- name: filebeat docker
+  docker_container:
+    name: filebeat
+    image: "{{filebeat_docker_image}}"
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
+    # default user 1000 has not necessary rights to read all log files
+    user: root
+    volumes:
+      - "/etc/filebeat/conf.d:/etc/filebeat/conf.d"
+      - "/etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml"
+      - "/var/log:/var/log"
+      - "/run:/run"
+    network_mode: host
+  tags:
+    - filebeat

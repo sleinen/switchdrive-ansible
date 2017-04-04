@@ -39,8 +39,36 @@ os_server:
 
   graphite1:  { ip: "{{ hostvars[groups['graphite'][0]].inventory_hostname}}",  flavor: "drive-40-4-4-120-ssd",     image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['graphite'] }}" } }
   graphite2:  { ip: "{{ hostvars[groups['graphite'][1]].inventory_hostname}}",  flavor: "drive-40-4-4-120-ssd",     image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['graphite'] }}" } }
-  elk1:       { ip: "{{ hostvars[groups['elk'][0]].inventory_hostname}}",       flavor: "drive-40-16-16-600-ssd",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['elk'] }}" } }
-  elk2:       { ip: "{{ hostvars[groups['elk'][1]].inventory_hostname}}",       flavor: "drive-40-16-16-600-ssd",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['elk'] }}" } }
+  #elk1:       { ip: "{{ hostvars[groups['elk'][0]].inventory_hostname}}",       flavor: "drive-40-16-16-600-ssd",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['elk'] }}" } }
+  #elk2:       { ip: "{{ hostvars[groups['elk'][1]].inventory_hostname}}",       flavor: "drive-40-16-16-600-ssd",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['elk'] }}" } }
+  elk1:       { ip: "{{ hostvars[groups['elk'][0]].inventory_hostname}}",       flavor: "drive-20-64-16",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default,elk",                  hints: { group: "{{ os_server_group['elk'] }}" } }
+  elk2:       { ip: "{{ hostvars[groups['elk'][1]].inventory_hostname}}",       flavor: "drive-20-64-16",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default,elk",                  hints: { group: "{{ os_server_group['elk'] }}" } }
+
+# ceph data volumes; do not add root volumes and ssd-ephemeral volumes like e.g. the one for graphite.
+os_volumes:
+  elk1:
+    - { name: "000", state: "mounted", device: "/dev/vdb", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "001", state: "mounted", device: "/dev/vdc", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "002", state: "mounted", device: "/dev/vdd", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "003", state: "mounted", device: "/dev/vde", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "004", state: "mounted", device: "/dev/vdf", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "005", state: "mounted", device: "/dev/vdg", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "006", state: "mounted", device: "/dev/vdh", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "007", state: "mounted", device: "/dev/vdi", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "008", state: "mounted", device: "/dev/vdj", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "009", state: "mounted", device: "/dev/vdk", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+  elk2:
+    - { name: "000", state: "mounted", device: "/dev/vdb", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "001", state: "mounted", device: "/dev/vdc", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "002", state: "mounted", device: "/dev/vdd", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "003", state: "mounted", device: "/dev/vde", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "004", state: "mounted", device: "/dev/vdf", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "005", state: "mounted", device: "/dev/vdg", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "006", state: "mounted", device: "/dev/vdh", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "007", state: "mounted", device: "/dev/vdi", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "008", state: "mounted", device: "/dev/vdj", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+    - { name: "009", state: "mounted", device: "/dev/vdk", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
+
 
 #####################
 # vips

@@ -1,0 +1,26 @@
+---
+
+- name: "{{ os_action }} a data volume"
+  os_volume:
+    auth: "{{ os_auth }}"
+    region_name: "{{ os_region }}"
+    state: "{{ os_volume_state }}"
+    size: "{{ item.size }}"
+    display_name: "{{ site }}-{{ server }}_{{ item.name }}"
+  with_items: "{{ os_volumes[server] }}"
+  tags:
+    - os_data
+
+- name: "attach data volumes to {{ server }}"
+  os_server_volume:
+    auth: "{{ os_auth }}"
+    region_name: "{{ os_region }}"
+    state: "present"
+    server: "{{ site }}-{{ server }}"
+    volume: "{{ site }}-{{ server }}_{{ item.name }}"
+    device: "{{ item.device }}"
+  with_items: "{{ os_volumes[server] }}"
+  when: os_action == "create"
+  tags:
+    - os_data
+    - os_attach

@@ -9,15 +9,22 @@ httpd_port: 80
 apply_common_iptables: true
 collectd_processes: []
 
-elk_syslog_port: 10000
-elk_owncloud_ports:
+#################
+# elk stuff
+logstash_syslog_port: 10000
+logstash_logspout_port: 10010
+#logstash_forwarder_port: 20000
+
+#logstash_hosts: "elk.drive.switch.ch"
+logstash_beats_port: 5044
+
+logstash_owncloud_ports:
     - 10001
     - 10002
-elk_postgres_port: 10010
 
 # lumberjack_host may not be an IP: -> if changed then certificate needs to be updated as well.
-lumberjack_host: elk.{{internal_domain}}
-lumberjack_port: 5043
+#lumberjack_host: elk.{{internal_domain}}
+#lumberjack_port: 5043
 
 apache_config:
   keepAlive: 'On'
@@ -58,3 +65,5 @@ letsencrypt:
   email: "christian.schnidrig@gmail.com"
 
 haproxy_state_file: "/var/lib/haproxy/state"
+
+server_name: "{{ ansible_hostname | regex_replace('^[^-]+-(.*)$', '\\1') }}"

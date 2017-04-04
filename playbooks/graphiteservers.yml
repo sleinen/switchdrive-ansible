@@ -13,7 +13,7 @@
   vars_files:
     - '../vars/users.yml'
   roles:
-    - data_disk
+    - ephemeral_disk
     - common
     - docker
     - grafana

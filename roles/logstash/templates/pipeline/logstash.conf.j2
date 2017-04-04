@@ -1,0 +1,44 @@
+input {
+    syslog {
+        port => {{logstash_syslog_port}}
+        type => "syslog"
+    }
+}
+filter {
+}
+output {
+  if [logtype] == "owncloud"  and ([app] == "admin_audit" or [app] == "sharing_log") {
+      elasticsearch {
+         hosts => ["localhost:9200"]
+         index => "logstash-audit-%{+YYYY.MM.dd}"
+         document_type => "events"
+      }
+  } else if [logtype] == "nginx-access" or [logtype] == "nginx-error" or [logtype] == "apache-access" or [logtype] == "apache-error" {
+      elasticsearch {
+         hosts => ["localhost:9200"]
+         index => "logstash-http-%{+YYYY.MM.dd}"
+         document_type => "events"
+      }
+  } else if "metric" in [tags] or [facility] == 6 {
+      elasticsearch {
+         hosts => ["localhost:9200"]
+         index => "logstash-metrics-%{+YYYY.MM.dd}"
+         document_type => "events"
+      }
+  } else {
+      elasticsearch {
+         hosts => ["localhost:9200"]
+         index => "logstash-syslog-%{+YYYY.MM.dd}"
+      }
+  }
+
+  if "metric" in [tags] {
+    #stdout { codec => rubydebug }
+    graphite {
+      host => "{{ hostvars[groups['carbon_vip'][0]].inventory_hostname }}"
+      port => "2013"
+      fields_are_metrics => true
+      include_metrics => [".*.count"]
+    }
+  }
+}

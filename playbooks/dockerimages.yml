@@ -11,6 +11,7 @@
     - ocphp_fpm_image
     - ocapache_image
     - haproxy_image
+    - logstash_image
   become: true
   gather_facts: no
   environment:
@@ -19,5 +20,3 @@
      DOCKER_HOST: "{{ lookup('env','DOCKER_HOST') }}"
      DOCKER_CERT_PATH: "{{ lookup('env','DOCKER_CERT_PATH') }}"
      DOCKER_MACHINE_NAME: "{{ lookup('env','DOCKER_MACHINE_NAME') }}"
-  
-

@@ -7,6 +7,8 @@
   when: os_action == "delete"
 - include: volume.yml
   when: os_action == "delete"
+- include: data_volume.yml
+  when: os_action == "delete"
 
 # creation
 - include: server_group.yml
@@ -16,6 +18,8 @@
 - include: port.yml
   when: os_action == "create"
 - include: server.yml
+  when: os_action == "create"
+- include: data_volume.yml
   when: os_action == "create"
 - include: vip.yml
   when: os_action == "create"

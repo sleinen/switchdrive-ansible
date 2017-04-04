@@ -1,0 +1,37 @@
+input {
+    udp {
+        port => {{logstash_logspout_port}}
+        codec => "json"
+        type => "logspout"
+        add_field => {
+          "region" => "none"
+        }
+    }
+}
+filter {
+  if [type] == "logspout" {
+    #if [docker.image] =~ "^mariadb:.*" {
+        #multiline {
+        #    pattern => "^%{NUMBER}-*%{NUMBER}"
+        #    negate  => true
+        #    what    => "previous"
+        #}
+        grok {
+            match => [ 'message', "(?m)^%{TIMESTAMP_ISO8601:mariadb_timestamp}%{SPACE}%{NUMBER:thread_id}%{SPACE}%{GREEDYDATA:message}" ]
+            overwrite => [ 'message' ]
+            patterns_dir => ["/usr/share/logstash/patterns"]
+        }
+        if [message] =~ /^\[/ {
+            grok {
+                match => [ 'message', "(?m)\[%{NOTSPACE:severity}\]%{SPACE}%{GREEDYDATA:message}" ]
+                overwrite => [ 'message' ]
+                patterns_dir => ["/usr/share/logstash/patterns"]
+            }
+        }
+        grok {
+            match => [ 'message', "(?m)%{NOTSPACE:module}:%{SPACE}%{GREEDYDATA}" ]
+            patterns_dir => ["/usr/share/logstash/patterns"]
+        }
+    }
+  #}
+}

@@ -4,4 +4,30 @@
 apply_common_iptables: false
 
 # elastic search
-elasticsearch_heap_size: 31g
+elasticsearch_heap_size: "31g"
+
+elasticsearch_license: "{{vault_elasticsearch_license}}"
+
+logstash_beats_port: 5044
+logstash:
+  configs:
+    - "log4j2.properties"
+    - "logstash.yml"
+    - "jvm.options"
+  pipeline:
+    - "logstash"
+    - "logstash.beats"
+    - "logstash.ansible"
+    - "logstash.apache"
+    - "logstash.logspout"
+    - "logstash.owncloud"
+    - "logstash.syslog-stats"
+  patterns:
+    - "ansible"
+    - "apache"
+    - "owncloud"
+
+
+filebeat:
+  configs:
+    - { src: "filebeat.yml.j2", dst: "filebeat.yml" }

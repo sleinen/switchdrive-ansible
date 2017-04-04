@@ -9,10 +9,11 @@
 #  ldap=61
 #  nfs=71
 #  sync=101
-#  elk=151
+#  -- elk=151
 #  dev=161
 #  test=181
 #  web=201
+#  elk=221
 #  graphite=231
 #  redis=241
 #  maxscale=246
@@ -42,7 +43,7 @@
 10.0.23.251 vols="{{volumes_elk1}}"
 
 [elk]
-10.0.23.[151:152] vols="{{volumes_elk1}}"
+10.0.23.[221:222]
 
 [lb]
 10.0.23.[51:52]

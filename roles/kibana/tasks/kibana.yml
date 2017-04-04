@@ -1,0 +1,17 @@
+---
+
+
+- name: kibana docker
+  docker_container:
+    name: kibana
+    image: "{{ kibana_docker_image }}"
+    network_mode: host
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
+    env:
+      ELASTICSEARCH_URL: "http://localhost:9200"
+      ELASTICSEARCH_USERNAME: ""
+      SERVER_PORT: "80"
+  tags:
+    - kibana

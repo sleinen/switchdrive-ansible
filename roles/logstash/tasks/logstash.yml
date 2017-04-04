@@ -1,0 +1,81 @@
+---
+
+- name: config directories
+  file:
+    dest: "{{item}}"
+    state: directory
+    owner: "{{elasticsearch_uid}}"
+    group: "{{elasticsearch_gid}}"
+    mode: "0755"
+  with_items:
+    - "/etc/logstash/config"
+    - "/etc/logstash/pipeline"
+    - "/etc/logstash/patterns"
+    - "/var/log/logstash"
+  tags:
+    - logstash
+
+- name: Logstash conf files
+  template:
+    src: "{{ item }}"
+    dest: "/etc/logstash/config/{{ item }}"
+    owner: "{{elasticsearch_uid}}"
+    group: "{{elasticsearch_gid}}"
+    mode: "0644"
+  with_items:
+   - "{{logstash.configs}}"
+  notify: restart logstash
+  tags:
+    - lsconfig
+    - logstash
+
+- name: Logstash pipeline files
+  template:
+    src: "pipeline/{{ item }}.conf.j2"
+    dest: "/etc/logstash/pipeline/{{ item }}.conf"
+    owner: "{{elasticsearch_uid}}"
+    group: "{{elasticsearch_gid}}"
+    mode: "0644"
+  with_items:
+   - "{{logstash.pipeline}}"
+  notify: restart logstash
+  tags:
+    - lsconfig
+    - logstash
+
+- name: Logstash pattern files
+  template:
+    src: "patterns/{{ item }}.j2"
+    dest: "/etc/logstash/patterns/{{ item }}"
+    owner: "{{elasticsearch_uid}}"
+    group: "{{elasticsearch_gid}}"
+    mode: "0644"
+  with_items:
+    - "{{logstash.patterns}}"
+  when: logstash.patterns is defined
+  notify: restart logstash
+  tags:
+    - lsconfig
+    - logstash
+
+
+- name: logstash docker
+  docker_container:
+    name: logstash
+    image: "{{logstash_docker_image}}"
+    restart_policy: "unless-stopped"
+    state: started
+    pull: true
+    network_mode: host
+    volumes:
+      - "/etc/logstash/config:/usr/share/logstash/config/"
+      - "/etc/logstash/pipeline:/usr/share/logstash/pipeline/"
+      - "/etc/logstash/patterns:/usr/share/logstash/patterns/"
+      - "/var/log/logstash:/usr/share/logstash/logs"
+    env:
+      LS_OPTS: "-w 5"
+      LS_HEAP_SIZE: "1g"
+      LOGSPOUT: ignore
+    #command: "logstash agent -f /config -v -w 5"
+  tags:
+    - logstash
