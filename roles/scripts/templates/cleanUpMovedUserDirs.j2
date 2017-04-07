@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+for dir in `find /mnt/*/_moved -maxdepth 1 -name done -mtime +0 | sed -e 's&/done$&&'`; do
+	/usr/bin/logger cleanUpMovedUserDirs: start deletion of "$dir"
+	rm -rf "$dir"
+	/usr/bin/logger cleanUpMovedUserDirs: deletion of "$dir" done
+done
+
+
+
+#

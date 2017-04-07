@@ -1,11 +1,12 @@
 #!/bin/bash
 
-if [ "x$1" == "x" ]; then 
+if [ "x$1" == "x" ]; then
 	echo "Usage: `basename $0` <source_dir>
 .      source_dir:  directory from where links are move away.to /mnt/data E.g. /mnt/102
 "
 	exit
 fi
 
-find $1 -maxdepth 1 -type l -not -name .ocdata -exec mv {} /mnt/data \;
-
+if [ "$1" != "/mnt/data" ]; then
+	find $1 -maxdepth 1 -type l -not -name .ocdata -not -name ._ocdata -exec mv {} /mnt/data \;
+fi

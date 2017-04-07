@@ -10,6 +10,8 @@ iptables:
     - 111
     - 2049
 
-collectd_processes: 
+collectd_processes:
    - nfsd
-    
+
+scripts:
+   - { name: "cleanUpMovedUserDirs", path: "/root", mode: "0550" }

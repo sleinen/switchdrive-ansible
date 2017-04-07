@@ -38,7 +38,7 @@
   service: name=iptables-persistent state=restarted
   tags:
     - config
-    
+
 - name: start nfs-kernel-server
   service: name=nfs-kernel-server state=started
 
@@ -58,3 +58,13 @@
     - config
     - sysctl
 
+- name: install delete _moved dirs cronjob
+  cron:
+    name: delete _moved dirs
+    minute: 33
+    hour: 4
+    user: root
+    job: "/root/cleanUpMovedUserDirs"
+    cron_file: moveUserDirs
+  tags:
+    - cron
