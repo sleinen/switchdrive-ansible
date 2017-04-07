@@ -1,0 +1,40 @@
+---
+
+- name: copy curator build instructions to remote host
+  synchronize:
+    src: curator
+    dest: /tmp
+    delete: yes
+  tags:
+    - curator
+
+
+- name: copy curator configs to remote host
+  template:
+    src={{item.name}}
+    dest=/tmp/curator/{{item.name}}
+    mode={{item.mode}}
+  with_items:
+    - { name: Dockerfile, mode: "0644" }
+  tags:
+    - curator
+
+
+- name: build curator
+  docker_image:
+    path="/tmp/curator"
+    name="{{curator_docker_name}}"
+    tag="{{curator_docker_tag}}"
+    dockerfile="Dockerfile"
+    state=present
+    tls_hostname=localhost
+    state=build
+    #state=present
+    #force=true
+  tags:
+    - curator
+
+- name: push curator image
+  shell: docker push "{{curator_docker_image}}"
+  tags:
+    - curator

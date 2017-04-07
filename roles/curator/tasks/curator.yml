@@ -1,0 +1,42 @@
+---
+
+- name: Create dirs
+  file: path="{{item}}" state=directory group=root owner=root
+  with_items:
+    - "/etc/curator"
+  tags:
+    - curator
+
+
+- name: install curator configurations
+  template:
+    src: "{{ item }}"
+    dest: "/etc/curator/{{ item }}"
+  with_items:
+    - "config.yml"
+    - "purgeIndices.yml"
+  tags:
+    - curator
+
+- name: curator cronjob
+  cron:
+    name: delete old indices
+    cron_file: curator
+    hour: 2
+    minute: 44
+    job: "docker run --net=host -v '/etc/curator:/etc/curator' -v '/var/log:/var/log' --rm -ti docker.drive.switch.ch:5000/curator:4.2.6 --config /etc/curator/config.yml /etc/curator/purgeIndices.yml"
+    user: root
+  tags:
+    - curator
+
+
+# - name: curator docker
+#   docker_container:
+#     name: curator
+#     network_mode: host
+#     image: "{{curator_docker_image}}"
+#     restart_policy: "unless-stopped"
+#     state: present
+#     pull: true
+#   tags:
+#     - curator

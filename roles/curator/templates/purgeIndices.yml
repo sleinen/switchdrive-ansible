@@ -1,0 +1,51 @@
+---
+# https://www.elastic.co/guide/en/elasticsearch/client/curator/current/actionfile.html
+
+actions:
+  1:
+    action: delete_indices
+    description: "Delete old log data"
+    options:
+      timeout_override:
+      continue_if_exception: False
+      disable_action: False
+    filters:
+      - filtertype: kibana
+        exclude: True
+      - filtertype: age
+        source: name
+        direction: older
+        timestring: '%Y.%m.%d'
+        unit: days
+        unit_count: 7
+        field:
+        stats_result:
+        epoch:
+        exclude: False
+      - filtertype: pattern
+        kind: prefix
+        value: 'logstash-audit-'
+        exclude: True
+  2:
+    action: delete_indices
+    description: "Delete old audit log data"
+    options:
+      timeout_override:
+      continue_if_exception: False
+      disable_action: False
+    filters:
+      - filtertype: kibana
+        exclude: True
+      - filtertype: age
+        source: name
+        direction: older
+        timestring: '%Y.%m.%d'
+        unit: days
+        unit_count: 180
+        field:
+        stats_result:
+        epoch:
+        exclude: False
+      - filtertype: pattern
+        kind: regex
+        value: '^(logstash-audit-).*$'

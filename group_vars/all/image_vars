@@ -28,10 +28,10 @@ logspout_docker_tag: "latest"
 logspout_docker_image: "{{logspout_docker_name}}:{{logspout_docker_tag}}"
 
 # port where local logspout interface is accessible
-logspout_http_port: 8080
+logspout_http_port: 8088
 
 # where logspout routes it's logs to
-logstash_host: "elk.drive"
+#logstash_host: "elk.drive"
 #logstash_logspout_port: 10100
 
 ####################
@@ -173,3 +173,12 @@ logstash_docker_image: "{{logstash_docker_name}}:{{logstash_docker_tag}}"
 #logstash_forwarder_docker_name: "{{registry_url}}/logstash_forwarder"
 #logstash_forwarder_docker_tag: "scale_latest"
 #logstash_forwarder_docker_image: "{{logstash_forwarder_docker_name}}:{{logstash_forwarder_docker_tag}}"
+
+####################
+# curator
+
+#curator_version: "5.0.0"
+curator_version: "4.2.6"
+curator_docker_name: "{{registry_url}}/curator"
+curator_docker_tag: "{{curator_version}}"
+curator_docker_image: "{{curator_docker_name}}:{{curator_docker_tag}}"

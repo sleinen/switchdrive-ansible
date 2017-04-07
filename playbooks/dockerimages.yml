@@ -11,7 +11,7 @@
     - ocphp_fpm_image
     - ocapache_image
     - haproxy_image
-    - logstash_image
+    - curator_image
   become: true
   gather_facts: no
   environment:
