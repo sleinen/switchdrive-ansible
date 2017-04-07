@@ -1,6 +1,5 @@
 global
-    log         {{ hostvars[groups['elk'][0]].inventory_hostname }} local1
-    #log         /dev/log local1
+    log         {{ hostvars[groups['elk'][0]].inventory_hostname }}:{{logstash_syslog_port}} local1
 
     chroot      /var/lib/haproxy
     pidfile     /var/run/haproxy.pid
@@ -24,7 +23,7 @@ global
 
 defaults
     mode                    http
-    log                     global
+    #log                     global
     option                  httplog
     option                  dontlognull
 
@@ -153,6 +152,7 @@ frontend ssl
     #########
     # misc
     http-request del-header Proxy
+    http-response del-header X-Username
     reqadd X-Forwarded-Proto:\ https
 
 

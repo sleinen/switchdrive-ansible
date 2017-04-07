@@ -19,9 +19,9 @@ shard_config:
 # ocphp_fpm container deployment
 shard_mapping:
   drive.switch.ch:
-     - { oc_major_version: '9.0', oc_minor_version: '8', oc_image_version: '1', shards: [a01] }
+     - { oc_major_version: '9.0', oc_minor_version: '8', oc_image_version: '2', shards: [a01] }
   drive-stage.switch.ch:
-     - { oc_major_version: '9.0', oc_minor_version: '8', oc_image_version: '1', shards: [a01] }
+     - { oc_major_version: '9.0', oc_minor_version: '8', oc_image_version: '2', shards: [a01] }
   drive-backup.switch.ch:
      #- { oc_major_version: '9.0', oc_minor_version: '7', oc_image_version: '1', , shards: [a04] }
      - { oc_major_version: '9.1', oc_minor_version: '4', oc_image_version: '1', shards: [a01, a02, a03, a05, a06] }
@@ -34,9 +34,9 @@ strict_transport_security_max_age:
 
 # what ocphp_fpm to take for root site
 php_version_root_site:
-  drive.switch.ch: "9.0.8-1"
-  drive-stage.switch.ch: "9.0.8-1"
-  drive-backup.switch.ch: "9.0.8-1"
+  drive.switch.ch: "9.0.8-2"
+  drive-stage.switch.ch: "9.0.8-2"
+  drive-backup.switch.ch: "9.0.8-2"
 
 # variables in status.php
 owncloud_version_root_site:

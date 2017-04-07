@@ -58,6 +58,11 @@ COPY patches/appconfig/lib/private/appconfig.{{owncloud_major_version}}.php /var
 # ocdata
 COPY patches/ocdata/lib/private/util.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/util.php
 
+# username
+COPY patches/username/remote.{{owncloud_major_version}}.php /var/www/owncloud/remote.php
+COPY patches/username/base.{{owncloud_major_version}}.php /var/www/owncloud/lib/base.php
+COPY patches/username/v1.{{owncloud_major_version}}.php /var/www/owncloud/ocs/v1.php
+
 
 ###########
 # config

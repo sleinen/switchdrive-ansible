@@ -101,6 +101,7 @@ frontend ssl
     #########
     # misc
     http-request del-header Proxy
+    http-response del-header X-Username
     reqadd X-Forwarded-Proto:\ https
 
     #########

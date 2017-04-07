@@ -11,7 +11,7 @@ registry_url: "{{docker_registry}}:5000"
 
 owncloud_major_version: "9.0"
 owncloud_version: "{{owncloud_major_version}}.8"
-owncloud_docker_image_version: 1
+owncloud_docker_image_version: 2
 
 #owncloud_major_version: "8.2"
 #owncloud_version: "{{owncloud_major_version}}.8"
