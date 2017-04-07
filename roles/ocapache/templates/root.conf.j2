@@ -18,7 +18,7 @@
                     Dav off
                 </IfModule>
                 Satisfy Any
-                
+
                 SetEnv HOME {{owncloud_webroot}}/root
                 SetEnv HTTP_HOME {{owncloud_webroot}}/root
         </Directory>
@@ -35,4 +35,3 @@
             Header always set Strict-Transport-Security "max-age={{strict_transport_security_max_age[service_name]}}; includeSubDomains; preload"
          </IfModule>
 </VirtualHost>
-

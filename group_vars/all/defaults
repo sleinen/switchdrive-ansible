@@ -15,7 +15,7 @@ logstash_syslog_port: 10000
 logstash_logspout_port: 10010
 #logstash_forwarder_port: 20000
 
-#logstash_hosts: "elk.drive.switch.ch"
+logstash_host: "{{ hostvars[groups['elk'][0]].inventory_hostname }}"
 logstash_beats_port: 5044
 
 logstash_owncloud_ports:

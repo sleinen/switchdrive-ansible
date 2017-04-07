@@ -10,5 +10,6 @@
     - docker
     - nagios
     - redis
+    - logspout
     #- scripts
   become: true

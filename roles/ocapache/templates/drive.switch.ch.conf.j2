@@ -27,6 +27,7 @@
 
                 SetEnv HOME {{owncloud_webroot}}/{{item.shard_name}}
                 SetEnv HTTP_HOME {{owncloud_webroot}}/{{item.shard_name}}
+
         </Directory>
         <IfModule mod_fastcgi.c>
                 AddType application/x-httpd-fastphp5 .php
