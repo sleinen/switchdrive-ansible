@@ -1,5 +1,8 @@
 #!/bin/bash
 
+NUM_USERS_TO_MOVE=40
+TARGET_DISKS_FILE="/root/targetDisks"
+MIN_DISK_FREE_TARGET_DISK="500000000"
 
 while (true); do
 
@@ -10,8 +13,16 @@ echo "***********************************************************"
 echo "***********************************************************"
 date
 
-NUM_USERS_TO_MOVE=70
-TARGET_DISKS_FILE="/root/targetDisks"
+# kick out disks that are full
+for disk in `cat /root/targetDisks`; do
+  available=`df /mnt/$disk| grep /mnt/$disk| awk '{ print $4; }'`
+  if [ $available -lt ${MIN_DISK_FREE_TARGET_DISK} ]; then
+    echo "Purging full target disk from list: $disk"
+    /usr/bin/logger moveUserDirs: $disk is full, removing it from possible targets
+    grep -v $disk "${TARGET_DISKS_FILE}" > "${TARGET_DISKS_FILE}.new" ; mv "${TARGET_DISKS_FILE}.new" "${TARGET_DISKS_FILE}"
+  fi
+done
+
 TARGET_DISKS=`cat /root/targetDisks`
 
 DISK=""
@@ -22,7 +33,6 @@ if [ ! -d "/mnt/data/_moved" ]; then
   if [ "$data_disk" -ne 0 ]; then
     echo "/mnt/data is getting full"
     DISK="data"
-    NUM_USERS_TO_MOVE=1000
   fi
 fi
 
@@ -53,7 +63,7 @@ if [ $(echo $DISK | wc -w) -gt 0 ]; then
   for disk in $full_disks; do
     echo "Purging full target disk from list: $disk"
     /usr/bin/logger moveUserDirs: $disk is full, removing it from possible targets
-   grep -v $disk "${TARGET_DISKS_FILE}" > "${TARGET_DISKS_FILE}.new" ; mv "${TARGET_DISKS_FILE}.new" "${TARGET_DISKS_FILE}"
+    grep -v $disk "${TARGET_DISKS_FILE}" > "${TARGET_DISKS_FILE}.new" ; mv "${TARGET_DISKS_FILE}.new" "${TARGET_DISKS_FILE}"
   done
   SELECTED_TARGET=`wc -l /root/userlists/* | egrep -v '^ +0 ' | egrep -v 'userlists/all|total|rest' | head -n 1 | sed -e 's&.*userlists/&&'`
 
@@ -62,15 +72,15 @@ if [ $(echo $DISK | wc -w) -gt 0 ]; then
   else
     echo "Moving users from disk $DISK to $SELECTED_TARGET"
     echo "***********************************************************"
-    echo running tar
+    echo "running tar (`date`)"
     /usr/bin/logger moveUserDirs: /root/tarAndMoveUsers "/mnt/$DISK" $SELECTED_TARGET
     /root/tarAndMoveUsers "/mnt/$DISK" $SELECTED_TARGET
     echo "***********************************************************"
-    echo running rsync
+    echo "running rsync (`date`)"
     /usr/bin/logger moveUserDirs: /root/rsyncAndMoveUsers "/mnt/$DISK" "/mnt/$SELECTED_TARGET"
     /root/rsyncAndMoveUsers "/mnt/$DISK" "/mnt/$SELECTED_TARGET"
     echo "***********************************************************"
-    echo moving links
+    echo "moving links (`date`)"
     /usr/bin/logger moveUserDirs: /root/mvLinks "/mnt/$DISK"
     /root/mvLinks "/mnt/$DISK"
 

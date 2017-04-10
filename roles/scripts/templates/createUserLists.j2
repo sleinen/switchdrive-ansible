@@ -2,7 +2,7 @@
 
 export LC_ALL="en_US.UTF-8"
 
-if [ "x$1" == "x" ]; then 
+if [ "x$1" == "x" ]; then
 	echo "Usage: `basename $0` <source_dir> <dir_numbers> [<num_users>]
 .      source_dir:  directory from where users are move away. E.g. /mnt/data
 .      dir_numbers: list of directories to which users should be moved E.g. "102 105 107"
@@ -10,7 +10,7 @@ if [ "x$1" == "x" ]; then
 	exit
 fi
 
-MAX_USERS_PER_DISK=650
+MAX_USERS_PER_DISK=900
 ALL_DISKS=`echo 1{01..18}`
 USERLISTS_DIR=/root/userlists
 
