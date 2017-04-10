@@ -2,6 +2,8 @@
 
 registry_url: "{{docker_registry}}:5000"
 
+no_docker_cache: false
+
 ####################
 # image to be build
 

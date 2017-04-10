@@ -32,6 +32,7 @@
     tls_hostname: localhost
     force: true
     pull: true
+    nocache: "{{ no_docker_cache }}"
   tags:
     - ocphp_fpm
 
