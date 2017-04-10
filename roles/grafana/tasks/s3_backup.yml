@@ -13,10 +13,10 @@
 
 - name: install s3backup script
   template:
-    src=grafana_backup.sh
-    dest=/root/grafana_backup.sh
-    mode=0500
-    owner=root
+    src: "grafana_backup.sh"
+    dest: "/root/grafana_backup.sh"
+    mode: "0500"
+    owner: "root"
   tags:
     - s3backup
 

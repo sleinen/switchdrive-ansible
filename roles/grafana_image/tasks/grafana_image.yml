@@ -21,13 +21,14 @@
 
 - name: build grafana
   docker_image:
-    path="/tmp/grafana"
-    name="{{grafana_docker_name}}"
-    tag="{{grafana_docker_tag}}"
-    dockerfile="Dockerfile"
-    state=present
-    force=yes
-    tls_hostname=localhost
+    path: "/tmp/grafana"
+    name: "{{grafana_docker_name}}"
+    tag: "{{grafana_docker_tag}}"
+    dockerfile: "Dockerfile"
+    state: "present"
+    force: "yes"
+    tls_hostname: "localhost"
+    nocache: "{{ no_docker_cache }}"
   tags:
     - grafana
 

@@ -21,13 +21,15 @@
 
 
 - name: build ocapache
-  docker_image: 
-    path="/tmp/ocapache" 
-    name="{{ocapache_docker_name}}"
-    tag="{{ocapache_docker_tag}}"
-    dockerfile="Dockerfile"
-    state=build
-    tls_hostname=localhost
+  docker_image:
+    path: "/tmp/ocapache" 
+    name: "{{ocapache_docker_name}}"
+    tag: "{{ocapache_docker_tag}}"
+    dockerfile: "Dockerfile"
+    state: "present"
+    force: "yes"
+    tls_hostname: "localhost"
+    nocache: "{{ no_docker_cache }}"
   tags:
     - ocapache
 
@@ -35,7 +37,3 @@
   shell: docker push "{{ocapache_docker_image}}"
   tags:
     - ocapache
-
-
-
-

@@ -100,9 +100,6 @@ graphite_docker_name: "{{registry_url}}/graphite"
 graphite_docker_tag: "{{graphite_version}}"
 graphite_docker_image: "{{graphite_docker_name}}:{{graphite_docker_tag}}"
 
-graphite_host: "grafana.{{site}}.cloud.switch.ch"
-graphite_port: "2003"
-
 ####################
 # apache
 
