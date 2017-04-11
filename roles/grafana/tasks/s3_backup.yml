@@ -9,7 +9,7 @@
   with_items:
     - s3cmd
   tags:
-    - s3backup
+    - grafana_backup
 
 - name: install s3backup script
   template:
@@ -18,7 +18,7 @@
     mode: "0500"
     owner: "root"
   tags:
-    - s3backup
+    - grafana_backup
 
 - name: install s3backup cronjobs
   cron:
@@ -30,5 +30,5 @@
     user: "root"
     job: "/root/grafana_backup.sh"
   tags:
-    - s3backup
+    - grafana_backup
     - cron
