@@ -11,6 +11,13 @@ os_security_group:
     description: "ssh access"
     rules:
       - { protocol: "tcp", port_range_min: "22", port_range_max: "22", remote_ip_prefix: "0.0.0.0/0", state: "present" }
+  - name: "ldap"
+    description: "ldap access (636 and 389)"
+    rules:
+      - { protocol: "tcp", port_range_min: "636", port_range_max: "636", remote_ip_prefix: "130.59.0.0/16", state: "present" }
+      - { protocol: "tcp", port_range_min: "389", port_range_max: "389", remote_ip_prefix: "86.119.31.75/32", state: "present" }
+      - { protocol: "tcp", port_range_min: "389", port_range_max: "389", remote_ip_prefix: "86.119.31.72/32", state: "present" }
+      - { protocol: "tcp", port_range_min: "389", port_range_max: "389", remote_ip_prefix: "86.119.31.54/32", state: "present" }
 
 #####################
 # server groups
@@ -18,9 +25,11 @@ os_server_group:
   list:
     - { name: "load_balancers", policies: ['anti-affinity'] }
     - { name: "mariadb",        policies: ['anti-affinity'] }
+    - { name: "ldap",           policies: ['anti-affinity'] }
   # look up id after they were created: `openstack server group list`
   load_balancers: "7bae8106-25b5-4c36-99a2-51d85985d334"
   mariadb:        "9b7ed2cb-c5d4-4fd7-84d9-efced965cf66"
+  ldap:           "66884658-6b65-49af-a93e-17aa8856e65a"
 
 #####################
 # servers
@@ -30,8 +39,12 @@ os_server:
   jumphost1:  { ip: "{{ jumphost_internal }}",                                       flavor: "c1.small",               image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,ssh",            hints: {} }
   lb1:        { ip: "{{ hostvars[groups['lb'][0]].inventory_hostname}}",             flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
   lb2:        { ip: "{{ hostvars[groups['lb'][1]].inventory_hostname}}",             flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
+
+  ldap1:      { ip: "{{ hostvars[groups['ldap'][0]].inventory_hostname }}",          flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default,ldap", hints: { group: "{{ os_server_group['ldap'] }}" } }
+
   redis1:     { ip: "{{ hostvars[groups['redis'][0]].inventory_hostname}}",          flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
   #redis2:     { ip: "{{ hostvars[groups['redis'][1]].inventory_hostname}}",          flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
+
   web1:       { ip: "{{ hostvars[groups['web'][0]].inventory_hostname}}",            flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
   web2:       { ip: "{{ hostvars[groups['web'][1]].inventory_hostname}}",            flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
   sync1:      { ip: "{{ hostvars[groups['sync'][0]].inventory_hostname}}",           flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }

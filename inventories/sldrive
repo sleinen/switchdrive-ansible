@@ -40,9 +40,10 @@
 
 [ldap]
 # the first one in the list has to be the provider!
-#10.0.26.51 ansible_ssh_user=ubuntu provider=True
-# the one from "drive"
-86.119.34.136
+10.0.26.51 provider=True
+10.0.26.52 consumer=True
+# the one from "drive (production)"
+#86.119.34.136
 
 [monitoring]
 
