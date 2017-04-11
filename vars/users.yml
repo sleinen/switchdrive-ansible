@@ -127,6 +127,7 @@ ubuntu_keys:
   - fischer
   - furter
   - fritschi
+  - schmid2
 
 deleted_ubuntu_keys:
   - vernon

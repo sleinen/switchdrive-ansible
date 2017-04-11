@@ -1,0 +1,1 @@
+ansible-vault edit group_vars/all/vault_certificates
