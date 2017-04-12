@@ -1,16 +1,16 @@
 ##
-# L_check_http checks (internally) that it is possible to http connect to the load balancer. 
-# If a response is returned in less than 5 seconds an OK state is returned; 
+# L_check_http checks (internally) that it is possible to http connect to the load balancer.
+# If a response is returned in less than 5 seconds an OK state is returned;
 # otherwise a warning (between 5 and 10) or a critical (more than 10) is returned.
 ##
 L_check_http /usr/lib/nagios/plugins/check_http -w 5 -c 10  -H {{ inventory_hostname }}
 
 ##
-# L_check_ha checks the load balancing functionality by getting the stats of the service. 
-# This information is username and password protected, and these must therefore be passed to the probe as parameters. 
+# L_check_ha checks the load balancing functionality by getting the stats of the service.
+# This information is username and password protected, and these must therefore be passed to the probe as parameters.
 ##
 ## the parameter -c 1 means, that if the haproxy agent does not respond within 1 second -> error
-L_check_ha /home/nagios/plugins-static/check_haproxy.pl -u 'http://127.0.0.1:8080/haproxy?stats;csv' -U {{ HAPROXY_USER }} -P {{ HAPROXY_PASSWORD }}  -c 1 -w 2
+L_check_ha /home/nagios/plugins-static/check_haproxy.pl -u 'http://127.0.0.1:8080/haproxy?stats;csv' -U "{{ HAPROXY_USER }}" -P "{{ HAPROXY_PASSWORD }}"  -c 1 -w 2
 
 ##
 # check_logfiles checks the log files as defined in the specified configuration file
@@ -18,8 +18,8 @@ L_check_ha /home/nagios/plugins-static/check_haproxy.pl -u 'http://127.0.0.1:808
 L_check_ha_server_logs sudo /home/nagios/plugins-static/check_logfiles -f /home/nagios/etc/check_logfiles.cfg
 
 ##
-# L_check_haproxy_process checks that there is one and only one process of haproxy. 
-# Any other value triggers a critical error. 
+# L_check_haproxy_process checks that there is one and only one process of haproxy.
+# Any other value triggers a critical error.
 ##
 L_check_haproxy_process /usr/lib/nagios/plugins/check_procs -C haproxy -c 1:2
 
