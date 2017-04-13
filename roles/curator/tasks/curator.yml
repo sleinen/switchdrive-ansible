@@ -24,7 +24,7 @@
     cron_file: curator
     hour: 2
     minute: 44
-    job: "docker run --net=host -v '/etc/curator:/etc/curator' -v '/var/log:/var/log' --rm -ti docker.drive.switch.ch:5000/curator:4.2.6 --config /etc/curator/config.yml /etc/curator/purgeIndices.yml"
+    job: "docker run --net=host -v '/etc/curator:/etc/curator' -v '/var/log:/var/log' --rm -ti {{curator_docker_image}} --config /etc/curator/config.yml /etc/curator/purgeIndices.yml"
     user: root
   tags:
     - curator
