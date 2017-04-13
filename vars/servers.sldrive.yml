@@ -14,10 +14,12 @@ os_security_group:
   - name: "ldap"
     description: "ldap access (636 and 389)"
     rules:
-      - { protocol: "tcp", port_range_min: "636", port_range_max: "636", remote_ip_prefix: "130.59.0.0/16", state: "present" }
+      - { protocol: "tcp", port_range_min: "636", port_range_max: "636", remote_ip_prefix: "130.59.0.0/16", state: "absent" }
+      - { protocol: "tcp", port_range_min: "389", port_range_max: "389", remote_ip_prefix: "130.59.0.0/16", state: "present" }
       - { protocol: "tcp", port_range_min: "389", port_range_max: "389", remote_ip_prefix: "86.119.31.75/32", state: "present" }
       - { protocol: "tcp", port_range_min: "389", port_range_max: "389", remote_ip_prefix: "86.119.31.72/32", state: "present" }
       - { protocol: "tcp", port_range_min: "389", port_range_max: "389", remote_ip_prefix: "86.119.31.54/32", state: "present" }
+      - { protocol: "tcp", port_range_min: "389", port_range_max: "389", remote_ip_prefix: "86.119.30.61/32", state: "present" } # cloud-id server stage-id (10.0.21.17)
 
 #####################
 # server groups
