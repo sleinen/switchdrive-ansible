@@ -9,16 +9,16 @@
     - logspout
 
 - name: build logspout
-  docker_image: 
-    path="/tmp/logspout" 
-    name="{{logspout_docker_name}}"
-    tag="{{logspout_docker_tag}}"
-    dockerfile="Dockerfile"
-    state=present
-    tls_hostname=localhost
-    state=build
-    #state=present
-    #force=true
+  docker_image:
+    path: "/tmp/logspout"
+    name: "{{logspout_docker_name}}"
+    tag: "{{logspout_docker_tag}}"
+    dockerfile: "Dockerfile"
+    state: present
+    tls_hostname: localhost
+    state: build
+    pull: "{{ docker_pull }}"
+    nocache: "{{ no_docker_cache }}"
   tags:
     - logspout
 
@@ -26,4 +26,3 @@
   shell: docker push "{{logspout_docker_image}}"
   tags:
     - logspout
-

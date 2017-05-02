@@ -22,15 +22,15 @@
 
 - name: build curator
   docker_image:
-    path="/tmp/curator"
-    name="{{curator_docker_name}}"
-    tag="{{curator_docker_tag}}"
-    dockerfile="Dockerfile"
-    state=present
-    tls_hostname=localhost
-    state=build
-    #state=present
-    #force=true
+    path: "/tmp/curator"
+    name: "{{curator_docker_name}}"
+    tag: "{{curator_docker_tag}}"
+    dockerfile: "Dockerfile"
+    state: "present"
+    force: "yes"
+    tls_hostname: "localhost"
+    pull: "{{ docker_pull }}"
+    nocache: "{{ no_docker_cache }}"
   tags:
     - curator
 

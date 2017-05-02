@@ -28,6 +28,7 @@
     state: "present"
     force: "yes"
     tls_hostname: "localhost"
+    pull: "{{ docker_pull }}"
     nocache: "{{ no_docker_cache }}"
   tags:
     - grafana

@@ -21,15 +21,16 @@
 
 
 - name: build haproxy
-  docker_image: 
-    path="/tmp/haproxy" 
-    name="{{haproxy_docker_name}}"
-    tag="{{haproxy_docker_tag}}"
-    dockerfile="Dockerfile"
-    state=present
-    force=true
-    pull=true
-    tls_hostname=localhost
+  docker_image:
+    path: "/tmp/haproxy" 
+    name: "{{haproxy_docker_name}}"
+    tag: "{{haproxy_docker_tag}}"
+    dockerfile: "Dockerfile"
+    state: "present"
+    force: "yes"
+    tls_hostname: "localhost"
+    pull: "{{ docker_pull }}"
+    nocache: "{{ no_docker_cache }}"
   tags:
     - haproxy
 
@@ -37,7 +38,3 @@
   shell: docker push "{{haproxy_docker_image}}"
   tags:
     - haproxy
-
-
-
-

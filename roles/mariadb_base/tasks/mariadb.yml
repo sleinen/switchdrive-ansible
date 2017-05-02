@@ -47,7 +47,7 @@
     image: "mariadb:{{mariadb_version}}"
     network_mode: host
     state: started
-    pull: true
+    pull: "{{ docker_pull }}"
     expose:
       - "4567"
       - "4568"

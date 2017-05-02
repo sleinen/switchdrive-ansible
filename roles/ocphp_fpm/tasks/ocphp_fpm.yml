@@ -26,8 +26,8 @@
     image: "{{ocphp_fpm_docker_name}}:{{item.oc_major_version}}.{{item.oc_minor_version}}-{{item.oc_image_version}}"
     network_mode: host
     restart_policy: "unless-stopped"
-    state: started
-    pull: true
+    state: "started"
+    pull: "{{ docker_pull }}"
     env:
        SHARDS: '{{item.shards | join(" ")}}'
     volumes:
@@ -44,3 +44,4 @@
     - "{{shard_mapping[service_name]}}"
   tags:
     - ocphp_fpm
+    - ocphp_fpm_container

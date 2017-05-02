@@ -9,15 +9,16 @@
     - maxscale
 
 - name: build maxscale
-  docker_image: 
-    path="/tmp/maxscale" 
-    name="{{maxscale_docker_name}}"
-    tag="{{maxscale_docker_tag}}"
-    dockerfile="Dockerfile"
-    tls_hostname=localhost
-    state=build
-    #state=present
-    #force=true
+  docker_image:
+    path: "/tmp/maxscale"
+    name: "{{maxscale_docker_name}}"
+    tag: "{{maxscale_docker_tag}}"
+    dockerfile: "Dockerfile"
+    state: "present"
+    force: "yes"
+    tls_hostname: "localhost"
+    pull: "{{ docker_pull }}"
+    nocache: "{{ no_docker_cache }}"
   tags:
     - maxscale
 
@@ -25,4 +26,3 @@
   shell: docker push "{{maxscale_docker_image}}"
   tags:
     - maxscale
-
