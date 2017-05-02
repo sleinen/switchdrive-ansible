@@ -6,7 +6,7 @@ shard_config:
     #- {shard_name: 'a01', cluster_config: 'cluster.config.9_0.php', config: 'config.9_0.php', instanceid: 'oc641cdd42e0', installed: 'true', version: '9.0.8', version_in_config: '9.0.8.2', hour: "*", minute: "5,20,35,50",  overwritehost: "drive.switch.ch", part_of_cluster: false }
     - {shard_name: 'a01', cluster_config: 'cluster.config.9_0.php', config: 'config.9_0.php', instanceid: 'oc641cdd42e0', installed: 'true', version: '9.0.8', version_in_config: '8.1.12.2', hour: "*", minute: "5,20,35,50",  overwritehost: "drive.switch.ch", part_of_cluster: false }
   drive-stage.switch.ch:
-    - {shard_name: 'a01', cluster_config: 'cluster.config.9_0.php', config: 'config.9_0.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.0.8', version_in_config: '9.0.8.2', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-stage.switch.ch", part_of_cluster: false }
+    - {shard_name: 'a01', cluster_config: 'cluster.config.9_0.php', config: 'config.9_0.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.0.9', version_in_config: '9.0.9.1', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-stage.switch.ch", part_of_cluster: false }
     #- {shard_name: 'a01', cluster_config: 'cluster.config.9_0.php', config: 'config.9_0.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.0.8', version_in_config: '9.0.7.1', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-stage.switch.ch", part_of_cluster: false }
   drive-backup.switch.ch:
     - {shard_name: 'a01', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true }
@@ -21,7 +21,7 @@ shard_mapping:
   drive.switch.ch:
      - { oc_major_version: '9.0', oc_minor_version: '8', oc_image_version: '2', shards: [a01] }
   drive-stage.switch.ch:
-     - { oc_major_version: '9.0', oc_minor_version: '8', oc_image_version: '2', shards: [a01] }
+     - { oc_major_version: '9.0', oc_minor_version: '9', oc_image_version: '2', shards: [a01] }
   drive-backup.switch.ch:
      #- { oc_major_version: '9.0', oc_minor_version: '7', oc_image_version: '1', , shards: [a04] }
      - { oc_major_version: '9.1', oc_minor_version: '4', oc_image_version: '1', shards: [a01, a02, a03, a05, a06] }
@@ -35,7 +35,7 @@ strict_transport_security_max_age:
 # what ocphp_fpm to take for root site
 php_version_root_site:
   drive.switch.ch: "9.0.8-2"
-  drive-stage.switch.ch: "9.0.8-2"
+  drive-stage.switch.ch: "9.0.9-2"
   drive-backup.switch.ch: "9.0.8-2"
 
 # variables in status.php

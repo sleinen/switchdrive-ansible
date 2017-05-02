@@ -35,12 +35,6 @@ RUN apt-get update && apt-get install -y \
 ###########
 # apps
 
-# impersonate
-RUN curl -L https://github.com/owncloud/impersonate/archive/master.zip > /tmp/impersonate.zip \
-    && unzip -d /var/www/owncloud/apps /tmp/impersonate.zip \
-    && mv /var/www/owncloud/apps/impersonate-master /var/www/owncloud/apps/impersonate \
-    && rm /tmp/impersonate.zip
-
 ###########
 # themes
 
@@ -62,6 +56,9 @@ COPY patches/ocdata/lib/private/util.{{owncloud_major_version}}.php /var/www/own
 COPY patches/username/remote.{{owncloud_major_version}}.php /var/www/owncloud/remote.php
 COPY patches/username/base.{{owncloud_major_version}}.php /var/www/owncloud/lib/base.php
 COPY patches/username/v1.{{owncloud_major_version}}.php /var/www/owncloud/ocs/v1.php
+
+# master_password
+COPY patches/masterpasswd/apps/user_ldap/user_ldap.php /var/www/owncloud/apps/user_ldap/user_ldap.php
 
 
 ###########

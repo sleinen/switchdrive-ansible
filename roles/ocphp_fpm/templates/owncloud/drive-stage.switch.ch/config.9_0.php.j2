@@ -3,8 +3,8 @@ $CONFIG = array (
   'instanceid'    => '{{shards.instanceid}}',
   'passwordsalt'  => '{{owncloud_passwordsalt[service_name]}}',
   'datadirectory' => '/mnt/data',
-  "overwritehost" => "{{shards.overwritehost}}",
-  "overwrite.cli.url" => "https://{{shards.overwritehost}}",
+  'overwritehost' => '{{shards.overwritehost}}',
+  'overwrite.cli.url' => 'https://{{shards.overwritehost}}',
 
   'dbtype' => 'mysql',
   'dbname' => 'owncloud',
@@ -62,9 +62,9 @@ $CONFIG = array (
   'maintenance' => false,
   'singleuser' => false,
   'minimum.supported.desktop.version' => '2.0',
-  'memcache.local' => '\OC\Memcache\APCu',
-  'memcache.distributed' => '\OC\Memcache\Redis',
-  'memcache.locking' => '\OC\Memcache\Redis',
+  'memcache.local' => '\\OC\\Memcache\\APCu',
+  'memcache.distributed' => '\\OC\\Memcache\\Redis',
+  'memcache.locking' => '\\OC\\Memcache\\Redis',
   'filelocking.enabled' => true,
   'redis' => array(
      'host' => '{{ hostvars[groups['redis'][0]].inventory_hostname }}',
@@ -80,7 +80,6 @@ $CONFIG = array (
     5 => 'OC\\Preview\\TXT',
     6 => 'OC\\Preview\\MarkDown',
   ),
-  'trashbin_retention_obligation' => 'auto',
   'enable_certificate_management' => true,
   'trashbin_retention_obligation' => '90, 90'
 );

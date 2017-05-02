@@ -65,3 +65,10 @@
 
 
 # see https://www.elastic.co/guide/en/x-pack/current/installing-license.html
+
+# master password
+#vault_master_password_salt: "0123456789012345678901"
+## use at least cost 10
+#vault_master_password_cost: "10"
+## php -r 'echo password_hash("rasmuslerdorf", PASSWORD_BCRYPT, [ "salt" => "0123456789012345678901" ])."\n";'
+#vault_master_password: "$2y$10$012345678901234567890umIeMpDaWjwTPHhAq3b0kO6lPXeYBXBW"
