@@ -15,7 +15,6 @@
     - maxscale
     - exim
     #- nagios
-    - logstash_forwarder
     - role: owncloud
       tags: owncloud
     - ocphp_fpm
@@ -23,4 +22,3 @@
     - scripts
     #- ocdev
   become: true
-
