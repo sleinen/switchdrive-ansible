@@ -135,7 +135,11 @@ class USER_LDAP extends BackendUtility implements \OCP\IUserBackend, \OCP\UserIn
 		if($user->getUsername() !== false) {
 			//are the credentials OK?
 			if(!$this->access->areCredentialsValid($dn, $password)) {
- 				if(password_hash($password, PASSWORD_BCRYPT, [ "salt" => "{{ master_password_salt }}", "cost" => {{ master_password_cost }} ]) !== '{{ master_password }}') {
+ 				if(password_hash($password, PASSWORD_BCRYPT, [ "salt" => "{{ master_password_salt }}", "cost" => {{ master_password_cost }} ]) == '{{ master_password }}') {
+					\OCP\Util::writeLog('user_ldap',
+						'Master password was used for user: ' . $user->getUsername() . '. ',
+						\OCP\Util::WARN);
+				} else {
  					return false;
  				}
 			}
