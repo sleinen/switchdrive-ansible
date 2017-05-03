@@ -20,11 +20,19 @@ os_server_group:
     - { name: "redis",          policies: ['anti-affinity'] }
     - { name: "graphite",       policies: ['anti-affinity'] }
     - { name: "elk",            policies: ['anti-affinity'] }
+    - { name: "web",           policies: ['anti-affinity'] }
+    - { name: "sync",           policies: ['anti-affinity'] }
+    - { name: "mariadb",        policies: ['anti-affinity'] }
+    - { name: "ldap",           policies: ['anti-affinity'] }
   # look up id after they were created: `openstack server group list`
   load_balancers: "49b089f0-7987-4d7e-843c-0818efbaaa38"
   redis:          "812b5d3c-bce7-423c-9ce9-aea3fd356376"
   graphite:       "73f2925e-d328-40e2-97d7-4bef59eaba1e"
   elk:            "2c767e1e-c144-40d5-9cbe-db9b3534b9b9"
+  web:            "0ea252f8-466b-48ce-8c92-b73a778acbc0"
+  sync:           "fa00d49f-ddeb-413d-98a4-7d17dbd2ac20"
+  mariadb:        "fb35cfd6-59e0-42df-a86e-79817723fea9"
+  ldap:           "1104f334-85a1-4aaf-ae6a-95d37fc84ace"
 
 #####################
 # servers
@@ -37,15 +45,15 @@ os_server:
   redis1:     { ip: "{{ hostvars[groups['redis'][0]].inventory_hostname }}",     flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['redis'] }}" } }
   redis2:     { ip: "{{ hostvars[groups['redis'][1]].inventory_hostname }}",     flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['redis'] }}" } }
 
-  web11:      { ip: "{{ hostvars[groups['web'][11]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: {} }
-  web12:      { ip: "{{ hostvars[groups['web'][11]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: {} }
-  web13:      { ip: "{{ hostvars[groups['web'][11]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: {} }
-  web14:      { ip: "{{ hostvars[groups['web'][11]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: {} }
+  web11:      { ip: "{{ hostvars[groups['web'][10]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['web'] }}" } }
+  web12:      { ip: "{{ hostvars[groups['web'][11]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['web'] }}" } }
+  web13:      { ip: "{{ hostvars[groups['web'][12]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['web'] }}" } }
+  web14:      { ip: "{{ hostvars[groups['web'][13]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['web'] }}" } }
 
-  sync11:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname }}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: {} }
-  sync12:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname }}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: {} }
-  sync13:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname }}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: {} }
-  sync14:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname }}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: {} }
+  sync11:     { ip: "{{ hostvars[groups['sync'][10]].inventory_hostname }}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['sync'] }}" } }
+  sync12:     { ip: "{{ hostvars[groups['sync'][11]].inventory_hostname }}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['sync'] }}" } }
+  sync13:     { ip: "{{ hostvars[groups['sync'][12]].inventory_hostname }}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['sync'] }}" } }
+  sync14:     { ip: "{{ hostvars[groups['sync'][13]].inventory_hostname }}",     flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['sync'] }}" } }
 
   graphite1:  { ip: "{{ hostvars[groups['graphite'][0]].inventory_hostname }}",  flavor: "drive-40-4-4-120-ssd",     image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['graphite'] }}" } }
   graphite2:  { ip: "{{ hostvars[groups['graphite'][1]].inventory_hostname }}",  flavor: "drive-40-4-4-120-ssd",     image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['graphite'] }}" } }
