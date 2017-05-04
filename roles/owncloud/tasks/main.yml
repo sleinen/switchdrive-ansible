@@ -11,7 +11,7 @@
   ignore_errors: yes
   tags:
     - apache
-    
+
 - include: root_site.yml
 
 # iptables
@@ -22,10 +22,8 @@
 #- include: email.yml
 #- include: install_ssh-keys.yml
 
-- include: logstash.yml
+#- include: logstash.yml
 
 - include: ocdata.yml
 
 - include: cron.yml
-
-
