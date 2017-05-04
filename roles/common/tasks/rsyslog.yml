@@ -5,7 +5,7 @@
   when: ansible_distribution == "Ubuntu" and ansible_distribution_version == "14.04"
   tags:
     - syslog
-    
+
 - name: install rsyslog
   #apt: name={{item}} state=latest
   apt: name={{item}} state=present
@@ -35,7 +35,7 @@
     - syslog
 
 - name: configure remote logging
-  template: 
+  template:
     src=syslog/{{item.name}}.conf.j2
     dest=/etc/rsyslog.d/{{item.prio}}-{{item.name}}.conf
   notify: restart rsyslog
@@ -46,4 +46,4 @@
      - { name: remotesyslog, prio: 30 }
      - { name: rsyslogstats, prio: 01 }
      - { name: spam, prio: 10 }
-
+     - { name: default, prio: 50 }
