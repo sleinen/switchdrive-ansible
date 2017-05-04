@@ -21,12 +21,12 @@ shard_config:
   drive-stage.switch.ch:
     - {shard_name: 'a01', cluster_config: 'cluster.config.{{ ssd.staging.major_version }}.php', config: 'config.{{  ssd.staging.major_version }}.php', instanceid: 'oceacd978fb9', installed: 'true', version: '{{ ssd.staging.major_version }}.{{ ssd.staging.minor_version }}', version_in_config: '{{  ssd.staging.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-stage.switch.ch", part_of_cluster: false }
   drive-backup.switch.ch:
-    - {shard_name: 'a01', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true }
-    - {shard_name: 'a02', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true }
-    - {shard_name: 'a03', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fac', installed: 'true', version: '9.1.4', hour: "*", minute: "10,25,40,55", overwritehost: "drive-backup.switch.ch", part_of_cluster: true  }
-    #- {shard_name: 'a04', cluster_config: 'cluster.config.9_1.php', config: 'config.9_0.php', instanceid: 'oceacd978fad', installed: 'true', version: '9.0.7', hour: "*", minute: "10,25,40,55", overwritehost: "a04.drive-backup.switch.ch", part_of_cluster: true }
-    - {shard_name: 'a05', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fae', installed: 'true', version: '9.1.4', hour: "*", minute: "0,15,30,45",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true  }
-    - {shard_name: 'a06', cluster_config: 'cluster.config.9_1.php', config: 'config.9_1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "0,15,30,45",  overwritehost: "a06.drive-backup.switch.ch", part_of_cluster: false }
+    - {shard_name: 'a01', cluster_config: 'cluster.config.9.1.php', config: 'config.9.1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true }
+    - {shard_name: 'a02', cluster_config: 'cluster.config.9.1.php', config: 'config.9.1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true }
+    - {shard_name: 'a03', cluster_config: 'cluster.config.9.1.php', config: 'config.9.1.php', instanceid: 'oceacd978fac', installed: 'true', version: '9.1.4', hour: "*", minute: "10,25,40,55", overwritehost: "drive-backup.switch.ch", part_of_cluster: true  }
+    #- {shard_name: 'a04', cluster_config: 'cluster.config.9.1.php', config: 'config.9.0.php', instanceid: 'oceacd978fad', installed: 'true', version: '9.0.7', hour: "*", minute: "10,25,40,55", overwritehost: "a04.drive-backup.switch.ch", part_of_cluster: true }
+    - {shard_name: 'a05', cluster_config: 'cluster.config.9.1.php', config: 'config.9.1.php', instanceid: 'oceacd978fae', installed: 'true', version: '9.1.4', hour: "*", minute: "0,15,30,45",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true  }
+    - {shard_name: 'a06', cluster_config: 'cluster.config.9.1.php', config: 'config.9.1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "0,15,30,45",  overwritehost: "a06.drive-backup.switch.ch", part_of_cluster: false }
 
 # ocphp_fpm container deployment
 shard_mapping:
