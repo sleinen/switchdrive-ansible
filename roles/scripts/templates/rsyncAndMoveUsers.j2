@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "x$2" == "x" ]; then 
+if [ "x$2" == "x" ]; then
 	echo "Usage: `basename $0` <source_dir> <dest_dirs>
 .      source_dir: directory from where users are move away. E.g. /mnt/data
 .      dest_dirs: list of absolute paths. E.g. '/mnt/101 /mnt/102'"
@@ -31,19 +31,18 @@ while ((! $DONE)) ; do
 		echo "*******************************************"
 		echo Directory: $DEST_DIR
 		DEST_HOST=`mount | grep ${DEST_DIR} | sed -e 's/:.*//'`
-		for user in `/bin/ls $DEST_DIR`; do 
-			if [ -d $SOURCE_DIR/$user ] && ! [ -h $SOURCE_DIR/$user ] ; then 
+		for user in `/bin/ls $DEST_DIR`; do
+			if [ -d $SOURCE_DIR/$user ] && ! [ -h $SOURCE_DIR/$user ] ; then
 				if [ `stat -c %U $DEST_DIR/$user` == "www-data" ]; then
 					echo "*******************************************"
 					echo Preparing $user;
-					#ETAG=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
 					ETAG=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
 					if [ $? -ne 0 ] ; then
 						ok=false
-						while ( ! $ok ); do 
+						while ( ! $ok ); do
 							echo could not access database. Retrying..
 							sleep 30
-							ETAG=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+							ETAG=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
 							if [ $? -eq 0 ] ; then
 								ok=true;
 							fi
@@ -62,14 +61,13 @@ while ((! $DONE)) ; do
 						echo Could not rsync, skipping $user
 						SKIPPED=$((SKIPPED+1))
 					else
-						#ETAG2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
 						ETAG2=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
 						if [ $? -ne 0 ] ; then
 							ok=false
-							while ( ! $ok ); do 
+							while ( ! $ok ); do
 								echo could not access database. Retrying..
 								sleep 30
-								ETAG2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
+								ETAG2=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
 								if [ $? -eq 0 ] ; then
 									ok=true;
 								fi
@@ -121,9 +119,9 @@ while ((! $DONE)) ; do
 	echo Skipped: $SKIPPED
 	echo Moved: $MOVED
 	echo Failed: $FAILED
-	
-	if (( $FAILED != 0 )) ; then 
-		exit 
+
+	if (( $FAILED != 0 )) ; then
+		exit
 	fi
 	DONE=$((SKIPPED==0))
 	if ((! $DONE )) ; then
@@ -131,6 +129,3 @@ while ((! $DONE)) ; do
 		sleep 300;
 	fi
 done
-	
-
-

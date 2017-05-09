@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ "x$1" == "x" ]; then 
+if [ "x$1" == "x" ]; then
 	echo "Usage: `basename $0` <source_dir> <dir_number>
 .      source_dir: where to copy from. E.g. /mnt/104
 .      dir_number: three digits, set number to be copied. E.g. 102"
@@ -30,16 +30,13 @@ for user in `cat ${USER_LIST}`; do
 	if [ -d $SOURCE_DIR/$user ] && ! [ -h $SOURCE_DIR/$user ] ; then
 		if ! [ -d ${DEST_DIR}/$user ] || [ `stat -c %U ${DEST_DIR}/$user` != "www-data" ]; then
 			echo Copying user $user
-			#ETAG=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
 			ETAG=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
-			#LASTSEEN=`/usr/bin/psql -t -d owncloud -U owncloud -c "select configvalue from oc_preferences where appid = 'login' and configkey = 'lastLogin' and userid = '$user';"`
 			if [ $? -ne 0 ] ; then
 				ok=false
-				while ( ! $ok ); do 
+				while ( ! $ok ); do
 					echo could not access database. Retrying..
 					sleep 30
-					ETAG=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
-					#LASTSEEN=`/usr/bin/psql -t -d owncloud -U owncloud -c "select configvalue from oc_preferences where appid = 'login' and configkey = 'lastLogin' and userid = '$user';"`
+					ETAG=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
 					if [ $? -eq 0 ] ; then
 						ok=true;
 					fi
@@ -56,22 +53,18 @@ for user in `cat ${USER_LIST}`; do
 				echo Could not run tar, skipping $user
 				SKIPPED=$((SKIPPED+1))
 			else
-				#ETAG2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
 				ETAG2=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
-				#LASTSEEN2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select configvalue from oc_preferences where appid = 'login' and configkey = 'lastLogin' and userid = '$user';"`
 				if [ $? -ne 0 ] ; then
 					ok=false
-					while ( ! $ok ); do 
+					while ( ! $ok ); do
 						echo could not access database. Retrying..
 						sleep 30
-						ETAG2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
-						#LASTSEEN2=`/usr/bin/psql -t -d owncloud -U owncloud -c "select configvalue from oc_preferences where appid = 'login' and configkey = 'lastLogin' and userid = '$user';"`
+						ETAG2=`/root/mysqlcmd "select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = 'home::$user');"`
 						if [ $? -eq 0 ] ; then
 							ok=true;
 						fi
 					done
 				fi
-				#if [ $((LASTSEEN2-LASTSEEN)) -ne 0 ]; then
 				if [ "$ETAG" != "$ETAG2" ]; then
 					echo user was active, skipping
 					SKIPPED=$((SKIPPED+1))

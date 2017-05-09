@@ -4,7 +4,7 @@ NUM_USERS_TO_MOVE=40
 TARGET_DISKS_FILE="/root/targetDisks"
 MIN_DISK_FREE_TARGET_DISK="500000000"
 
-while (true); do
+while [ ! -e /root/stopMoveUsers ]; do
 
 echo "***********************************************************"
 echo "***********************************************************"
