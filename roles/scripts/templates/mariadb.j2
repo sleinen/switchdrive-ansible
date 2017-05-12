@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
 
 HOST=$1
-USER=owncloud
 
 if [ "x$1" == "x" ]; then
   HOST=`hostname | sed -e 's&.*-&&'`
 fi
 
-if [[ "$HOST" =~ "^db.*" ]]; then
+if [[ "$HOST" =~ ^db.* ]]; then
   USER=root
+  docker exec -ti mariadb bash -c "mysql -u$USER -p'{{mariadb_passwd}}' -h $HOST.drive --default-character-set=utf8 '$@'"
+else
+  USER=owncloud
+  docker run --rm -ti --net=host mariadb bash -c "mysql -u$USER -p'{{mariadb_passwd}}' -h $HOST.drive --default-character-set=utf8 '$@'"
 fi
-
-
-
-#docker run --rm -ti --net=host mariadb bash -c "mysql -u$USER -p'{{mariadb_passwd}}' -h $HOST.drive --default-character-set=utf8 $@"
-docker exec -ti mariadb bash -c "mysql -u$USER -p'{{mariadb_passwd}}' -h $HOST.drive --default-character-set=utf8 $@"
