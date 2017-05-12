@@ -12,13 +12,13 @@ docker_pull: true
 #owncloud_version: "{{owncloud_major_version}}.4"
 #owncloud_docker_image_version: 1
 
-owncloud_major_version: "9.0"
-owncloud_version: "{{owncloud_major_version}}.9"
-owncloud_docker_image_version: 2
+#owncloud_major_version: "9.0"
+#owncloud_version: "{{owncloud_major_version}}.9"
+#owncloud_docker_image_version: 2
 
-#owncloud_major_version: "8.2"
-#owncloud_version: "{{owncloud_major_version}}.8"
-#owncloud_docker_image_version: 1
+owncloud_major_version: "8.2"
+owncloud_version: "{{owncloud_major_version}}.8"
+owncloud_docker_image_version: 1
 
 comment_out_git_include: '#'
 git_branch: "https://github.com/owncloud/core/archive/stable9.1-federated-cluster.zip"
@@ -52,7 +52,7 @@ owncloud_php_conf_dir:
     "9.0": "/etc/php/7.0"
     "9.1": "/etc/php/7.0"
 owncloud_pkgs:
-    "8.2": "php5-ldap php5-redis=2.2.4* php5-apcu php-xml-parser owncloud-server"
+    "8.2": "php5-fpm php5-ldap php5-redis=2.2.4* php5-apcu php-xml-parser owncloud-server"
     "9.0": "php-ldap php-redis php-apcu php-imagick php-bz2 php-xml-parser owncloud-enterprise"
     "9.1": "php-ldap php-redis php-apcu php-imagick php-bz2 php-xml-parser owncloud-enterprise"
 owncloud_ubuntu_base_version:
