@@ -69,16 +69,5 @@ $CONFIG = array (
      'host' => '{{ hostvars[groups['redis'][0]].inventory_hostname }}',
      'port' => 6379,
       ),
-  'enabledPreviewProviders' =>
-  array (
-    0 => 'OC\\Preview\\PNG',
-    1 => 'OC\\Preview\\JPEG',
-    2 => 'OC\\Preview\\GIF',
-    3 => 'OC\\Preview\\XBitmap',
-    4 => 'OC\\Preview\\MP3',
-    5 => 'OC\\Preview\\TXT',
-    6 => 'OC\\Preview\\MarkDown',
-  ),
   'enable_certificate_management' => true,
-  'trashbin_retention_obligation' => '90, 90'
 );

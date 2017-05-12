@@ -4,33 +4,35 @@ upgrade oc 8.1 to oc 9.0
 # setup
 
 >>> mac
-cd ~/drive
+cd ~/drive2
 #SITE=sldrive
 SITE=drive
 
 git status
- -> should be on branch 9.0
+ -> should be on branch master
 
 #################
 # set security groups to switch only
 
->> controllerz
+>> oscli-drive
 #. rc/ls-drive-staging
-. rc/zh-drive
 
-LB_SERVER_ID=`nova list | awk '/drive-lb/ {print $2}'`; echo $LB_SERVER_ID
-   -> id of lb server: c1994eca-f63d-407d-ab1e-33b7f99b8a53
-#SEC_GROUP_WEB=`nova list-secgroup $LB_SERVER_ID | awk '/web/ {print $2}'`; echo $SEC_GROUP_WEB
-SEC_GROUP_WEB2=`nova secgroup-list | awk '/web / {print $2}'`; echo $SEC_GROUP_WEB2
-	-> 6cb6a5f2-7ecf-462f-8493-cb5a523f6419
+LB1_SERVER_ID=`openstack server list | awk '/drive-lb1/ {print $2}'`; echo $LB1_SERVER_ID
+LB2_SERVER_ID=`openstack server list | awk '/drive-lb2/ {print $2}'`; echo $LB2_SERVER_ID
+
+SEC_GROUP_WEB=`openstack security group list | awk '/web / {print $2}'`; echo $SEC_GROUP_WEB
+
 # remove sec group "web"
-nova remove-secgroup $LB_SERVER_ID $SEC_GROUP_WEB
-# add sec group "webint"
-SEC_GROUP_WEBINT=`nova secgroup-list | awk '/webint/ {print $2}'`; echo $SEC_GROUP_WEBINT
-	-> a3bc3bf1-129a-4bea-adaf-eb915676192e
+openstack server remove security group $LB1_SERVER_ID $SEC_GROUP_WEB
+openstack server remove security group $LB2_SERVER_ID $SEC_GROUP_WEB
 
-nova add-secgroup $LB_SERVER_ID $SEC_GROUP_WEBINT
-nova list-secgroup $LB_SERVER_ID
+# add sec group "webint"
+SEC_GROUP_WEBINT=`openstack security group list | awk '/webint/ {print $2}'`; echo $SEC_GROUP_WEBINT
+
+openstack server add security group $LB1_SERVER_ID $SEC_GROUP_WEBINT
+openstack server add security group $LB2_SERVER_ID $SEC_GROUP_WEBINT
+openstack server show $LB1_SERVER_ID -c security_groups
+openstack server show $LB2_SERVER_ID -c security_groups
 
 #################
 # stop service
@@ -47,22 +49,6 @@ sudo /root/ha_update di sync1
 sudo /root/ha_update di sync2
 sudo /root/ha_update di sync3
 sudo /root/ha_update di sync4
-sudo /root/ha_update di sync5
-sudo /root/ha_update di sync6
-sudo /root/ha_update di sync7
-sudo /root/ha_update di sync8
-sudo /root/ha_update di sync9
-sudo /root/ha_update di sync10
-sudo /root/ha_update di sync11
-sudo /root/ha_update di sync12
-sudo /root/ha_update di sync13
-sudo /root/ha_update di sync14
-sudo /root/ha_update di sync15
-sudo /root/ha_update di sync16
-sudo /root/ha_update di sync17
-sudo /root/ha_update di sync18
-sudo /root/ha_update di sync19
-sudo /root/ha_update di sync20
 
 # kill all ongoing sessions
 >>> mac
@@ -86,7 +72,7 @@ bash ./snapshotAll
 
 
 # check with
-openstack snapshot list | grep 'data-.*-'`date "+%Y%m%d"` | sort -k 4
+openstack volume snapshot list | grep 'data-.*-'`date "+%Y%m%d"` | sort -k 4
 
 # redo those that failed.
 
@@ -101,30 +87,13 @@ snapshot sync1_root
 snapshot sync2_root
 snapshot sync3_root
 snapshot sync4_root
-snapshot sync5_root
-snapshot sync6_root
-snapshot sync7_root
-snapshot sync8_root
-snapshot sync9_root
-snapshot sync10_root
-snapshot sync11_root
-snapshot sync12_root
-snapshot sync13_root
-snapshot sync14_root
-snapshot sync15_root
-snapshot sync16_root
-snapshot sync17_root
-snapshot sync18_root
-snapshot sync19_root
-snapshot sync20_root
 snapshot web1_root
 snapshot web2_root
 snapshot web3_root
 snapshot web4_root
 
 # check with
-cinder snapshot-list | grep 'root.*-20160213' | sort -k 8
-openstack snapshot list | grep 'root-.*-'`date "+%Y%m%d"` | sort -k 4
+openstack volume snapshot list | grep 'root-.*-'`date "+%Y%m%d"` | sort -k 4
 
 # db
 
@@ -133,12 +102,6 @@ openstack snapshot list | grep 'root-.*-'`date "+%Y%m%d"` | sort -k 4
 sudo docker exec mariadb bash -c "xtrabackup --backup --datadir=/var/lib/mysql/ --target-dir=/backup/preUpgrade --password=\$MYSQL_ROOT_PASSWORD"
 sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/preUpgrade"
 sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/preUpgrade"
-
-# OC 8.1 config
->>> mac
-ssh web1.$SITE sudo cp /var/www/owncloud/config/config.php /tmp/config.php
-ssh web1.$SITE sudo chmod o+r /tmp/config.php
-scp web1.$SITE:/var/www/owncloud/config/config.php tmp/config.php-8.1
 
 #################
 # convert galera cluster to single db instance
@@ -163,85 +126,75 @@ rsync --rsync-path="sudo rsync" web1.$SITE:/var/www/owncloud/config/config.php t
 
 # install code
 
-# only php-fpm container
+# only php-fpm container on web10
+edit group_vars/all/shards file and set drive to 8.2 release.
+
 >>> mac
-ansible-playbook -i inventories/$SITE-8.2 playbooks/webservers.yml --limit=*.201 --tags=ocphp_fpm
+ansible-playbook -i inventories/$SITE playbooks/webservers.yml --limit=*.210 --tags=ocphp_fpm
 
 # run upgrade
->>> web1.$SITE
-sudo /root/occ upgrade -vvv --skip-migration-test
-# takes about 60 Minutes
+>>> web10.$SITE
+time /root/occ a01 upgrade -vvv --skip-migration-test
+# takes about 90 Minutes
 
 # backup OC 8.2 config
 >>> mac
-rsync --rsync-path="sudo rsync" web1.$SITE:/etc/owncloud/config.php tmp/config.php-8.2
+rsync --rsync-path="sudo rsync" web10.$SITE:/var/webroot/a01/config/config.php tmp/config.php-8.2
 
-#edit roles/ocphp_fpm/templates/owncloud/drive-xxx.switch.ch/config.php.j2
-    -> check/fix version
-    add/replace the following
-   -----------
-  'enabledPreviewProviders' =>
-  array (
-    0 => 'OC\\Preview\\PNG',
-    1 => 'OC\\Preview\\JPEG',
-    2 => 'OC\\Preview\\GIF',
-    3 => 'OC\\Preview\\XBitmap',
-    4 => 'OC\\Preview\\MP3',
-    5 => 'OC\\Preview\\TXT',
-    6 => 'OC\\Preview\\MarkDown',
-  ),
-  'trashbin_retention_obligation' => 'auto',
-   -----------
+#edit group_vars/all/shards
+  -> check/fix version
 
 #################
 # OC-9.0
 
 # install code
 >>> mac
-# only php-fpm container
-ansible-playbook -i inventories/$SITE playbooks/webservers.yml --limit=*.201 --tags=ocphp_fpm
+# only php-fpm container on web11
+edit group_vars/all/shards file and set drive to 9.0 release.
+ansible-playbook -i inventories/$SITE playbooks/webservers.yml --limit=*.211 --tags=ocphp_fpm
 
 # speed up upgrade (recommended by owncloud)
 # on db1:
 /root/mariadb
   -> use owncloud;
      ALTER TABLE `oc_filecache` ADD COLUMN checksum varchar(255) DEFAULT NULL AFTER permissions;
-# this takes about 30 Minutes
+# this takes about 50 Minutes
 
 
 
 # run upgrade
->>>> web1.$SITE
-sudo /root/occ upgrade -vvv --skip-migration-test
-# this takes about 20 Minutes
+>>>> web11.$SITE
+time /root/occ a01 upgrade -vvv --skip-migration-test
+# this takes about 40 Minutes
 
 # backup upgraded database
 sudo docker exec mariadb bash -c "xtrabackup --backup --datadir=/var/lib/mysql/ --target-dir=/backup/postUpgrade --password=\$MYSQL_ROOT_PASSWORD"
 sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/postUpgrade"
 sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/postUpgrade"
+-> about 25 minutes
 
 
 # backup OC 9.0 config
-rsync --rsync-path="sudo rsync" web1.$SITE:/etc/owncloud/config.php tmp/config.php-9.0
+rsync --rsync-path="sudo rsync" web11.$SITE:/var/webroot/a01/config/config.php tmp/config.php-9.0
 
-#edit roles/owncloud/templates/owncloud/drive-xxx.switch.ch/config.php.j2
-    -> check/fix version
+#edit group_vars/all/shards
+  -> check/fix version
 
-ansible-playbook -i inventories/$SITE playbooks/webservers.yml --limit=*201
+ansible-playbook -i inventories/$SITE playbooks/webservers.yml --limit=*211
 
 #################
 # check upgrade
 
->>> web1.$SITE
+>>> web11.$SITE
 sudo /root/occ maintenance:singleuser --on
 >>> lb.$SITE
-sudo /root/ha_update en web1
+sudo /root/ha_update en web11
 
 
 #### check config on admin page #####
 -> check apps -> disable pictures app
 
->>> web1
+>>> web11
 /root/occ maintenance:singleuser --off
 
 
@@ -253,7 +206,7 @@ ansible-playbook -i inventories/$SITE jobs/mariadb_bootcluster.yml
 #monitor proges on web1 with:
 while (true) ; do /root/maxadmin list servers; sleep 1; done
 
-# from now on db server in config.php has to poin to localhost again.
+# from now on db server in config.php has to point to localhost again.
 
 #edit roles/ocphp_fpm/templates/owncloud/drive-xxx.switch.ch/config.php.j2
     -> set 'dbhost' => 'localhost'
@@ -269,26 +222,14 @@ ansible-playbook -i inventories/$SITE playbooks/devservers.yml
 # reenable lb
 >>> lb.$SITE
 
-sudo /root/ha_update en web1
-sudo /root/ha_update en web2
-sudo /root/ha_update en web3
-sudo /root/ha_update en web4
-sudo /root/ha_update en sync1
-sudo /root/ha_update en sync2
-sudo /root/ha_update en sync3
-sudo /root/ha_update en sync4
-sudo /root/ha_update en sync5
-sudo /root/ha_update en sync6
-sudo /root/ha_update en sync7
-sudo /root/ha_update en sync8
-sudo /root/ha_update en sync9
-sudo /root/ha_update en sync10
+sudo /root/ha_update en web11
+sudo /root/ha_update en web12
+sudo /root/ha_update en web13
+sudo /root/ha_update en web14
 sudo /root/ha_update en sync11
 sudo /root/ha_update en sync12
 sudo /root/ha_update en sync13
 sudo /root/ha_update en sync14
-sudo /root/ha_update en sync15
-sudo /root/ha_update en sync16
 
 #### test web and sync ####
 
@@ -298,24 +239,24 @@ sudo /root/ha_update en sync16
 #################
 # set back security groups to default
 
->>> controllerz
+>>> oscli-drive
 #. rc/ls-drive-staging
-. rc/zh-drive
 
+LB1_SERVER_ID=`openstack server list | awk '/drive-lb1/ {print $2}'`; echo $LB1_SERVER_ID
+LB2_SERVER_ID=`openstack server list | awk '/drive-lb2/ {print $2}'`; echo $LB2_SERVER_ID
 
-LB_SERVER_ID=`nova list | awk '/drive-lb/ {print $2}'`; echo $LB_SERVER_ID
-   -> id of lb server: c1994eca-f63d-407d-ab1e-33b7f99b8a53
-#SEC_GROUP_WEB=`nova list-secgroup $LB_SERVER_ID | awk '/web/ {print $2}'`; echo $SEC_GROUP_WEB
-SEC_GROUP_WEB=`nova secgroup-list | awk '/web / {print $2}'`; echo $SEC_GROUP_WEB
-	-> 6cb6a5f2-7ecf-462f-8493-cb5a523f6419
-SEC_GROUP_WEBINT=`nova secgroup-list | awk '/webint/ {print $2}'`; echo $SEC_GROUP_WEBINT
-	-> a3bc3bf1-129a-4bea-adaf-eb915676192e
+SEC_GROUP_WEB=`openstack security group list | awk '/web / {print $2}'`; echo $SEC_GROUP_WEB
+SEC_GROUP_WEBINT=`openstack security group list | awk '/webint/ {print $2}'`; echo $SEC_GROUP_WEBINT
+
 # remove sec group "webint"
-nova remove-secgroup $LB_SERVER_ID $SEC_GROUP_WEBINT
+openstack server remove security group $LB1_SERVER_ID $SEC_GROUP_WEBINT
+openstack server remove security group $LB2_SERVER_ID $SEC_GROUP_WEBINT
 
 # add sec group "web"
-nova add-secgroup $LB_SERVER_ID $SEC_GROUP_WEB
-nova list-secgroup $LB_SERVER_ID
+openstack server add security group $LB1_SERVER_ID $SEC_GROUP_WEB
+openstack server add security group $LB2_SERVER_ID $SEC_GROUP_WEB
+openstack server show $LB1_SERVER_ID -c security_groups
+openstack server show $LB2_SERVER_ID -c security_groups
 
 
 ***************************************
@@ -324,4 +265,6 @@ nova list-secgroup $LB_SERVER_ID
 ***************************************
 
 
-for the upgrade test with read only file-system on web10: edit file lib/private/util.php line 702
+for the upgrade test with read only file-system on web10:
+  edit file lib/private/util.php line 702
+  umount /mnt/*; for disk in `ls /mnt`; do mount -o ro /mnt/$disk; done
