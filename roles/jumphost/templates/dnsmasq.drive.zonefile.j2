@@ -8,12 +8,12 @@ address=/jumpip.{{ internal_domain }}/{{ hostvars[groups['jumphost'][0]].invento
 {% if loop.index == 1 %}
 address=/{{group}}.{{ internal_domain }}/{{ hostvars[host].inventory_hostname }}
 {% endif %}
-address=/{{group}}{{loop.index}}.{{ internal_domain }}/{{ hostvars[host].inventory_hostname }}
-#address=/{_ hostvars[host].ansible_hostname | regex_replace('^(drive|sldrive|szdrive|zdrive|ldrive|tzdrive|tldrive)-(.*)$', '\\2') _}.{{ internal_domain }}/{{ hostvars[host].inventory_hostname }}
+address=/{{ group | regex_replace('mariadb', 'db') }}{{ loop.index }}.{{ internal_domain }}/{{ hostvars[host].inventory_hostname }}
 {% endif %}
 {% endfor %}
 {% endif %}
 {% endfor %}
+#address=/{_ hostvars[host].ansible_hostname | regex_replace('^(drive|sldrive|szdrive|zdrive|ldrive|tzdrive|tldrive)-(.*)$', '\\2') _}.{_ internal_domain _}/{_ hostvars[host].inventory_hostname _}
 
 address=/drive-stage.switch.ch/{{ hostvars[groups['lb'][0]].inventory_hostname }}
 
