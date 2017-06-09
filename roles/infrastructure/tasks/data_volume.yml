@@ -8,6 +8,7 @@
     size: "{{ item.size }}"
     display_name: "{{ site }}-{{ server }}_{{ item.name }}"
   with_items: "{{ os_volumes[server] }}"
+  when: os_volumes[server] is defined
   tags:
     - os_data
 
@@ -20,7 +21,7 @@
     volume: "{{ site }}-{{ server }}_{{ item.name }}"
     device: "{{ item.device }}"
   with_items: "{{ os_volumes[server] }}"
-  when: os_action == "create"
+  when: os_action == "create" and os_volumes[server] is defined
   tags:
     - os_data
     - os_attach
