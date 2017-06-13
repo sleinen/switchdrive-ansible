@@ -1,17 +1,18 @@
 ################
 # create volumes
 
-    cinder create volume --name drive-data-XXX 2048
+    openstack volume create --size 2048 drive-data-XXX
 
 # list volumes with:
 
     cinder list | egrep " drive-data-... " | sort -k6
-
+    openstack volume list | egrep " drive-data-... " | sort -k4
 
 # edit data-volumes.production.yml file.
 
 # attach volumes to server:
 
+    os server list | grep nfs
     openstack server add volume  <server> <volume>
 
 # edit then run:
@@ -20,7 +21,7 @@
 
     ansible-playbook -i "10.0.23.7X," jobs/formatnfsservers.yml
 
-    
+
 # mount disks on nfs server
     ansible-playbook -i inventories/drive playbooks/nfsservers.yml --limit=*7X
 
@@ -29,8 +30,13 @@
 
 # fix ocdata
     ansible-playbook -i inventories/drive playbooks/nfsservers.yml --limit=*7X -t ocdata
-    
+
 # check ocdata on mgmt.drive
 
-    ls -l /mnt/*/.ocdata
-    
+    sudo ls -l /mnt/*/.ocdata
+
+# add to mgmt.drive:/root/targetDisks
+
+# update snapshot cron jobs:
+
+  ansible-playbook -i inventories/drive playbooks/snapshotservers.yml -t cron

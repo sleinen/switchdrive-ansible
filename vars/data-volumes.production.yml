@@ -77,6 +77,13 @@ snapshot_volumes:
    - { name: "129", hour: 4, minute: 29, region_name: "ZH", volume_id: "e32796aa-fefb-4589-8a9b-1b5e68cb1c4e", state: present }
    - { name: "130", hour: 2, minute: 30, region_name: "ZH", volume_id: "34d9a7a5-0383-4e59-8293-e9f9d4989490", state: present }
 
+   - { name: "155", hour: 3, minute: 55, region_name: "ZH", volume_id: "7359a08c-dfb9-4700-8ee7-39032e08b9ea", state: present }
+   - { name: "156", hour: 4, minute: 56, region_name: "ZH", volume_id: "6f03bea2-4c84-46e5-b172-f383df3cf3cf", state: present }
+   - { name: "157", hour: 2, minute: 57, region_name: "ZH", volume_id: "d1ed893a-90a2-45fe-bb73-39d0f69e1334", state: present }
+   - { name: "158", hour: 3, minute: 58, region_name: "ZH", volume_id: "624696e3-fc1b-478b-afb7-86a171d41f91", state: present }
+   - { name: "159", hour: 4, minute: 59, region_name: "ZH", volume_id: "36a9d04e-eb7c-44ca-8350-ef0207ac4bc2", state: present }
+   - { name: "160", hour: 2, minute: 00, region_name: "ZH", volume_id: "2a1b4b36-9778-47f2-8848-fa1c3aef8b94", state: present }
+
 # manually format the volumes like this: "mkfs.xfs -L "109" /dev/vdk"
 
 volumes_nfs1:
@@ -134,7 +141,7 @@ volumes_nfs4:
      - { name: "151", src: "LABEL=152", state: "mounted", ocdata_link: "152" }
      - { name: "152", src: "LABEL=151", state: "mounted", ocdata_link: "153" }
      - { name: "153", src: "LABEL=153", state: "mounted", ocdata_link: "154" }
-     - { name: "154", src: "LABEL=154", state: "mounted", ocdata_link: "." }
+     - { name: "154", src: "LABEL=154", state: "mounted", ocdata_link: "155" }
 
 volumes_nfs5:
      - { name: "125", src: "LABEL=125", state: "mounted", ocdata_link: "126" }
@@ -143,6 +150,12 @@ volumes_nfs5:
      - { name: "128", src: "LABEL=128", state: "mounted", ocdata_link: "129" }
      - { name: "129", src: "LABEL=129", state: "mounted", ocdata_link: "130" }
      - { name: "130", src: "LABEL=130", state: "mounted", ocdata_link: "." }
+     - { name: "155", src: "LABEL=155", state: "mounted", ocdata_link: "156" }
+     - { name: "156", src: "LABEL=156", state: "mounted", ocdata_link: "157" }
+     - { name: "157", src: "LABEL=157", state: "mounted", ocdata_link: "158" }
+     - { name: "158", src: "LABEL=158", state: "mounted", ocdata_link: "159" }
+     - { name: "159", src: "LABEL=159", state: "mounted", ocdata_link: "160" }
+     - { name: "160", src: "LABEL=160", state: "mounted", ocdata_link: "." }
 
 ocdata_links:
    - { name: ".ocdata1", link: "data" }

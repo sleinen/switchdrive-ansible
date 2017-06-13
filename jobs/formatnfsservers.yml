@@ -1,7 +1,7 @@
 ---
 
 
-# run with: 
+# run with:
 #     ansible-playbook -i "10.0.23.75," jobs/formatnfsservers.yml
 
 
@@ -15,6 +15,5 @@
       #command: xfs_admin -L {{ item.1 }} /dev/{{ item.0 }}
       with_together:
         - [ vdh, vdi, vdj, vdk, vdl, vdm ]
-        - [ "137", "138", "139", "140", "141 ", "142 "]
+        - [ "155", "156", "157", "158", "159 ", "160 "]
       ignore_errors: yes
-
