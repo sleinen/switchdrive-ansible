@@ -3,12 +3,12 @@
 - hosts: 
     - web
     - sync
-    - dev
-    - mgmt
+    #- dev
+    #- mgmt
   become: yes
   tasks:
-    - name: restart ocphp_fpm
-      shell: "docker stop ocphp_fpm"
+    - name: remove container
+      shell: "docker stop php_fpm_9.0.9; docker rm php_fpm_9.0.9"
 
 
 
