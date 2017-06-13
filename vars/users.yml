@@ -23,6 +23,15 @@ user:
     uid: 1110
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD6iCEu+Nj3RrDwYpM3rQZysouVPriE8a1SITXmN6T8S8+4qYJugzAHhmWs49Bj0iHmy4srPmeiu+h6n6nHFNLFHSIYrfsihutEnF4zA80mH19WyqkO+ZvWB3KkmLkx/H36lVVFJwZEGKPCzI+tRaxThEcKNEDoj/+rrtvoo9OQ5mJD14kWirRHLFm3lbxssDEfaFLqZGFQjCLklBcZQQXV3GgbOixZMhS5pNC3xQJh9UEbgCYht0hVD3FueY6JOc/nPXg+ETBhDkMXkJPKfKz5U+r2Vf9lJ9J91uYcHeoAdhaPs1aO+zVFa+wJ91cCRF300FVZNCiqszaGDSVa6KcF proto@macfp.switch.ch"
   # InIt
+  vernon:
+    comment: "Greg Vernon"
+    uid: 1004
+    key: "ssh-dss AAAAB3NzaC1kc3MAAACBAP5Gzt8T7WoRnHZocbnxHOU+16RyhehKtY862qv7YPDeGtSLEAaWSvHgjp62N8oDsHKXqXwegnlbBDBy/+jsMPqQDROboDUF2tyuwH+ZJNmgSFuUafxJ4RA23gfodFoNqz1Vjg/j0QfkxMgxbIP9kQQGi5/JLzcpHI4F1qAv6wgZAAAAFQCqnnP4FOgYaeaQd/l/RfutHUzhSQAAAIBZlMbNxk+DX7prQt8/hgxJWNOz7p/YKRz4FpLfaIh8u0Qlds+y2sG2ay+S02Djcs5XOT8Av8dYKheLUrHBju/jLWHyZ13cQjos6esrdWgLQyW+dSASkxwvMfooMLhgjHmjoMBqwr2teLwx4/WBGT8B504sMHuGC+M9tUoXykrX9QAAAIEAvxA1zkkbpB7pL2z2+EqE0HG2r1PGMreXHTEh0duA51+fdaZJrj9AcfwziFXucgRzCEjPxCCJ9bfJL2FilAENfvF/p5LhDqvJfMUb27QFeSu9McC5yzWQPSleAKGs4Po+hLm/eikrZ/akfFW6PnFUFK2A6pcH3BUPkNhUkiFhnHo= vernon@macgv.switch.ch"
+  buschor:
+    comment: "Thomas Buschor"
+    uid: 951
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC5JR3MNWk9alC2TOtlpDIz9n4G1Tsd+2UH5E3JrDMtqr3s5Bwp6V8z4MmHL+gHxHwW7ENq6Rw0raVSCeWvfv36VLx0FXYeLMWdQD/NVoa0bt7WrbY2bDYXCXz8IDqjqfogmwseOW38Pe3y7LnPSNHHMS2S1jEvTpPqcNXK6vJfAC8a3Nkh8uKu1rj9ns5ZbrU5Vi6pgZuNVN9Zb0gH0laC9u9kV0T0hZd4J87oUJEpBqKhRaRcMhsm8uhmMolj9tVTtPaVrYO7kldYChKI2adOJCgNkYgUnjq21qoE1JIEAFzz2K6Tvxuf/1DmLLEb9AtngtI0u8gqWu4bECUQRVewFvhzTL6PksJaAKOFLEwQ7SBTO97CzHn9IPD96Cs+gb9nM9kWKlg4/Hpx7FyamB4j2tRvg1QEpRQYz0ZhRPw9gKoq6el4Xy1aWT37kb3vlcP76gGrUnOhvarGnv9gUoXipijIxj01gocXdWKFdSfh6MAtuUo5OQEMFc2Nypr3iqI185EC7T4v8c6T8WkLd04MT5gv/Q0uswCFBE36t4vLk7Y9ZKriNZe8oWzVjOgBeiNqWgdSU4LSaYwh4AH25ea1zdMjGqftHnCGSUz6w4Tz3/tTrOXRfeohYfOIF/UOnVSrsRggO5CtWKgOXmH5AQYx1AxW9pzqClTmxEfB8CMoxw== buschor@switch.ch"
+
   # Coll
   furter:
     comment: "Renato Furter"
@@ -59,10 +68,6 @@ user:
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDeYeurVx0D/CSWTBbKsjGPtb+o+yJePdH4EwYSJrGAR/LrWhK6715vUbKCXYSOtNycxcMecW34IGhShXYo/VpU0GIAAElKdsoi20Ob8o0dHGRzkceyYsVR6WQIY7d7pfydD3Z9wLtL9GynHzMiUP4O9EgrKAhjMDdCjcj1vyLE4POEH9HcU3besz3z2Q3dWxTZVPXyBX7m6X91n6quWcQFp7jL+R1uFLB/AxLDfGhme6unOYOfQ+4P4KxJzFMMcf9aCKEJjV9pk5R3u64xkpbUR4iJ359ZvPEQpEL7PZ9SjmjQYbdpBsUHz2Tp//3LAUPTEVKE/193iejWcXJJ6leksZG1ulluKmFsBgbZHa5ojA5J2WmRELD54+2FidT2Qwo9jx+fRkCFdhdwL0+20olxy3Ft3DpD/KQAPXzaCrEjdY5QzzPJ9XP/MttIFJYudTd06x998pkZ9sc80MRJm6C+ZIB7E4xvGj5NmQeYrAq7dfSlnzTKQzZHmyNhfyTLjVXv/pMTlzLxRli4rRODF6gxs5vTxsEUmst97N8SIoIDums9BXqMsFQcN5I1wtIIzdMRZh6VtU8FlhwpXGG7hGzMF5V9uPbUsJw0U5sjbO0wOEQDcYoLkAiypnNZuT3MdTU6YolRsGduEqseGC5u6l2AfaWadckRHcCqAPaSjcZseQ== mueller2@macfm.switch.ch"
 
   # removed
-  vernon:
-    comment: "Greg Vernon"
-    uid: 1004
-    key: "ssh-dss AAAAB3NzaC1kc3MAAACBAP5Gzt8T7WoRnHZocbnxHOU+16RyhehKtY862qv7YPDeGtSLEAaWSvHgjp62N8oDsHKXqXwegnlbBDBy/+jsMPqQDROboDUF2tyuwH+ZJNmgSFuUafxJ4RA23gfodFoNqz1Vjg/j0QfkxMgxbIP9kQQGi5/JLzcpHI4F1qAv6wgZAAAAFQCqnnP4FOgYaeaQd/l/RfutHUzhSQAAAIBZlMbNxk+DX7prQt8/hgxJWNOz7p/YKRz4FpLfaIh8u0Qlds+y2sG2ay+S02Djcs5XOT8Av8dYKheLUrHBju/jLWHyZ13cQjos6esrdWgLQyW+dSASkxwvMfooMLhgjHmjoMBqwr2teLwx4/WBGT8B504sMHuGC+M9tUoXykrX9QAAAIEAvxA1zkkbpB7pL2z2+EqE0HG2r1PGMreXHTEh0duA51+fdaZJrj9AcfwziFXucgRzCEjPxCCJ9bfJL2FilAENfvF/p5LhDqvJfMUb27QFeSu9McC5yzWQPSleAKGs4Po+hLm/eikrZ/akfFW6PnFUFK2A6pcH3BUPkNhUkiFhnHo= vernon@macgv.switch.ch"
   kerins:
     comment: "Fergus Kerins"
     uid: 998
@@ -89,6 +94,8 @@ users_admin:
   - herzog
   - furter
   - schmid2
+  - vernon
+  - buschor
 
 users_mgmt:
   - wieting
