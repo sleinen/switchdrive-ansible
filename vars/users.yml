@@ -26,7 +26,7 @@ user:
   vernon:
     comment: "Greg Vernon"
     uid: 1004
-    key: "ssh-dss AAAAB3NzaC1kc3MAAACBAP5Gzt8T7WoRnHZocbnxHOU+16RyhehKtY862qv7YPDeGtSLEAaWSvHgjp62N8oDsHKXqXwegnlbBDBy/+jsMPqQDROboDUF2tyuwH+ZJNmgSFuUafxJ4RA23gfodFoNqz1Vjg/j0QfkxMgxbIP9kQQGi5/JLzcpHI4F1qAv6wgZAAAAFQCqnnP4FOgYaeaQd/l/RfutHUzhSQAAAIBZlMbNxk+DX7prQt8/hgxJWNOz7p/YKRz4FpLfaIh8u0Qlds+y2sG2ay+S02Djcs5XOT8Av8dYKheLUrHBju/jLWHyZ13cQjos6esrdWgLQyW+dSASkxwvMfooMLhgjHmjoMBqwr2teLwx4/WBGT8B504sMHuGC+M9tUoXykrX9QAAAIEAvxA1zkkbpB7pL2z2+EqE0HG2r1PGMreXHTEh0duA51+fdaZJrj9AcfwziFXucgRzCEjPxCCJ9bfJL2FilAENfvF/p5LhDqvJfMUb27QFeSu9McC5yzWQPSleAKGs4Po+hLm/eikrZ/akfFW6PnFUFK2A6pcH3BUPkNhUkiFhnHo= vernon@macgv.switch.ch"
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQD4lit9V8bxuKXLslSf05tVE6iJIJ9egT29EUq8vI7zNZ8W/GdbdnHLyzrt6299uGIBSg/FC7A2NGzxuL+zpcT97rn0+sQah4E5P+0YEDykOJKs8fw0HVHaen12zb/qtBF+r2D4fPHogixTH7voaw+fftgKB2eJATgWyyHzvbuCKYzR4mpAVO930EViqoCmJuUnP7HkBtYvc0qHo0I9c9M5+vPWVzjTRCDv6nD3Hu0dQLMxnnpcpcR3rkWaHSPMqapYTFBT9qphtUnr33KnunO+W00jGU8AsJuPzbNFs43v77Ca8hjubI8yT2oJ2+3VNFl59+vrKqjH2VwIBqeVHV6XNnEecs7qyCXvo/jgr9MiK71aBdUgbKxjJaPTkNL0j0AjlNUY6/dXCok+t5XdMkdM/40FGJNy57DMFySbc7BonCZvNzrDqvAqD5ewgptnQyfahLQUkczFymlovXRTUuzuYEqXyB6P+2FwC/RNJI5CBGghR8AI38RTcxjoLlVwFpkhALqXR+D7BMry93xoCJ/9qRHIurLbOELb2/qhpQwkKzLF9cttMo+tINtxC1A0eJqWICDFdJ088NPu6tjKmy5hGTYQ5NKLK7Gm0/DhnXlNdQoFTtSIqF+hv4hLldY5fm9X+B+6BDKA68+2Zl1soi3yqdz34gKtVU2nA6uxBBWCPw== vernon@macgv.switch.ch"
   buschor:
     comment: "Thomas Buschor"
     uid: 951
@@ -135,9 +135,10 @@ ubuntu_keys:
   - furter
   - fritschi
   - schmid2
+  - vernon
+  - buschor
 
 deleted_ubuntu_keys:
-  - vernon
   - helmle
   - kerins
   - usai
