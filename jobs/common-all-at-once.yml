@@ -14,7 +14,7 @@
     - redis
     - ldap
     - lb
-    #- jumphost
+    - jumphost
   vars_files:
     - ../vars/users.yml
   #serial: 1
