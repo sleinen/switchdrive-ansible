@@ -122,7 +122,7 @@ max_connections=1024
 max_connect_errors=100
 
 # oc is writing avatar into db :-( (starting with OC 9.0)
-#max_allowed_packet=128M
+max_allowed_packet=128M
 
 tmp_table_size=32M
 max_heap_table_size=32M
