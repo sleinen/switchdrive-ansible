@@ -8,6 +8,15 @@
   file: path={{mariadb_backup_dir}} state=directory owner=999 group=999 mode=0755
   tags: mariadb
 
+- name: 'Create directory for MariaDB tmp'
+  file:
+    path: "{{mariadb_mount_point}}/tmp"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "u+rwx,g+rwx,o+rwx"
+  tags: mariadb
+
 - name: 'Create directory for MariaDB configs'
   file: path=/etc/mysql/conf.d state=directory owner=root group=root mode=0755
   tags: mariadb
@@ -70,6 +79,7 @@
        - "{{mariadb_backup_dir}}:/backup"
        #- "/run/mysqld:/run/mysqld"
        - "/run/systemd/journal/syslog:/dev/log"
+       - "/mnt/data/tmp:/tmp"
     # normal
     command: "{{mariadb_cmdline_options}}"
     restart_policy: "{{mariadb_restart_policy}}"
