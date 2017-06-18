@@ -1,22 +1,14 @@
 ---
 
-# singel shard deployments
+# single shard deployments
 ssd:
-  # drive:
-  #   major_version: "9.0"
-  #   minor_version: "9"
-  #   image_version: 2
-  #   version_in_config: '8.2.8.2'
-  #   version_in_config: '9.0.9.1'
   drive:
     major_version: "9.0"
     minor_version: "10"
     image_version: 1
-    #version_in_config: '8.1.12.2'
-    version_in_config: '8.2.11.1'
-    #version_in_config: '9.0.10.2'
-    #db_host: localhost
-    db_host: 10.0.23.34
+    version_in_config: '9.0.10.2'
+    db_host: localhost
+    #db_host: 10.0.23.31
     #db_host: {{hostvars[groups["mariadb"][0]].inventory_hostname}}
   staging:
     major_version: "9.0"
