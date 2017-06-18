@@ -119,16 +119,17 @@ frontend ssl
     acl shard_a04 cook(shard) a04
     acl shard_a05 cook(shard) a05
     acl has_shard_cookie cook(shard) -m found
-    acl is_cluster_dom hdr_beg(host) -i drive-backup.switch.ch
+    acl is_cluster_dom hdr_beg(host) -i {{service_name}}
 
     # set shard cookie if not present yet (only for sync clients)
     # commented out -> better do this with php to take load away from haproxy.
     #redirect prefix / set-cookie shard=%[lua.userToShardLookup] if !has_shard_cookie syncclient
 
     # default for non webdav clients
-#    http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie !webdav
-    #http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth syncclient
-    #http-request set-header Host a01.drive-backup.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth iosclient
+    http-request set-header Host a01.{{service_name}} if is_cluster_dom
+    #http-request set-header Host a01.{{service_name}}.switch.ch if is_cluster_dom !has_shard_cookie !webdav
+    #http-request set-header Host a01.{{service_name}}.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth syncclient
+    #http-request set-header Host a01.{{service_name}}.switch.ch if is_cluster_dom !has_shard_cookie has_basic_auth iosclient
 
     # webdav client -> let them go to root site where a cookie will be set for them.
     # -> works for syncclients and iosclients
@@ -139,11 +140,11 @@ frontend ssl
     #http-request lua.userToShardLookup if has_basic_auth pyocclient
 
     # based on cookie already present
-#    http-request set-header Host a01.{{ service_name }} if shard_a01
-#    http-request set-header Host a02.{{ service_name }} if shard_a02
-#    http-request set-header Host a03.{{ service_name }} if shard_a03
-#    http-request set-header Host a04.{{ service_name }} if shard_a04
-#    http-request set-header Host a05.{{ service_name }} if shard_a05
+    http-request set-header Host a01.{{ service_name }} if shard_a01
+    http-request set-header Host a02.{{ service_name }} if shard_a02
+    http-request set-header Host a03.{{ service_name }} if shard_a03
+    http-request set-header Host a04.{{ service_name }} if shard_a04
+    http-request set-header Host a05.{{ service_name }} if shard_a05
 
     #########
     # session cookie also valid on subdomains:
