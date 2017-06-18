@@ -72,7 +72,7 @@ bash ./snapshotAll
 
 
 # check with
-openstack volume snapshot list | grep 'data-.*-'`date "+%Y%m%d"` | sort -k 4
+openstack snapshot list | grep 'data-.*-'`date "+%Y%m%d"` | sort -k 4
 
 # redo those that failed.
 
@@ -108,7 +108,7 @@ sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/preU
 
 ansible-playbook -i inventories/$SITE jobs/mariadb_convert_galeracluster_to_single_node.yml
 
-#monitor proges on web1 with:
+#monitor progress on web1 with:
 while (true) ; do /root/maxadmin list servers; sleep 1; done
 
 # from now on db server in config.php has to point to the remaining db server: 10.0.Y.3X
@@ -134,8 +134,15 @@ ansible-playbook -i inventories/$SITE playbooks/webservers.yml --limit=*.210 --t
 
 # run upgrade
 >>> web10.$SITE
+tmux
 time /root/occ a01 upgrade -vvv --skip-migration-test
 # takes about 90 Minutes
+
+# db backup on db1
+sudo docker exec mariadb bash -c "xtrabackup --backup --datadir=/var/lib/mysql/ --target-dir=/backup/oc8.2 --password=\$MYSQL_ROOT_PASSWORD"
+sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/oc8.2"
+sudo docker exec mariadb bash -c "xtrabackup --prepare --target-dir=/backup/oc8.2"
+
 
 # backup OC 8.2 config
 >>> mac
@@ -158,8 +165,8 @@ ansible-playbook -i inventories/$SITE playbooks/webservers.yml --limit=*.211 --t
 /root/mariadb
   -> use owncloud;
      ALTER TABLE `oc_filecache` ADD COLUMN checksum varchar(255) DEFAULT NULL AFTER permissions;
-# this takes about 50 Minutes
-
+# this takes about 60 Minutes
+# make sure to have enough space in /tmp
 
 
 # run upgrade
@@ -203,7 +210,7 @@ sudo /root/ha_update en web11
 
 ansible-playbook -i inventories/$SITE jobs/mariadb_bootcluster.yml
 
-#monitor proges on web1 with:
+#monitor progress on web1 with:
 while (true) ; do /root/maxadmin list servers; sleep 1; done
 
 # from now on db server in config.php has to point to localhost again.
@@ -260,6 +267,9 @@ openstack server show $LB2_SERVER_ID -c security_groups
 
 
 ***************************************
+
+!!!!!!! check and fix cronjobs
+
 ***************************************
 ***************************************
 ***************************************
