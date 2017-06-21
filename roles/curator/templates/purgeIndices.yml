@@ -17,7 +17,7 @@ actions:
         direction: older
         timestring: '%Y.%m.%d'
         unit: days
-        unit_count: 7
+        unit_count: {{elasticsearch_keep_data.logfiles}}
         field:
         stats_result:
         epoch:
@@ -41,7 +41,7 @@ actions:
         direction: older
         timestring: '%Y.%m.%d'
         unit: days
-        unit_count: 180
+        unit_count: {{elasticsearch_keep_data.audit}}
         field:
         stats_result:
         epoch:
