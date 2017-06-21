@@ -16,6 +16,13 @@
   file: path=/run/mysqld state=directory owner=997 group=996 mode=0755
   tags: maxscale
 
+- name: 'Create directory for logging stuff'
+  file: path="{{item}}" state=directory owner=997 group=996 mode=0755
+  with_items:
+    - "/var/log/maxscale"
+    - "/var/log/maxscale/sessions"
+  tags: maxscale
+
 
 - name: maxscale docker
   docker_container:
@@ -29,5 +36,6 @@
       - "/etc/maxscale.cnf:/etc/maxscale.cnf"
       - "/run/mysqld:/run/mysqld"
       - "/run/systemd/journal/syslog:/dev/log"
+      - "/var/log/maxscale:/var/log/maxscale"
   tags:
     - maxscale

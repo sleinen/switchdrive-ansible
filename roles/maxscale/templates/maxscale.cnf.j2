@@ -13,6 +13,12 @@ max_slave_connections=100%
 user={{ maxscale_user }}
 passwd={{ maxscale_password }}
 
+# uncomment the following to lines to activate the top10Logger
+#router_options=running
+#filters=top10Logger
+
+
+
 # https://mariadb.com/kb/en/mariadb-enterprise/mariadb-maxscale-14/readwritesplit/
 # default: LEAST_CURRENT_OPERATIONS
 #router_options=slave_selection_criteria=LEAST_CURRENT_OPERATIONS
@@ -28,6 +34,7 @@ service=Splitter Service
 protocol=MySQLClient
 port={{ maxscale_port }}
 socket={{ maxscale_socket }} 
+
 
 {% for host in groups["mariadb"] %}
 [{{ host }}]
@@ -60,4 +67,12 @@ service=CLI
 protocol=maxscaled
 address=localhost
 port=6603
+
+[top10Logger]
+# See more at: https://mariadb.com/resources/blog/which-sql-queries-take-all-time-using-maxscale-answer-age-old-question#sthash.BBHfONo9.dpuf
+type=filter
+module=topfilter
+count=10
+filebase=/var/log/maxscale/sessions/top10
+
 
