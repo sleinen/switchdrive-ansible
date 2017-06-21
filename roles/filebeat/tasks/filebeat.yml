@@ -34,6 +34,7 @@
       - "/etc/filebeat/filebeat.yml:/usr/share/filebeat/filebeat.yml"
       - "/var/log:/var/log"
       - "/run:/run"
+      - "/dev/shm:/dev/shm"
     network_mode: host
   tags:
     - filebeat
