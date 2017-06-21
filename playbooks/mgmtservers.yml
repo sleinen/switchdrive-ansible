@@ -10,13 +10,14 @@
     - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
   roles:
     - common
-    - role: docker_14_06
-      tags: docker
+    - docker
     - maxscale
-    - exim
+    #- exim
     - role: owncloud
       tags: owncloud
     - ocphp_fpm
-    - ocapache
+    # no apache, that way we make sure this will never become an active oc server.
+    #- ocapache
+    - filebeat
     - scripts
     - mgmt
