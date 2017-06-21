@@ -10,5 +10,9 @@
      - ceph_pg_plugin.py
      - ceph_pool_plugin.py
      - LICENSE
+  tags:
+    - mgmt
 
 - copy: src=ceph/ceph.conf dest=/etc/collectd/collectd.conf.d/ceph.conf
+  tags:
+    - mgmt

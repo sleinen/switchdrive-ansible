@@ -38,8 +38,15 @@ scripts:
    - { name: "createUserLists", path: "/root", mode: "0550" }
    - { name: "mvLinks", path: "/root", mode: "0550" }
    - { name: "scanUser", path: "/usr/bin", mode: "0755" }
+   - { name: "sh.scanUser", path: "/usr/bin", mode: "0755" }
    - { name: "cacheCleaner", path: "/usr/bin", mode: "0755" }
    - { name: "scanUsersOnDisk", path: "/root", mode: "0550" }
    - { name: "mariadb", path: "/root", mode: "0550" }
    - { name: "mysqlcmd", path: "/root", mode: "0550" }
    - { name: "maxadmin", path: "/root", mode: "0550" }
+
+filebeat:
+  configs:
+    - { src: "filebeat.yml.j2", dst: "filebeat.yml" }
+    - { src: "apache.yml.j2",   dst: "conf.d/apache.yml" }
+    - { src: "owncloud.yml.j2",   dst: "conf.d/owncloud.yml" }

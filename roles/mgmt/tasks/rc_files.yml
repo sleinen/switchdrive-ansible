@@ -1,0 +1,11 @@
+---
+
+- name: copy over rc files
+  template:
+    src: "rc_files/{{item.src}}"
+    dest: "{{item.dest}}"
+    mode: "{{item.mode}}"
+  with_items:
+    - { src: "root_aliases.sh", dest: "/root/.bash_aliases", mode: "0644" }
+  tags:
+    - mgmt

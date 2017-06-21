@@ -45,6 +45,8 @@ os_server:
   redis1:     { ip: "{{ hostvars[groups['redis'][0]].inventory_hostname }}",     flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['redis'] }}" } }
   redis2:     { ip: "{{ hostvars[groups['redis'][1]].inventory_hostname }}",     flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['redis'] }}" } }
 
+  mgmt1:      { ip: "{{ hostvars[groups['mgmt'][0]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "60", security_groups: "default",                      hints: {} }
+
   web11:      { ip: "{{ hostvars[groups['web'][10]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['web'] }}" } }
   web12:      { ip: "{{ hostvars[groups['web'][11]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['web'] }}" } }
   web13:      { ip: "{{ hostvars[groups['web'][12]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['web'] }}" } }
@@ -57,10 +59,11 @@ os_server:
 
   graphite1:  { ip: "{{ hostvars[groups['graphite'][0]].inventory_hostname }}",  flavor: "drive-40-4-4-120-ssd",     image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['graphite'] }}" } }
   graphite2:  { ip: "{{ hostvars[groups['graphite'][1]].inventory_hostname }}",  flavor: "drive-40-4-4-120-ssd",     image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['graphite'] }}" } }
-  #elk1:       { ip: "{{ hostvars[groups['elk'][0]].inventory_hostname }}",       flavor: "drive-40-16-16-600-ssd",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['elk'] }}" } }
-  #elk2:       { ip: "{{ hostvars[groups['elk'][1]].inventory_hostname }}",       flavor: "drive-40-16-16-600-ssd",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['elk'] }}" } }
+
   elk1:       { ip: "{{ hostvars[groups['elk'][0]].inventory_hostname }}",       flavor: "drive-20-64-16",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default,elk",      hints: { group: "{{ os_server_group['elk'] }}" } }
   elk2:       { ip: "{{ hostvars[groups['elk'][1]].inventory_hostname }}",       flavor: "drive-20-64-16",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default,elk",      hints: { group: "{{ os_server_group['elk'] }}" } }
+
+  db6:        { ip: "{{ hostvars[groups['mariadb'][5]].inventory_hostname }}",   flavor: "drive-100-245-46-1.2-ssd", image: "{{os_image['xenial']}}", root_size: "80", security_groups: "default",          hints: { group: "{{ os_server_group['mariadb'] }}" } }
 
 # ceph data volumes; do not add root volumes and ssd-ephemeral volumes like e.g. the one for graphite.
 os_volumes:

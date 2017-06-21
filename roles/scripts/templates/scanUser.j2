@@ -1,4 +1,3 @@
 #!/bin/bash
 
-cd /var/www/owncloud
-sudo -u www-data -g www-data /usr/bin/php /var/www/owncloud/occ files:scan $@
+sudo /usr/bin/sh.scanUser "$@"
