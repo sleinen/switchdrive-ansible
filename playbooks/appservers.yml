@@ -1,11 +1,10 @@
 ---
-# handles the devservers
+# handles the web- & syncservers
 
-
-- hosts: dev
+- hosts: web,sync
+#  gather_facts: no
   vars:
     node_type: web
-    php_ini_file: "php.xdebug.ini"
   vars_files:
     - ../vars/users.yml
     - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
@@ -14,11 +13,11 @@
     - docker
     - maxscale
     - exim
-    #- nagios
+    - nagios
     - role: owncloud
       tags: owncloud
     - ocphp_fpm
     - ocapache
+    - filebeat
     - scripts
-    #- ocdev
   become: true

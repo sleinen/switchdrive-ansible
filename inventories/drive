@@ -20,7 +20,7 @@
 
 [mariadb]
 # the first one is the master on cluster-reboot.
-10.0.23.[31:33]
+10.0.23.[31:36]
 
 [nfs]
 10.0.23.71 vols="{{volumes_nfs1}}"
@@ -30,12 +30,12 @@
 10.0.23.75 vols="{{volumes_nfs5}}"
 
 [web]
-10.0.23.[201:204] active=True
+10.0.23.[201:204] active=False
 10.0.23.[205:210] active=False
 10.0.23.[211:214] active=True
 
 [sync]
-10.0.23.[101:104] active=True
+10.0.23.[101:104] active=False
 10.0.23.[105:110] active=False
 10.0.23.[111:114] active=True
 

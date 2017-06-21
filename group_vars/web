@@ -21,7 +21,7 @@ db_pool_size: 35
 
 collectd_processes:
    - php-fpm
-   - nginx
+   - apache2
 
 php_config:
   max_file_upload_size: 4G

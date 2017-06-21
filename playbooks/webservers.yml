@@ -4,7 +4,7 @@
 - hosts: web
   vars:
     node_type: web
-    php_ini_file: "php.xdebug.ini"
+    #php_ini_file: "php.xdebug.ini"
   vars_files:
     - ../vars/users.yml
     - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
@@ -21,12 +21,3 @@
     - filebeat
     - scripts
   become: true
-  #tasks:
-  #  - name: setup cronjob
-  #    cron: name="owncloud" user=www-data minute="*/15" job="php -f /var/www/owncloud/cron.php"
-  #    run_once: true
-  #    delegate_to: "{{ hostvars[groups['web'][0]].inventory_hostname }}"
-  #    tags:
-  #      - app
-  #      - config
-  #      - cron
