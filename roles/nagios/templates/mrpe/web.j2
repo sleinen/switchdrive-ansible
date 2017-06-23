@@ -2,7 +2,7 @@
 # L_check_http checks the http connection to the host. Between 5 and 10 secs for a response returns WARNING; for less than 5 secs it is OK.
 # For response time higher than 10 secs the returned status is CRITICAL.
 ##
-L_check_http /usr/lib/nagios/plugins/check_http -w 5 -c 10  -I {{ inventory_hostname }}
+L_check_http /usr/lib/nagios/plugins/check_http -w 5 -c 10  -I {{ inventory_hostname }} -u /status.php
 
 ##
 # L_check_ldap_bind checks an ldap bind (ldapsearch) to the ldap server on port 636 with 'ou=Users,dc=cloud,dc=switch,dc=ch'
@@ -22,12 +22,12 @@ L_check_tcp_nfs_port2049 /usr/lib/nagios/plugins/check_tcp -p 2049 -H {{ nfs1_ip
 ##
 # L_check_php-fpm checks that at least 6 processes of php-fpm are up and running (under user www-data).
 ##
-L_check_php-fpm /usr/lib/nagios/plugins/check_procs -c 6:  -C php-fpm5.6 -u www-data
+L_check_php-fpm /usr/lib/nagios/plugins/check_procs -c 6:  -C php-fpm7.0 -u www-data
 
 ##
 # L_check_php-fpm_master checks that one and only one php-fpm_master process is up and running.
 ##
-L_check_php-fpm_master /usr/lib/nagios/plugins/check_procs -C php-fpm5.6 -u root -c 1:1
+L_check_php-fpm_master /usr/lib/nagios/plugins/check_procs -C php-fpm7.0 -u root -c 1:1
 
 ##
 # check_logfiles checks the log files as defined in the specified configuration file
