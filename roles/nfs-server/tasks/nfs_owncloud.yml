@@ -1,0 +1,14 @@
+---
+
+- name: setup ocdata link
+  file:
+    dest: "/mnt/{{ item.name }}/._ocdata"
+    src: "/mnt/{{ item.ocdata_link }}/._ocdata"
+    state: link
+    force: yes
+  #with_items: "{{vols}}"
+  with_items: "{{os_volumes[short_hostname]}}"
+  tags:
+    - config
+    - ocdata
+    - mount

@@ -16,7 +16,7 @@
   filesystem:
     fstype: "{{ item.fs }}"
     dev: "{{ item.device }}"
-    opts:
+    opts: "-L {{ item.name }}"
   with_items:
     - "{{ os_volumes[server_name] }}"
   tags:
@@ -25,7 +25,8 @@
 - name: mount volumes
   mount:
     name: "/mnt/{{ item.name }}"
-    src: "{{ item.device }}"
+    #src: "{{ item.device }}"
+    src: "LABEL={{ item.name }}"
     fstype: "{{ item.fs }}"
     opts: noatime
     state: "{{ item.state }}"

@@ -13,7 +13,7 @@ snapshot_volumes:
    # quobyte
    - { name: "001", hour: 6, minute: 0, region_name: "LS", volume_id: "96cafbfa-53fe-424e-8d25-be758f5c6036", state: absent }
    # nfs1
-   - { name: "000", hour: 2, minute: 0, region_name: "ZH", volume_id: "82f37a75-6bc2-46a2-ae5e-669541fa112b", state: present }
+   - { name: "data", hour: 2, minute: 0, region_name: "ZH", volume_id: "82f37a75-6bc2-46a2-ae5e-669541fa112b", state: present }
    - { name: "101", hour: 3, minute: 1, region_name: "ZH", volume_id: "1d20d74f-567b-42d7-ab19-32d8a9386f63", state: present }
    - { name: "102", hour: 4, minute: 2, region_name: "ZH", volume_id: "f38829ec-a279-4422-9e3b-c74e8f974070", state: present }
    - { name: "103", hour: 2, minute: 3, region_name: "ZH", volume_id: "4c0ad366-0209-44f3-adfc-9f5d58378f43", state: present }
@@ -160,6 +160,7 @@ volumes_nfs5:
 ocdata_links:
    - { name: ".ocdata1", link: "data" }
    - { name: ".ocdata2", link: "131" }
+   - { name: ".ocdata3", link: "131" }
 
 nfs_volumes:
   - ip: "{{nfs1_ip}}"

@@ -16,7 +16,9 @@
   vars_files:
     - ../vars/users.yml
     - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+    - ../vars/servers.{{ site }}.yml
   roles:
+    - data_volumes
     - common
     - nagios
     - nfs-server

@@ -1,7 +1,9 @@
 ---
 
 - include: nfs_main.yml
-- include: nfs_mount_volumes.yml
+#- include: nfs_mount_volumes.yml
+- include: nfs_export_volumes.yml
+- include: nfs_owncloud.yml
 - include: install_ssh-keys.yml
 
 

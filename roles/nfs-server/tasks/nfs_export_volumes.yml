@@ -1,0 +1,11 @@
+---
+
+- name: set nfs exports
+  template: src=exports.j2 dest=/etc/exports
+  notify:
+    - reexport nfs
+    #- restart nfs server
+  tags:
+    - config
+    - export
+

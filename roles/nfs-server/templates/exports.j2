@@ -7,7 +7,7 @@
 
 #/mnt/data *(rw,sync,no_root_squash,no_subtree_check)
 
-{% for volume in vols %}
+{% for volume in os_volumes[short_hostname] %}
 /mnt/{{ volume.name }} {{ inventory_hostname | regex_replace('(.*)\\.[^.]*$', '\\1') }}.0/24(rw,sync,no_root_squash,no_subtree_check)
 {% endfor %}
 

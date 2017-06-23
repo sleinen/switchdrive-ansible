@@ -21,23 +21,3 @@
   tags:
     - mount
 
-- name: set nfs exports
-  template: src=exports.j2 dest=/etc/exports
-  notify:
-    - reexport nfs
-    #- restart nfs server
-  tags:
-    - config
-    - export
-
-- name: setup ocdata link
-  file:
-    dest: "/mnt/{{ item.name }}/._ocdata"
-    src: "/mnt/{{ item.ocdata_link }}/._ocdata"
-    state: link
-    force: yes
-  with_items: "{{vols}}"
-  tags:
-    - config
-    - ocdata
-    - mount
