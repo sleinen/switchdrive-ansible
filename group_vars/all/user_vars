@@ -2,8 +2,8 @@
 ---
 
 #ansible_ssh_user: "{{vault_ansible_ssh_user}}"
-#ansible_ssh_user: "schnidri"
-#ansible_become_pass: '{{vault_ansible_become_pass}}'
+#ansible_ssh_user: "vernon"
+#ansible_become_pass: '{ncfH\(AE:bPj6E&'
 
 os_username: '{{vault_os_username}}'
 os_password: '{{vault_os_password}}'

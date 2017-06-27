@@ -965,6 +965,13 @@ class OC_Util {
 					' ".ocdata2" in its root.')
 			];
 		}
+		if (!file_exists($dataDirectory . '/.ocdata3')) {
+			$errors[] = [
+				'error' => $l->t('Data directory (%s) is invalid', [$dataDirectory]),
+				'hint' => $l->t('Please check that the data directory contains a file' .
+					' ".ocdata3" in its root.')
+			];
+		}
 		return $errors;
 	}
 
