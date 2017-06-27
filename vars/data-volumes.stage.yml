@@ -25,6 +25,8 @@ volumes_nfs1:
 ocdata_links: 
    - { name: ".ocdata1", link: "data" }
    - { name: ".ocdata2", link: "105" }
+   # this is just dummy to satisfy owncloud
+   - { name: ".ocdata3", link: "data" }
 
 volumes_nfs2:
 

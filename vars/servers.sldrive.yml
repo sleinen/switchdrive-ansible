@@ -55,6 +55,21 @@ os_server:
   db2:        { ip: "{{ hostvars[groups['mariadb'][1]].inventory_hostname}}",        flavor: "drive-100-32-8-100-ssd", image: "{{os_image['xenial']}}", root_size: "80", security_groups: "default", hints: { group: "{{ os_server_group['mariadb'] }}" } }
   db3:        { ip: "{{ hostvars[groups['mariadb'][2]].inventory_hostname}}",        flavor: "drive-100-32-8-100-ssd", image: "{{os_image['xenial']}}", root_size: "80", security_groups: "default", hints: { group: "{{ os_server_group['mariadb'] }}" } }
 
+os_volumes:
+  nfs1:
+    # the label is wong on disk "data"!!!! it is currently "000"
+    - { name: "data", name_prefix: "data", state: "mounted", device: "/dev/vdb", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "101"  }
+    - { name: "101", name_prefix: "data", state: "mounted", device: "/dev/vdc", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "102"  }
+    - { name: "102", name_prefix: "data", state: "mounted", device: "/dev/vdd", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "103"  }
+    - { name: "103", name_prefix: "data", state: "mounted", device: "/dev/vde", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "104"  }
+    - { name: "104", name_prefix: "data", state: "mounted", device: "/dev/vdf", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "."  }
+    - { name: "105", name_prefix: "data", state: "mounted", device: "/dev/vdg", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "106"  }
+    - { name: "106", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "107"  }
+    - { name: "107", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "108"  }
+    - { name: "108", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "."  }
+
+
+
 #####################
 # vips
 
@@ -68,3 +83,4 @@ os_vip:
   ports:
     - { name: '{{ site }}-lb1-port_{{ os_network }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
     - { name: '{{ site }}-lb2-port_{{ os_network }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
+
