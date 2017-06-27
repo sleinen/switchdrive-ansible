@@ -44,3 +44,17 @@ filebeat:
     - { src: "filebeat.yml.j2", dst: "filebeat.yml" }
     - { src: "apache.yml.j2",   dst: "conf.d/apache.yml" }
     - { src: "owncloud.yml.j2",   dst: "conf.d/owncloud.yml" }
+
+#################
+# owncloud: php_fpm_volumes
+
+# /run/shm is only 2GB on web servers -> that would limit the file size of uploaded files.
+php_fpm_volumes:
+  - "/etc/owncloud:/etc/owncloud"
+  - "{{owncloud_logdir}}:/var/log/owncloud"
+  - "/var/log/php:/var/log"
+  - "/run/mysqld:/run/mysqld"
+  - "/mnt:/mnt"
+  - "/var/run/php:/var/run/php"
+  #- "/run/shm:/tmp"
+  - "{{owncloud_webroot}}:{{owncloud_webroot}}"

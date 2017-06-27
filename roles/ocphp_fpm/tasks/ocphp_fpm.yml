@@ -9,7 +9,6 @@
   tags:
     - ocphp_fpm
 
-
 - include: install_php_fpm_config.yml
   with_items: "{{shard_mapping[service_name]}}"
   loop_control:
@@ -30,15 +29,7 @@
     pull: "{{ docker_pull }}"
     env:
        SHARDS: '{{item.shards | join(" ")}}'
-    volumes:
-      - "/etc/owncloud:/etc/owncloud"
-      - "{{owncloud_logdir}}:/var/log/owncloud"
-      - "/var/log/php:/var/log"
-      - "/run/mysqld:/run/mysqld"
-      - "/mnt:/mnt"
-      - "/var/run/php:/var/run/php"
-      - "/run/shm:/tmp"
-      - "{{owncloud_webroot}}:{{owncloud_webroot}}"
+    volumes: "{{php_fpm_volumes}}"
     #command: "bash -c 'sleep 3000'"
   with_items:
     - "{{shard_mapping[service_name]}}"

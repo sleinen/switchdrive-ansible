@@ -70,3 +70,17 @@ letsencrypt:
 haproxy_state_file: "/var/lib/haproxy/state"
 
 server_name: "{{ ansible_hostname | regex_replace('^[^-]+-(.*)$', '\\1') }}"
+
+
+#################
+# owncloud: php_fpm_volumes
+
+php_fpm_volumes:
+  - "/etc/owncloud:/etc/owncloud"
+  - "{{owncloud_logdir}}:/var/log/owncloud"
+  - "/var/log/php:/var/log"
+  - "/run/mysqld:/run/mysqld"
+  - "/mnt:/mnt"
+  - "/var/run/php:/var/run/php"
+  - "/run/shm:/tmp"
+  - "{{owncloud_webroot}}:{{owncloud_webroot}}"
