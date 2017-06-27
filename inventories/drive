@@ -32,13 +32,13 @@
 
 [web]
 10.0.23.[201:204] active=True
-10.0.23.[205:210] active=False
-10.0.23.[211:214] active=False
+#10.0.23.[205:210] active=False
+#10.0.23.[211:214] active=False
 
 [sync]
 10.0.23.[101:104] active=True
-10.0.23.[105:110] active=False
-10.0.23.[111:114] active=False
+#10.0.23.[105:110] active=False
+#10.0.23.[111:114] active=False
 
 [mgmt]
 10.0.23.10 admin_users={{mgmt_users}}
