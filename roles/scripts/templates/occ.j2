@@ -1,3 +1,4 @@
+#!/bin/bash
 SHARD=$1
 
 if [ "x$SHARD" == 'x' ]; then
@@ -14,4 +15,6 @@ OC_VERSION_{{shard.shard_name}}={{shard.version}}
 OC_VERSION_VAR="OC_VERSION_${SHARD}"
 OC_VERSION=${!OC_VERSION_VAR}
 
-docker exec -ti --user www-data php_fpm_${OC_VERSION} {{owncloud_webroot}}/${SHARD}/occ "$@"
+#docker exec -ti --user www-data php_fpm_${OC_VERSION} {{owncloud_webroot}}/${SHARD}/occ "$@"
+docker exec -i --user www-data php_fpm_${OC_VERSION} {{owncloud_webroot}}/${SHARD}/occ --ansi "$@"
+
