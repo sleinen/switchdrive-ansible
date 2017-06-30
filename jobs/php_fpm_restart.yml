@@ -8,7 +8,7 @@
   become: yes
   tasks:
     - name: restart ocphp_fpm
-      shell: "docker stop ocphp_fpm; docker start ocphp_fpm"
+      shell: "docker restart php_fpm_{{ssd[site].major_version}}.{{ssd[site].minor_version}}"
 
 
 
