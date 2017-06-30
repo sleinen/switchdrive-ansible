@@ -62,10 +62,10 @@ user:
     comment: "Samuel Wuethrich"
     uid: 1100
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC0+feO5A67tAcfjUqgtE6ol1hO1Kl9OI5mc9D7vVfPw4u4amg6y0vf2/eXdyeky8gSJhPf4e8GDmH2w84eQtB6RVE1d69xO50OmrBvY4CZAWu9VZFq/hyeQpxWpUo25x8PvdOh7glZ8JW8gQhtBJ018JNryxyVcGLk645Dc6rG/WJCwE7sxPBHVDvODeCEFVeX8rE9N0SojtrLh4BlxRuyNPDYE/cxSzpul809YyBzOaudGgaH7WYKGtnAjONRnRzIUeANq9hVeX9lIaZlEM4xqUpfZpaw469LAA5/YyfOCG807mo7ru81KyKpVIdtVYVuPnXAKF4lIX9gdYq/Vs8DA8omU/hyxUrAjkXZpjrT/GEtn57ENOnJO+Isv+u8GgbYBeuK/lgBmnYx9eJiVisMbUnB1ZN3RJksnVEdchONA6TneqZ4mmlcTN8Jsc5WSSFQQZmXJLkR0Usr4BTrp+xuMC4LfUgCiwZkgCz9kQiaEbAIOd9edSzZx7g3LPmiU4eXV/Ht/g97cG7oYEjKf7bPtoES+jyZ9Wazj6zmqVpTwTUpijVaI1uKx29/Q4JTnQWHPOeIV8N76k3DgkhgCokaQvEyK2zD10mOQWJ8M0UMGCcbBzddnoEBHdg6/PWvrV6/brlAPtMk1bKKeA15wn6EX8Ag9uEoki3HjyENGknTaQ== wuethric@Samuel-s-Computer.local"
-  mueller2:
-    comment: "Florian Müller"
-    uid: 1126
-    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDeYeurVx0D/CSWTBbKsjGPtb+o+yJePdH4EwYSJrGAR/LrWhK6715vUbKCXYSOtNycxcMecW34IGhShXYo/VpU0GIAAElKdsoi20Ob8o0dHGRzkceyYsVR6WQIY7d7pfydD3Z9wLtL9GynHzMiUP4O9EgrKAhjMDdCjcj1vyLE4POEH9HcU3besz3z2Q3dWxTZVPXyBX7m6X91n6quWcQFp7jL+R1uFLB/AxLDfGhme6unOYOfQ+4P4KxJzFMMcf9aCKEJjV9pk5R3u64xkpbUR4iJ359ZvPEQpEL7PZ9SjmjQYbdpBsUHz2Tp//3LAUPTEVKE/193iejWcXJJ6leksZG1ulluKmFsBgbZHa5ojA5J2WmRELD54+2FidT2Qwo9jx+fRkCFdhdwL0+20olxy3Ft3DpD/KQAPXzaCrEjdY5QzzPJ9XP/MttIFJYudTd06x998pkZ9sc80MRJm6C+ZIB7E4xvGj5NmQeYrAq7dfSlnzTKQzZHmyNhfyTLjVXv/pMTlzLxRli4rRODF6gxs5vTxsEUmst97N8SIoIDums9BXqMsFQcN5I1wtIIzdMRZh6VtU8FlhwpXGG7hGzMF5V9uPbUsJw0U5sjbO0wOEQDcYoLkAiypnNZuT3MdTU6YolRsGduEqseGC5u6l2AfaWadckRHcCqAPaSjcZseQ== mueller2@macfm.switch.ch"
+  hofmann:
+    comment: "Marcel Hofmann"
+    uid: 1014
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCkhWSBLC0ZQ7J9rZY4UgUeoEoGrZuqvSY8Z74sQg5mHkjdjxXuqlZv2e1DWq0WtYGx4J84ZfgS26RDlYqpk/q9gKD7l5To4cqvnf+YC05+mEXTjrtLEltj5rfNVkBBpHydPCBDUrW9DoCbloQPSq2gRXvif8ezk2TNKYsYbKVpyNTEMT4epFKD/AW/ufy5R2sNLxZzpaRkHehs6sbR1E17/wl1UM0hZZn6x+/IupRc4zDd9TXo8/UhZqWEGp1/s9udsVZ0n6EF91/3+qdORKGpNG5qK861C5/oftf8wifaihdjt5QLFbEfzQ08Yydob8QTKlKiFPHzQbp1MhHiqCXRQZ5r/qnK5i87INHK4BYeDcZXuamBiBCzRfRMyG39eWks/OxPIJOvE9PXs/Zt0zBP4avuQ08nBT5WNqoonoOvVemHx4dvIIQOiiKtzM8ip0iWq8fzoc85Oi+tdc7JB0wGji5OLGnipAxnv+haP4kxIC+Peo1P5qDdkBUavUGETsMcjKC7YrKCKDl+28HujUrN+hlqDO69zjUONnkf+WX41DUsAmR/EjSfRxrM715PnC3113Wu3fyzakuRAME8RI5og7d0i4GaDkWyFbBjr/pKjtY/6jOWN5Q1iMy20diplU2V+Bf9lx6rkHleTcvwcWf6QsSEnr0M5kDF2czGHfqE/Q== hofmann@vpn-ho-c-7.switch.ch"
 
   # removed
   kerins:
@@ -84,6 +84,10 @@ user:
     comment: "Alessandro Usai"
     uid: 989
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA9zD6fdwOASm7RcheEGUJGCi2oh6ryHEX7CebhKGeshsh4ez8W+ovU4aq6gG+IDSOrP9b2QpRTdUHz+fDWf0F6TBUFzermljudccinEsORPdl/T4XzaLcWZ4aL8AsiaLQ2X8IvThTQqpQfeMxFVmSI++Z5NdXO2EfZ9nWZjlsgjgUL8UlIWd/uwlBwwIyRmXywcOoy71Qw99RLjJefvlJiYnKDfU2YSw8zO/Py3ptaJeBdBxXA/ph8REJtwapry5ugvkxb6UYZAKqMcC9WoIAYtDyJWexSMF6SUNe2c8jSK24jDZIFyp6Ju+dYBcBx3J1gxetY2uZz9Yiqd19gtWU0w== usai@macau.switch.ch"
+  mueller2:
+    comment: "Florian Müller"
+    uid: 1126
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDeYeurVx0D/CSWTBbKsjGPtb+o+yJePdH4EwYSJrGAR/LrWhK6715vUbKCXYSOtNycxcMecW34IGhShXYo/VpU0GIAAElKdsoi20Ob8o0dHGRzkceyYsVR6WQIY7d7pfydD3Z9wLtL9GynHzMiUP4O9EgrKAhjMDdCjcj1vyLE4POEH9HcU3besz3z2Q3dWxTZVPXyBX7m6X91n6quWcQFp7jL+R1uFLB/AxLDfGhme6unOYOfQ+4P4KxJzFMMcf9aCKEJjV9pk5R3u64xkpbUR4iJ359ZvPEQpEL7PZ9SjmjQYbdpBsUHz2Tp//3LAUPTEVKE/193iejWcXJJ6leksZG1ulluKmFsBgbZHa5ojA5J2WmRELD54+2FidT2Qwo9jx+fRkCFdhdwL0+20olxy3Ft3DpD/KQAPXzaCrEjdY5QzzPJ9XP/MttIFJYudTd06x998pkZ9sc80MRJm6C+ZIB7E4xvGj5NmQeYrAq7dfSlnzTKQzZHmyNhfyTLjVXv/pMTlzLxRli4rRODF6gxs5vTxsEUmst97N8SIoIDums9BXqMsFQcN5I1wtIIzdMRZh6VtU8FlhwpXGG7hGzMF5V9uPbUsJw0U5sjbO0wOEQDcYoLkAiypnNZuT3MdTU6YolRsGduEqseGC5u6l2AfaWadckRHcCqAPaSjcZseQ== mueller2@macfm.switch.ch"
 
 
 users_admin:
@@ -101,7 +105,7 @@ users_mgmt:
   - wieting
   - malmborg
   - wuethric
-  - mueller2
+  - hofmann
 
 users_dev:
   - tschopp
@@ -122,11 +126,11 @@ staging_users:
 remove_users:
   - schnidrig
   - rissman
-  - vernon
   - helmle
   - kerins
   - bleh
   - usai
+  - mueller2
 
 ubuntu_keys:
   - schnidri
