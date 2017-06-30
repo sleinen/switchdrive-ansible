@@ -10,10 +10,10 @@
     - dev
     - mgmt
     - nfs
-    - db
     - redis
     - ldap
     - lb
+    - mariadb
     - jumphost
   vars_files:
     - ../vars/users.yml
