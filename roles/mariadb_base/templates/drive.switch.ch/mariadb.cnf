@@ -47,6 +47,10 @@ query_cache_type=0
 query_cache_size=0
 
 
+# limit bin logs to 2 days. That should be enough since we have daily backups.
+
+expire_logs_days        = 2
+
 # --- wsrep ---
 
 wsrep_on={{mariadb_wsrep_on}}
@@ -88,6 +92,7 @@ innodb_log_block_size=4096
 
 # 60-80 % of RAM (in bytes)
 innodb_buffer_pool_size=170G
+#innodb_buffer_pool_size=140G
 # innodb_buffer_pool_size / 1GB or less
 innodb_buffer_pool_instances=64
 # default: 200
