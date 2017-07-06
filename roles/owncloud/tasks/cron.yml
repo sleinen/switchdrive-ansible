@@ -16,4 +16,19 @@
     - app
   run_once: true
   delegate_to: "{{ hostvars[groups['web'][0]].inventory_hostname }}"
-    
+
+# workaround for data corruption bug 2017.07.06
+- name: install workaround cronjobs
+  cron: cron_file=owncloud
+    hour=*/6 minute=40
+    name="php-workaround_cronjob-{{item.shard_name}}"
+    state=present
+    user=root
+    job="docker restart php_fpm_{{item.version}}"
+  with_items:
+     - "{{shard_config[service_name]}}"
+  when:
+  tags:
+    - config
+    - cron
+    - app
