@@ -1,0 +1,142 @@
+From ca48e4684ee93e50776baf4368f28e9556c416b1 Mon Sep 17 00:00:00 2001
+From: Vincent Petry <pvince81@owncloud.com>
+Date: Fri, 26 May 2017 15:11:57 +0200
+Subject: [PATCH 1/6] Fix cross-storage move info when moving between two
+ received shares
+
+Need to properly resolve the given path to a source path in
+`getMoveInfo`. This was missing when adding this new method.
+---
+ lib/private/files/cache/wrapper/cachejail.php | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lib/private/files/cache/wrapper/cachejail.php b/lib/private/files/cache/wrapper/cachejail.php
+index 83329bbbd9c..2e411dedbf2 100644
+--- a/lib/private/files/cache/wrapper/cachejail.php
++++ b/lib/private/files/cache/wrapper/cachejail.php
+@@ -292,4 +292,8 @@ public function getPathById($id) {
+ 		$path = $this->cache->getPathById($id);
+ 		return $this->getJailedPath($path);
+ 	}
++
++	protected function getMoveInfo($path) {
++		return [$this->getNumericStorageId(), $this->getSourcePath($path)];
++	}
+ }
+
+
+From 6a19c400fdcc30671ec260fc853bf1a4930ccb7d Mon Sep 17 00:00:00 2001
+From: Vincent Petry <pvince81@owncloud.com>
+Date: Thu, 16 Feb 2017 11:47:16 +0100
+Subject: [PATCH 4/6] Remove SharedCache::getNumericStorageId to let
+ CacheWrapper do it
+
+The CacheWrapper will properly forward the call to the wrapped cache.
+
+
+diff --git a/apps/files_sharing/lib/cache.php b/apps/files_sharing/lib/cache.php
+index 4dcdaa892ad..4754dd73da3 100644
+--- a/apps/files_sharing/lib/cache.php
++++ b/apps/files_sharing/lib/cache.php
+@@ -71,14 +71,6 @@ public function __construct($storage, IStorage $sourceStorage, ICacheEntry $sour
+ 		);
+ 	}
+ 
+-	public function getNumericStorageId() {
+-		if (isset($this->numericId)) {
+-			return $this->numericId;
+-		} else {
+-			return false;
+-		}
+-	}
+-
+ 	protected function formatCacheEntry($entry) {
+ 		$path = $entry['path'];
+ 		$entry = parent::formatCacheEntry($entry);
+
+diff --git a/lib/private/files/cache/cache.php b/lib/private/files/cache/cache.php
+index c16393cf42e..a678d92bef3 100644
+--- a/lib/private/files/cache/cache.php
++++ b/lib/private/files/cache/cache.php
+@@ -491,6 +491,7 @@ protected function getMoveInfo($path) {
+ 	 * @param string $sourcePath
+ 	 * @param string $targetPath
+ 	 * @throws \OC\DatabaseException
++	 * @throws \Exception if the given storages have an invalid id
+ 	 */
+ 	public function moveFromCache(ICache $sourceCache, $sourcePath, $targetPath) {
+ 		if ($sourceCache instanceof Cache) {
+@@ -505,6 +506,13 @@ public function moveFromCache(ICache $sourceCache, $sourcePath, $targetPath) {
+ 			list($sourceStorageId, $sourcePath) = $sourceCache->getMoveInfo($sourcePath);
+ 			list($targetStorageId, $targetPath) = $this->getMoveInfo($targetPath);
+ 
++			if (is_null($sourceStorageId) || $sourceStorageId === false) {
++				throw new \Exception('Invalid source storage id: ' . $sourceStorageId);
++			}
++			if (is_null($targetStorageId) || $targetStorageId === false) {
++				throw new \Exception('Invalid target storage id: ' . $targetStorageId);
++			}
++
+ 			// sql for final update
+ 			$moveSql = 'UPDATE `*PREFIX*filecache` SET `storage` =  ?, `path` = ?, `path_hash` = ?, `name` = ?, `parent` =? WHERE `fileid` = ?';
+ 
+
+From 0086803abe9d549c2b26079428c18059347e7a9f Mon Sep 17 00:00:00 2001
+From: Roeland Jago Douma <rullzer@owncloud.com>
+Date: Tue, 19 Apr 2016 14:03:39 +0200
+Subject: [PATCH 5/6] Move moveFromCache to CacheJail
+
+---
+ lib/private/files/cache/wrapper/cachejail.php | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/lib/private/files/cache/wrapper/cachejail.php b/lib/private/files/cache/wrapper/cachejail.php
+index 2e411dedbf2..04a0c138e80 100644
+--- a/lib/private/files/cache/wrapper/cachejail.php
++++ b/lib/private/files/cache/wrapper/cachejail.php
+@@ -293,6 +293,22 @@ public function getPathById($id) {
+ 		return $this->getJailedPath($path);
+ 	}
+ 
++	/**
++	 * Move a file or folder in the cache
++	 *
++	 * Note that this should make sure the entries are removed from the source cache
++	 *
++	 * @param \OCP\Files\Cache\ICache $sourceCache
++	 * @param string $sourcePath
++	 * @param string $targetPath
++	 */
++	public function moveFromCache(\OCP\Files\Cache\ICache $sourceCache, $sourcePath, $targetPath) {
++		if ($sourceCache === $this) {
++			return $this->move($sourcePath, $targetPath);
++		}
++		return $this->cache->moveFromCache($sourceCache, $sourcePath, $targetPath);
++	}
++
+ 	protected function getMoveInfo($path) {
+ 		return [$this->getNumericStorageId(), $this->getSourcePath($path)];
+ 	}
+
+From 55864e65390f99e4116a1f56de92df26be5e2868 Mon Sep 17 00:00:00 2001
+From: Roeland Jago Douma <rullzer@owncloud.com>
+Date: Mon, 25 Apr 2016 09:33:17 +0200
+Subject: [PATCH 6/6] Properly get the internal path for a cachejail move
+
+---
+ lib/private/files/cache/wrapper/cachejail.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/private/files/cache/wrapper/cachejail.php b/lib/private/files/cache/wrapper/cachejail.php
+index 04a0c138e80..bd34636cafb 100644
+--- a/lib/private/files/cache/wrapper/cachejail.php
++++ b/lib/private/files/cache/wrapper/cachejail.php
+@@ -306,7 +306,7 @@ public function moveFromCache(\OCP\Files\Cache\ICache $sourceCache, $sourcePath,
+ 		if ($sourceCache === $this) {
+ 			return $this->move($sourcePath, $targetPath);
+ 		}
+-		return $this->cache->moveFromCache($sourceCache, $sourcePath, $targetPath);
++		return $this->cache->moveFromCache($sourceCache, $sourcePath, $this->getSourcePath($targetPath));
+ 	}
+ 
+ 	protected function getMoveInfo($path) {
