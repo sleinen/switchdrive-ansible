@@ -173,6 +173,11 @@ frontend ssl_dev
     bind 0.0.0.0:4443 ssl crt /etc/haproxy/ssl/{{ service_name }}.pem
     reqadd X-Forwarded-Proto:\ https
 
+    http-request set-header Host a01.{{service_name}}:4443
+
+    http-request del-header Proxy
+    http-response del-header X-Username
+
     default_backend owncloud_dev
     mode http
     option forwardfor
