@@ -22,7 +22,7 @@
   cron: cron_file=owncloud
     hour=*/6 minute=40
     name="php-workaround_cronjob-{{item.shard_name}}"
-    state=present
+    state=absent
     user=root
     job="docker restart php_fpm_{{item.version}}"
   with_items:
