@@ -28,6 +28,9 @@
       GF_USERS_ALLOW_SIGN_UP: true
       GF_AUTH_BASIC_ENABLED: true
       GF_PATHS_PLUGINS: /plugins
+      GF_SMTP_ENABLED: true
+      GF_SMTP_HOST: "smtp.switch.ch:25"
+      GF_SMTP_FROM_ADDRESS: "drive-operations@switch.ch"
 #    links:
 #      - graphite
 #      - elasticsearch
