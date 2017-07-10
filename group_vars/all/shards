@@ -22,6 +22,7 @@ shard_config:
   drive.switch.ch:
     #- {shard_name: 'a01', cluster_config: 'cluster.config.9_0.php', config: 'config.9_0.php', instanceid: 'oc641cdd42e0', installed: 'true', version: '9.0.8', version_in_config: '9.0.8.2', hour: "*", minute: "5,20,35,50",  overwritehost: "drive.switch.ch", part_of_cluster: false }
     - {shard_name: 'a01', cluster_config: 'cluster.config.{{ ssd.drive.major_version }}.php', config: 'config.{{ ssd.drive.major_version }}.php', instanceid: 'oc641cdd42e0', installed: 'true', version: '{{ ssd.drive.major_version }}.{{ ssd.drive.minor_version }}', version_in_config: '{{  ssd.drive.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "drive.switch.ch", part_of_cluster: false, db_host: '{{  ssd.drive.db_host }}' }
+    # overridden for dev.drive in group_vars/dev file
   drive-stage.switch.ch:
     - {shard_name: 'a01', cluster_config: 'cluster.config.{{ ssd.staging.major_version }}.php', config: 'config.{{  ssd.staging.major_version }}.php', instanceid: 'oceacd978fb9', installed: 'true', version: '{{ ssd.staging.major_version }}.{{ ssd.staging.minor_version }}', version_in_config: '{{  ssd.staging.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-stage.switch.ch", part_of_cluster: false, db_host: '{{  ssd.staging.db_host }}'  }
   drive-backup.switch.ch:
