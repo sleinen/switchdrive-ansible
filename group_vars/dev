@@ -39,3 +39,6 @@ scripts:
    - { name: "mysqlcmd", path: "/root", mode: "0550" }
    - { name: "maxadmin", path: "/root", mode: "0550" }
 
+shard_config:
+  drive.switch.ch:
+    - {shard_name: 'a01', cluster_config: 'cluster.config.{{ ssd.drive.major_version }}.php', config: 'config.{{ ssd.drive.major_version }}.php', instanceid: 'oc641cdd42e0', installed: 'true', version: '{{ ssd.drive.major_version }}.{{ ssd.drive.minor_version }}', version_in_config: '{{  ssd.drive.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "drive.switch.ch:4443", part_of_cluster: false, db_host: '{{  ssd.drive.db_host }}' }
