@@ -1,13 +1,13 @@
 filebeat:
   prospectors:
     - paths:
-        - /var/log/apache2/access.log
+        - /var/log/apache2/access*.log
       input_type: log
       fields:
         logtype: apache-access
       fields_under_root: true
     - paths:
-        - /var/log/apache2/error.log
+        - /var/log/apache2/error*.log
       input_type: log
       fields:
         logtype: apache-error
