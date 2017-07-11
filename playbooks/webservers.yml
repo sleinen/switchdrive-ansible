@@ -8,6 +8,7 @@
   vars_files:
     - ../vars/users.yml
     - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+    - ../vars/servers.{{ site }}.yml
   roles:
     - common
     - docker

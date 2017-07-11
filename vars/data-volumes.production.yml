@@ -84,92 +84,33 @@ snapshot_volumes:
    - { name: "159", hour: 4, minute: 59, region_name: "ZH", volume_id: "36a9d04e-eb7c-44ca-8350-ef0207ac4bc2", state: present }
    - { name: "160", hour: 2, minute: 00, region_name: "ZH", volume_id: "2a1b4b36-9778-47f2-8848-fa1c3aef8b94", state: present }
 
-# manually format the volumes like this: "mkfs.xfs -L "109" /dev/vdk"
-
-volumes_nfs1:
-     - { name: "data", src: "LABEL=000", state: "mounted", ocdata_link: "101" }
-     - { name: "101", src: "LABEL=101", state: "mounted", ocdata_link: "102" }
-     - { name: "102", src: "LABEL=102", state: "mounted", ocdata_link: "103" }
-     - { name: "103", src: "LABEL=103", state: "mounted", ocdata_link: "104" }
-     - { name: "104", src: "LABEL=104", state: "mounted", ocdata_link: "105" }
-     - { name: "105", src: "LABEL=105", state: "mounted", ocdata_link: "106" }
-     - { name: "106", src: "LABEL=106", state: "mounted", ocdata_link: "107" }
-     - { name: "131", src: "LABEL=131", state: "mounted", ocdata_link: "132" }
-     - { name: "132", src: "LABEL=132", state: "mounted", ocdata_link: "133" }
-     - { name: "133", src: "LABEL=133", state: "mounted", ocdata_link: "134" }
-     - { name: "134", src: "LABEL=134", state: "mounted", ocdata_link: "135" }
-     - { name: "135", src: "LABEL=135", state: "mounted", ocdata_link: "136" }
-     - { name: "136", src: "LABEL=136", state: "mounted", ocdata_link: "137" }
-
-volumes_nfs2:
-     - { name: "107", src: "LABEL=107", state: "mounted", ocdata_link: "108" }
-     - { name: "108", src: "LABEL=108", state: "mounted", ocdata_link: "109" }
-     - { name: "109", src: "LABEL=109", state: "mounted", ocdata_link: "110" }
-     - { name: "110", src: "LABEL=110", state: "mounted", ocdata_link: "111" }
-     - { name: "111", src: "LABEL=111", state: "mounted", ocdata_link: "112" }
-     - { name: "112", src: "LABEL=112", state: "mounted", ocdata_link: "113" }
-     - { name: "137", src: "LABEL=137", state: "mounted", ocdata_link: "138" }
-     - { name: "138", src: "LABEL=138", state: "mounted", ocdata_link: "139" }
-     - { name: "139", src: "LABEL=139", state: "mounted", ocdata_link: "140" }
-     - { name: "140", src: "LABEL=140", state: "mounted", ocdata_link: "141" }
-     - { name: "141", src: "LABEL=141", state: "mounted", ocdata_link: "142" }
-     - { name: "142", src: "LABEL=142", state: "mounted", ocdata_link: "143" }
-
-volumes_nfs3:
-     - { name: "113", src: "LABEL=113", state: "mounted", ocdata_link: "114" }
-     - { name: "114", src: "LABEL=114", state: "mounted", ocdata_link: "115" }
-     - { name: "115", src: "LABEL=115", state: "mounted", ocdata_link: "116" }
-     - { name: "116", src: "LABEL=116", state: "mounted", ocdata_link: "117" }
-     - { name: "117", src: "LABEL=117", state: "mounted", ocdata_link: "118" }
-     - { name: "118", src: "LABEL=118", state: "mounted", ocdata_link: "119" }
-     - { name: "143", src: "LABEL=143", state: "mounted", ocdata_link: "144" }
-     - { name: "144", src: "LABEL=144", state: "mounted", ocdata_link: "145" }
-     - { name: "145", src: "LABEL=145", state: "mounted", ocdata_link: "146" }
-     - { name: "146", src: "LABEL=146", state: "mounted", ocdata_link: "147" }
-     - { name: "147", src: "LABEL=147", state: "mounted", ocdata_link: "148" }
-     - { name: "148", src: "LABEL=148", state: "mounted", ocdata_link: "149" }
-
-volumes_nfs4:
-     - { name: "119", src: "LABEL=119", state: "mounted", ocdata_link: "120" }
-     - { name: "120", src: "LABEL=120", state: "mounted", ocdata_link: "121" }
-     - { name: "121", src: "LABEL=121", state: "mounted", ocdata_link: "122" }
-     - { name: "122", src: "LABEL=122", state: "mounted", ocdata_link: "123" }
-     - { name: "123", src: "LABEL=123", state: "mounted", ocdata_link: "124" }
-     - { name: "124", src: "LABEL=124", state: "mounted", ocdata_link: "125" }
-     - { name: "149", src: "LABEL=149", state: "mounted", ocdata_link: "150" }
-     - { name: "150", src: "LABEL=150", state: "mounted", ocdata_link: "151" }
-     - { name: "151", src: "LABEL=152", state: "mounted", ocdata_link: "152" }
-     - { name: "152", src: "LABEL=151", state: "mounted", ocdata_link: "153" }
-     - { name: "153", src: "LABEL=153", state: "mounted", ocdata_link: "154" }
-     - { name: "154", src: "LABEL=154", state: "mounted", ocdata_link: "155" }
-
-volumes_nfs5:
-     - { name: "125", src: "LABEL=125", state: "mounted", ocdata_link: "126" }
-     - { name: "126", src: "LABEL=126", state: "mounted", ocdata_link: "127" }
-     - { name: "127", src: "LABEL=127", state: "mounted", ocdata_link: "128" }
-     - { name: "128", src: "LABEL=128", state: "mounted", ocdata_link: "129" }
-     - { name: "129", src: "LABEL=129", state: "mounted", ocdata_link: "130" }
-     - { name: "130", src: "LABEL=130", state: "mounted", ocdata_link: "." }
-     - { name: "155", src: "LABEL=155", state: "mounted", ocdata_link: "156" }
-     - { name: "156", src: "LABEL=156", state: "mounted", ocdata_link: "157" }
-     - { name: "157", src: "LABEL=157", state: "mounted", ocdata_link: "158" }
-     - { name: "158", src: "LABEL=158", state: "mounted", ocdata_link: "159" }
-     - { name: "159", src: "LABEL=159", state: "mounted", ocdata_link: "160" }
-     - { name: "160", src: "LABEL=160", state: "mounted", ocdata_link: "." }
+  # nfs6
+   - { name: "201", hour: 2, minute: 01, region_name: "ZH", volume_id: "cfacc6d0-cdfa-4640-9afe-9076d56b5a58", state: present }
+   - { name: "202", hour: 3, minute: 02, region_name: "ZH", volume_id: "2c565f65-d734-4d14-81ab-b5e6c948727c", state: present }
+   - { name: "203", hour: 4, minute: 03, region_name: "ZH", volume_id: "ffead261-de4d-489d-ba0a-0135c28afb62", state: present }
+   - { name: "204", hour: 2, minute: 04, region_name: "ZH", volume_id: "1f03c5a4-3936-4b38-9106-1bd86882089d", state: present }
+   - { name: "205", hour: 3, minute: 05, region_name: "ZH", volume_id: "cb6d0a0f-691b-4462-a801-9b473c2fd6d0", state: present }
+   - { name: "206", hour: 4, minute: 06, region_name: "ZH", volume_id: "75bfe8fc-f0a3-4621-93cc-4fe879ebaa10", state: present }
+   - { name: "207", hour: 2, minute: 07, region_name: "ZH", volume_id: "43b6c0ed-e9bf-4b77-911f-ee9678b46e4d", state: present }
+   - { name: "208", hour: 3, minute: 08, region_name: "ZH", volume_id: "7a42ad37-183c-417c-9b2d-024a403c89c5", state: present }
+   - { name: "209", hour: 4, minute: 09, region_name: "ZH", volume_id: "b37bd21e-d6d9-4ac4-b40e-ad97734ece63", state: present }
+   - { name: "210", hour: 2, minute: 10, region_name: "ZH", volume_id: "b3d3f812-efe7-4c70-8ccb-2f683bc54e14", state: present }
 
 ocdata_links:
    - { name: ".ocdata1", link: "data" }
    - { name: ".ocdata2", link: "131" }
-   - { name: ".ocdata3", link: "131" }
+   - { name: ".ocdata3", link: "201" }
 
 nfs_volumes:
   - ip: "{{nfs1_ip}}"
-    volumes: "{{volumes_nfs1}}"
+    volumes: "{{os_volumes.nfs1}}"
   - ip: "{{nfs2_ip}}"
-    volumes: "{{volumes_nfs2}}"
+    volumes: "{{os_volumes.nfs2}}"
   - ip: "{{nfs3_ip}}"
-    volumes: "{{volumes_nfs3}}"
+    volumes: "{{os_volumes.nfs3}}"
   - ip: "{{nfs4_ip}}"
-    volumes: "{{volumes_nfs4}}"
+    volumes: "{{os_volumes.nfs4}}"
   - ip: "{{nfs5_ip}}"
-    volumes: "{{volumes_nfs5}}"
+    volumes: "{{os_volumes.nfs5}}"
+  - ip: "{{nfs6_ip}}"
+    volumes: "{{os_volumes.nfs6}}"
