@@ -80,7 +80,8 @@ localhost ansible_connection=local
 86.119.34.135 admin_users={{mgmt_users}}
 
 [engines]
-controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass}}"
+#controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass}}"
+localhost
 
 [graphite]
 10.0.23.[231:232]
