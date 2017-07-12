@@ -47,6 +47,8 @@ os_server:
   redis1:     { ip: "{{ hostvars[groups['redis'][0]].inventory_hostname}}",          flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
   #redis2:     { ip: "{{ hostvars[groups['redis'][1]].inventory_hostname}}",          flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
 
+  nfs2:       { ip: "{{ hostvars[groups['nfs'][1]].inventory_hostname }}",       flavor: "drive-40-4-4",             image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: {} }
+
   web1:       { ip: "{{ hostvars[groups['web'][0]].inventory_hostname}}",            flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
   web2:       { ip: "{{ hostvars[groups['web'][1]].inventory_hostname}}",            flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
   sync1:      { ip: "{{ hostvars[groups['sync'][0]].inventory_hostname}}",           flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
@@ -67,6 +69,18 @@ os_volumes:
     - { name: "106", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "107"  }
     - { name: "107", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "108"  }
     - { name: "108", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "."  }
+
+  nfs2:
+    # the label is wong on disk "data"!!!! it is currently "000"
+    - { name: "201", name_prefix: "data", state: "mounted", device: "/dev/vdb", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "202"  }
+    - { name: "202", name_prefix: "data", state: "mounted", device: "/dev/vdc", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "203"  }
+    - { name: "203", name_prefix: "data", state: "mounted", device: "/dev/vdd", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "204"  }
+    - { name: "204", name_prefix: "data", state: "mounted", device: "/dev/vde", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "205"  }
+    - { name: "205", name_prefix: "data", state: "mounted", device: "/dev/vdf", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "206"  }
+    - { name: "206", name_prefix: "data", state: "mounted", device: "/dev/vdg", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "207"  }
+    - { name: "207", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "208"  }
+    - { name: "208", name_prefix: "data", state: "mounted", device: "/dev/vdi", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "."  }
+
 
 
 
