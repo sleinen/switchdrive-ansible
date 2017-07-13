@@ -3,6 +3,7 @@
 - hosts:
     - engines
   vars:
+    os_state: absent
     os_vm_state: absent
     os_volume_state: absent
     server: ""

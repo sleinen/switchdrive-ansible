@@ -16,6 +16,7 @@
   delegate_to: "{{ hostvars[groups['mariadb'][0]].inventory_hostname }}"
   with_items:
     - { hour: 0, minute: 0, state: present}
+  when: not stage_or_test_system
 
 
 - name: daily backup  of backup to db2 cronjob

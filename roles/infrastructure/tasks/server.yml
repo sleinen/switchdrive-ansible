@@ -12,10 +12,40 @@
     flavor: "{{ os_server[item].flavor }}"
     auto_ip: false
     nics:
-      - port-name: "{{ site }}-{{ item }}-port_{{ os_network }}"
+      - port-name: "{{ site }}-{{ item }}-port_{{ os_network_name }}"
     scheduler_hints: "{{ os_server[item].hints }}"
   with_items: "{{ server_list }}"
   when: server != ""
   tags:
     - os_server
+    - os_server_all
+
+
+- name: "{{ os_action }} attach a floating ip"
+  os_floating_ip:
+    state: "{{ os_state }}"
+    auth: "{{ os_auth }}"
+    region_name: "{{ os_region }}"
+    server: "{{ site }}-{{ item }}"
+    fixed_address: "{{ os_server[item].ip }}"
+    timeout: 200
+  with_items: "{{ server_list }}"
+  when: os_server[item].floating_ip is defined and os_server[item].floating_ip == ''
+  tags:
+    - os_floating_ip
+    - os_server_all
+
+- name: "{{ os_action }} attach a floating ip"
+  os_floating_ip:
+    state: "{{ os_state }}"
+    auth: "{{ os_auth }}"
+    region_name: "{{ os_region }}"
+    floating_ip_address: "{{ os_server[item].floating_ip }}"
+    server: "{{ site }}-{{ item }}"
+    fixed_address: "{{ os_server[item].ip }}"
+    timeout: 200
+  with_items: "{{ server_list }}"
+  when: os_server[item].floating_ip is defined and os_server[item].floating_ip != ''
+  tags:
+    - os_floating_ip
     - os_server_all

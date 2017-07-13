@@ -18,6 +18,7 @@
   pre_tasks:
     - name: stop mariadb
       command: docker stop mariadb
+      ignore_errors: yes
     - name: delete old data
       file: 
         name="{{mariadb_mount_point}}" 

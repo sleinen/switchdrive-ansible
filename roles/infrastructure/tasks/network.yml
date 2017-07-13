@@ -1,21 +1,39 @@
 ---
 
-- name: "{{ os_action }} a server"
-  os_server:
-    state: "{{ os_vm_state }}"
+- name: "{{ os_action }} a network"
+  os_network:
+    state: "{{ os_state }}"
     auth: "{{ os_auth }}"
     region_name: "{{ os_region }}"
-    name: "{{ site }}-{{ item }}"
-    boot_volume: "{{ site }}-{{ item }}_root"
-    key_name: "{{ os_ssh_key }}"
+    name: "{{ item.name }}"
     timeout: 200
-    flavor: "{{ os_server[item].flavor }}"
-    auto_ip: false
-    nics:
-      - port-name: "{{ site }}-{{ item }}-port_{{ os_network }}"
-    scheduler_hints: "{{ os_server[item].hints }}"
-  with_items: "{{ server_list }}"
-  when: server != ""
+  with_items: "{{ os_network }}"
   tags:
-    - os_server
-    - os_server_all
+    - os_network
+
+- name: "{{ os_action }} a subnet"
+  os_subnet:
+    state: "{{ os_state }}"
+    auth: "{{ os_auth }}"
+    region_name: "{{ os_region }}"
+    name: "{{ item.name }}_ipv4"
+    network_name: "{{ item.name }}"
+    cidr: "{{ item.cidr }}"
+    timeout: 200
+  with_items: "{{ os_network }}"
+  tags:
+    - os_network
+
+- name: "{{ os_action }} a router"
+  os_router:
+    state: "{{ os_state }}"
+    auth: "{{ os_auth }}"
+    region_name: "{{ os_region }}"
+    name: "{{ item.name }}_router"
+    network: "public"
+    interfaces: "{{ item.name }}_ipv4"
+    timeout: 200
+  with_items: "{{ os_network }}"
+  tags:
+    - os_network
+    - os_router

@@ -9,8 +9,12 @@
   when: os_action == "delete"
 - include: data_volume.yml
   when: os_action == "delete"
+- include: network.yml
+  when: os_action == "delete"
 
 # creation
+- include: network.yml
+  when: os_action == "create"
 - include: security_group.yml
   when: os_action == "create"
 - include: server_group.yml

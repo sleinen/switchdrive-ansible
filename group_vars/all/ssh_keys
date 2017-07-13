@@ -7,18 +7,21 @@ ssh_private_key_db_root:
    "drive.switch.ch": "{{vault_ssh_private_key_drive_db_root}}"
    "drive-stage.switch.ch": "{{vault_ssh_private_key_drive_stage_db_root}}"
    "drive-backup.switch.ch": "{{vault_ssh_private_key_drive_stage_db_root}}"
+   "drive-nc.switch.ch": "{{vault_ssh_private_key_drive_stage_db_root}}"
 
 ssh_private_key_nfs_root:
    "drive.switch.ch": "{{vault_ssh_private_key_drive_nfs_root}}"
    "drive-stage.switch.ch": "{{vault_ssh_private_key_drive_stage_nfs_root}}"
    "drive-backup.switch.ch": "{{vault_ssh_private_key_drive_backup_nfs_root}}"
    "drive-test.switch.ch": "{{vault_ssh_private_key_drive_test_nfs_root}}"
+   "drive-nc.switch.ch": "{{vault_ssh_private_key_drive_backup_nfs_root}}"
 
 ssh_private_key_sync_root:
    "drive.switch.ch": "{{vault_ssh_private_key_drive_sync_root}}"
    "drive-stage.switch.ch": "{{vault_ssh_private_key_drive_stage_sync_root}}"
    "drive-backup.switch.ch": "{{vault_ssh_private_key_drive_backup_sync_root}}"
    "drive-test.switch.ch": "{{vault_ssh_private_key_drive_test_sync_root}}"
+   "drive-nc.switch.ch": "{{vault_ssh_private_key_drive_backup_sync_root}}"
 
 ssh_private_key_backup_root:
    "drive.switch.ch": "{{vault_ssh_private_key_drive_backup_root}}"
@@ -27,3 +30,4 @@ ssh_private_key_lb_root:
    "drive.switch.ch": "{{vault_ssh_private_key_drive_lb_root}}"
    "drive-stage.switch.ch": "{{vault_ssh_private_key_drive_stage_lb_root}}"
    "drive-backup.switch.ch": "{{vault_ssh_private_key_drive_stage_lb_root}}"
+   "drive-nc.switch.ch": "{{vault_ssh_private_key_drive_stage_lb_root}}"

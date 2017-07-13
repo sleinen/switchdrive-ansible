@@ -1,83 +1,46 @@
-#  jumphost=5
-#  --graphite=6
-#  backup=9
-#  mgmt=10
-#  vip1=11
-#  reg=21
-#  db=31
-#  lb=51
-#  ldap=61
-#  nfs=71
-#  sync=101
-#  -- elk=151
-#  dev=161
-#  test=181
-#  web=201
-#  elk=221
-#  graphite=231
-#  redis=241
-#  maxscale=246
 
 [mariadb]
 # the first one is the master on cluster-reboot.
-10.0.23.[31:36]
+#10.0.50.[31:36]
+10.0.50.[31:31]
 
 [nfs]
-10.0.23.71 vols="{{volumes_nfs1}}"
-10.0.23.72 vols="{{volumes_nfs2}}"
-10.0.23.73 vols="{{volumes_nfs3}}"
-10.0.23.74 vols="{{volumes_nfs4}}"
-10.0.23.75 vols="{{volumes_nfs5}}"
-10.0.23.76
+10.0.50.71 vols="{{volumes_nfs1}}"
 
 [web]
-10.0.23.[201:204] active=True
-#10.0.23.[205:210] active=False
-#10.0.23.[211:214] active=False
+10.0.50.[201:202] active=True
 
 [sync]
-10.0.23.[101:104] active=True
-#10.0.23.[105:110] active=False
-#10.0.23.[111:114] active=False
-
-[mgmt]
-10.0.23.10 admin_users={{mgmt_users}}
+10.0.50.[101:102] active=True
 
 [registry]
-#docker.drive.switch.ch
-10.0.23.251 vols="{{volumes_elk1}}"
 
 [elk]
-10.0.23.[221:222]
+10.0.50.[221:222]
 
 [lb]
-10.0.23.[51:52]
+10.0.50.[51:52]
 
 [ldap]
 # the first one in the list has to be the provider!
-10.0.23.17 provider=True
-10.0.23.63 consumer=True
-10.0.23.65 consumer=True
+#10.0.50.51 provider=True
+#10.0.50.52 consumer=True
+#10.0.50.53 consumer=True
+# the one from "drive (production)"
+86.119.34.136
 
-[monitoring]
-#10.0.23.18 ansible_ssh_user=ubuntu
-
+[mgmt]
 [dev]
-10.0.23.161
-
 [reg]
-10.0.23.21
-
 [cmd]
 localhost ansible_connection=local
 
 [redis]
 # the first one is active. Just run `ansible-playbook -i inventories/drive playbooks/(web|sync|dev|mgmt)servers.yml -t ocphp_fpm`
-10.0.23.241
-10.0.23.242
+10.0.50.241
 
 [jumphost]
-86.119.34.135 admin_users={{mgmt_users}}
+86.119.33.56 admin_users={{mgmt_users}}
 
 [engines]
 controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass}}"
@@ -86,16 +49,16 @@ controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass
 10.0.23.[231:232]
 
 [backup]
-10.0.23.9
+10.0.50.9
 
 [test]
-10.0.23.15
+10.0.50.15
 
 [lb_vip]
-10.0.23.[11:12]
+10.0.50.[11:12]
 
 [carbon_vip]
-10.0.23.13
+10.0.50.13
 
 [production:children]
 mariadb
@@ -106,7 +69,6 @@ mgmt
 registry
 lb
 ldap
-monitoring
 engines
 graphite
 backup
@@ -121,42 +83,30 @@ jumphost
 
 [production:vars]
 
-site=drive
+site=nzdrive
 internal_domain={{site}}
+private_network="10.0.50"
 
 #main_site=True
-service_name=drive.switch.ch
+service_name="drive-nc.switch.ch"
 
 # network
-jumphost_internal=10.0.23.5
+jumphost_internal="{{private_network}}.5"
 reverse_dns_domain=23.0.10.in-addr.arpa
-backbone_ipv4_prefix=10.1.49
-backbone_ipv4_network=10.1.0.0/16
-backbone_ipv4_gateway=10.1.49.1
-backbone_ipv6_prefix=2001:620:5ca1:131:
 
 # LDAP
-ldap_ip=10.0.23.17
+ldap_ip=86.119.34.136
 ldap_host=ldap1.{{internal_domain}}
 stats_send_to=jens-christian.fischer@switch.ch
 stats_from=jens-christian.fischer@switch.ch
 
 # NFS
-nfs1_ip=10.0.23.71
-nfs2_ip=10.0.23.72
-nfs3_ip=10.0.23.73
-nfs4_ip=10.0.23.74
-nfs5_ip=10.0.23.75
-volumes_inventory_name=production
+nfs1_ip=10.0.50.71
+volumes_inventory_name=nc
 
 # owncloud
-#OWNCLOUD_MAJOR_VERSION='9.0'
-#OWNCLOUD_VERSION='{{OWNCLOUD_MAJOR_VERSION}}.5'
-OWNCLOUD_MAJOR_VERSION='8.1'
-OWNCLOUD_VERSION='{{OWNCLOUD_MAJOR_VERSION}}.12'
 enterprise=true
-stage_or_test_system=False
-rails_environment=production
+stage_or_test_system=True
 
 # servers mails to root (cronjobs) are sent to this address
 notification_mail=drive-operations@switch.ch
@@ -169,7 +119,7 @@ admin_users={{ production_users }}
 cloud_id_service_name=cloud-id.switch.ch
 
 # mariadb
-mariadb_wsrep_cluster_address=gcomm://10.0.23.31,10.0.23.32,10.0.23.33
+mariadb_wsrep_cluster_address=gcomm://10.0.50.31,10.0.50.32,10.0.50.33
 
 # misc
 docker_registry="docker.drive.switch.ch"

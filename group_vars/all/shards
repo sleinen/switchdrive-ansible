@@ -16,6 +16,12 @@ ssd:
     image_version: 3
     version_in_config: '9.0.10.2'
     db_host: localhost
+  nzdrive:
+    major_version: "9.0"
+    minor_version: "10"
+    image_version: 3
+    version_in_config: '9.0.10.2'
+    db_host: localhost
 
 # config deployment (ocapache, ocphp_fpm, cron)
 shard_config:
@@ -24,7 +30,7 @@ shard_config:
     - {shard_name: 'a01', cluster_config: 'cluster.config.{{ ssd.drive.major_version }}.php', config: 'config.{{ ssd.drive.major_version }}.php', instanceid: 'oc641cdd42e0', installed: 'true', version: '{{ ssd.drive.major_version }}.{{ ssd.drive.minor_version }}', version_in_config: '{{  ssd.drive.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "drive.switch.ch", part_of_cluster: false, db_host: '{{  ssd.drive.db_host }}' }
     # overridden for dev.drive in group_vars/dev file
   drive-stage.switch.ch:
-    - {shard_name: 'a01', cluster_config: 'cluster.config.{{ ssd.sldrive.major_version }}.php', config: 'config.{{  ssd.sldrive.major_version }}.php', instanceid: 'oceacd978fb9', installed: 'true', version: '{{ ssd.staging.major_version }}.{{ ssd.staging.minor_version }}', version_in_config: '{{  ssd.staging.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-stage.switch.ch", part_of_cluster: false, db_host: '{{  ssd.staging.db_host }}'  }
+    - {shard_name: 'a01', cluster_config: 'cluster.config.{{ ssd.sldrive.major_version }}.php', config: 'config.{{ ssd.sldrive.major_version }}.php', instanceid: 'oceacd978fb9', installed: 'true', version: '{{ ssd.sldrive.major_version }}.{{ ssd.sldrive.minor_version }}', version_in_config: '{{  ssd.sldrive.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-stage.switch.ch", part_of_cluster: false, db_host: '{{  ssd.sldrive.db_host }}'  }
   drive-backup.switch.ch:
     - {shard_name: 'a01', cluster_config: 'cluster.config.9.1.php', config: 'config.9.1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true }
     - {shard_name: 'a02', cluster_config: 'cluster.config.9.1.php', config: 'config.9.1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true }
@@ -32,6 +38,8 @@ shard_config:
     #- {shard_name: 'a04', cluster_config: 'cluster.config.9.1.php', config: 'config.9.0.php', instanceid: 'oceacd978fad', installed: 'true', version: '9.0.7', hour: "*", minute: "10,25,40,55", overwritehost: "a04.drive-backup.switch.ch", part_of_cluster: true }
     - {shard_name: 'a05', cluster_config: 'cluster.config.9.1.php', config: 'config.9.1.php', instanceid: 'oceacd978fae', installed: 'true', version: '9.1.4', hour: "*", minute: "0,15,30,45",  overwritehost: "drive-backup.switch.ch", part_of_cluster: true  }
     - {shard_name: 'a06', cluster_config: 'cluster.config.9.1.php', config: 'config.9.1.php', instanceid: 'oceacd978fb9', installed: 'true', version: '9.1.4', hour: "*", minute: "0,15,30,45",  overwritehost: "a06.drive-backup.switch.ch", part_of_cluster: false }
+  drive-nc.switch.ch:
+    - {shard_name: 'a01', cluster_config: 'cluster.config.{{ ssd.nzdrive.major_version }}.php', config: 'config.{{ ssd.nzdrive.major_version }}.php', instanceid: 'oc641cdd42e0', installed: 'true', version: '{{ ssd.nzdrive.major_version }}.{{ ssd.nzdrive.minor_version }}', version_in_config: '{{  ssd.nzdrive.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-nc.switch.ch", part_of_cluster: false, db_host: '{{  ssd.nzdrive.db_host }}' }
 
 # ocphp_fpm container deployment
 shard_mapping:
@@ -42,26 +50,32 @@ shard_mapping:
   drive-backup.switch.ch:
      #- { oc_major_version: '9.0', oc_minor_version: '7', oc_image_version: '1', , shards: [a04] }
      - { oc_major_version: '9.1', oc_minor_version: '4', oc_image_version: '1', shards: [a01, a02, a03, a05, a06] }
+  drive-nc.switch.ch:
+     - { oc_major_version: '{{ ssd.nzdrive.major_version }}', oc_minor_version: '{{ ssd.nzdrive.minor_version }}', oc_image_version: '{{ ssd.nzdrive.image_version }}', shards: [a01] }
 
 # 15768000 = 6 months
 strict_transport_security_max_age:
   drive.switch.ch: 0
   drive-stage.switch.ch: 15768000
   drive-backup.switch.ch: 0
+  drive-nc.switch.ch: 0
 
 # what ocphp_fpm to take for root site
 php_version_root_site:
   drive.switch.ch: "{{ ssd.drive.major_version }}.{{ ssd.drive.minor_version }}-{{  ssd.drive.image_version }}"
   drive-stage.switch.ch: "{{ ssd.sldrive.major_version }}.{{ ssd.sldrive.minor_version }}-{{  ssd.sldrive.image_version }}"
   drive-backup.switch.ch: "9.0.8-2"
+  drive-nc.switch.ch: "{{ ssd.nzdrive.major_version }}.{{ ssd.nzdrive.minor_version }}-{{  ssd.nzdrive.image_version }}"
 
 # variables in status.php
 owncloud_version_root_site:
   drive.switch.ch: "{{php_version_root_site[service_name]}}.2"
   drive-stage.switch.ch: "{{php_version_root_site[service_name]}}.2"
   drive-backup.switch.ch: "{{php_version_root_site[service_name]}}.2"
+  drive-nc.switch.ch: "{{php_version_root_site[service_name]}}.2"
 
 owncloud_passwordsalt:
   drive.switch.ch: '4b2df88ca20f48d594d74999694875'
   drive-stage.switch.ch: '8ef731b82e3dd7960cab032929763e'
   drive-backup.switch.ch: '/JmaEK3g1hMbdJA+QmWGqP9YYGMhpM'
+  drive-nc.switch.ch: '/JmaEK3g1hMbdJA+QmWGqP9YYGMhpM'

@@ -3,6 +3,7 @@
 - hosts:
     - engines
   vars:
+    os_state: present
     os_vm_state: present
     os_volume_state: present
     server: ""
