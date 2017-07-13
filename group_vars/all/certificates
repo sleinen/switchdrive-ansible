@@ -12,6 +12,7 @@ service_cert:
    "drive.switch.ch": "{{vault_service_drive_cert}}"
    "drive-stage.switch.ch": "{{vault_service_drive_stage_cert}}"
    "drive-backup.switch.ch": "{{vault_service_drive_backup_cert}}"
+   "drive-nc.switch.ch":
 
 docker_cert:
    drive.switch.ch: 

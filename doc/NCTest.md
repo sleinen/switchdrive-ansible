@@ -37,6 +37,8 @@ Create files:
 - vars/servers.nzdrive
 - vars/group_vars/user
 
+for nzdrive a chose a service name of drive-nc.switch.ch. For nldrive, that would have to be something different.
+
 # create network & jumphost & jump-ip
 
     ansible-playbook -i inventories/nzdrive jobs/infra_create.yml -t os_network
@@ -101,6 +103,19 @@ This may hang. Then ^C and run
 Setting up the db for the first time is a brittle step and may go wrong several times in a row just run initdb several times until it is ok.
 
 
+## create db
+
+Normally the steps above create an owncloud db ready to be used. However in this sharded setup we need dbs a01 ... a20. One for each shard.
+Let's create them manually:
+
+    ssh db1.nzdrive
+    /root/mariadb
+    
+    CREATE DATABASE IF NOT EXISTS `a01` ;
+    GRANT ALL ON `a01`.* TO 'owncloud'@'%' ;
+    FLUSH PRIVILEGES ;
+
+
 # install nfs and redis servers
 
     ansible-playbook -i inventories/nzdrive playbooks/nfsservers.yml
@@ -119,17 +134,78 @@ Add templates for new site to `roles/ocapache/templates`
 # install lb server
 
 add section in group_vars/all/keepalived.yml for the new site.
+edit file `group_vars/all/certificates` add new service name to `service_cert` dictionary. 
+Leave it empty we'll create a cert with letsencrypt but we first want it to create a self signed cert to get started.
 
     ansible-playbook -i inventories/nzdrive playbooks/lbservers.yml --limit=*1
 
-# service ip
+# DNS and Service IP & certificate
 
-get a floating ip and assign it to lb_vip1 (took shortcut and assigned it to lb1 since we only have one load balancer anyways.)
+## ip
 
-get DNS entry for that ip. Name 'drive-nc.switch.ch'. (don't know yet what the requirements for lausanne by nextcloud are going to be....)
+Get a floating ip and assign it to lb_vip1.
+Since we only have one lb here. I assigned it to lb1 directly instead of the lb_vip1. (for testing nc that is good enough)
 
+# DNS
+Get DNS entry for that ip. For the site nzdrive I chose 'drive-nc.switch.ch'. 
+(don't know yet what the requirements for lausanne by nextcloud are going to be....)
+
+## certificate
 Once we have dns entry, we can request a letsencrypt certificate. 
 
-Other stuff missing is: create db for shard a01, setup ldap config in db etc.
+edit file `group_vars/all/defaults` add section in `letsencrypt.domain`
 
-replace ocphp_fpm with no comment stuff.
+install letsencrypt docker container:
+
+    ansible-playbook -i inventories/nzdrive playbooks/letsencrypt.yml --limit=*1
+
+run letsencrypt:
+
+    ssh lb1.nzdrive
+    sudo docker start -a letsencrypt
+    sudo cat /etc/letsencrypt/live/drive-nc.switch.ch/fullchain.pem /etc/letsencrypt/live/drive-nc.switch.ch/privkey.pem > /etc/haproxy/ssl/drive-nc.switch.ch.pem
+    sudo docker restart haproxy
+    
+Whatch output and check for errors.
+
+open `https://drive-nc.switch.ch/` in a browser -> you should have a working certificate.
+
+# install owncloud
+
+Set installed flag in config back to false: edit `shards` file -> in dictionary `shard_config.<service_name>` change `installed` to false
+
+    ansible-playbook -i inventories/nzdrive playbooks/webservers.yml --limit=*1 -t ocphp_fpm
+    
+installation with occ command seems to be broken -> install through the web:
+
+first shut down apache on web2 to make sure it does not interfere
+    ssh web2.nzdrive sudo docker stop ocapache
+    
+In a browser load `https://drive-nc.switch.ch/`
+
+-> login with credentials from the file web1.nzdrive:/etc/owncloud/autoconfig.a01.php
+
+edit `shards` file -> in dictionary `shard_config.<service_name>` change `installed` to true
+
+start web2 again
+    ssh web2.nzdrive sudo docker start ocapache
+
+
+## disable silly apps
+
+    ssh web1.nzdrive
+    SHARD=a01
+    
+    /root/occ $SHARD app:enable  user_ldap
+    /root/occ $SHARD app:disable activity
+    /root/occ $SHARD app:disable comments
+    /root/occ $SHARD app:disable firewall
+    /root/occ $SHARD app:disable systemtags
+    /root/occ $SHARD app:disable windows_network_drive
+    /root/occ $SHARD app:disable workflow
+
+
+# Missing
+login as admin and setup ldap. -> do not run ldap ansible playbooks. That is something different.
+
+replace ocphp_fpm docker image with a nc image (needs to be build first).

@@ -71,7 +71,7 @@
   shell: "cat '/etc/haproxy/ssl/{{ service_name }}.crt' '/etc/haproxy/ssl/{{ service_name }}.key' > '/etc/haproxy/ssl/{{service_name}}.pem'"
   args:
     creates: "/etc/haproxy/ssl/{{ service_name }}.pem"
-  when: not service_cert[service_name] is none
+  when: service_cert[service_name] is none
   tags:
      - haproxy
      - cert
