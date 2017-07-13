@@ -26,15 +26,23 @@ ocdata_links:
    - { name: ".ocdata1", link: "data" }
    - { name: ".ocdata2", link: "105" }
    # this is just dummy to satisfy owncloud
-   - { name: ".ocdata3", link: "data" }
+   - { name: ".ocdata3", link: "201" }
 
 volumes_nfs2:
+     - { name: "201", src: "LABEL=201", state: "mounted", ocdata_link: "202" }
+     - { name: "202", src: "LABEL=202", state: "mounted", ocdata_link: "203" }
+     - { name: "203", src: "LABEL=203", state: "mounted", ocdata_link: "204" }
+     - { name: "204", src: "LABEL=204", state: "mounted", ocdata_link: "205" }
+     - { name: "205", src: "LABEL=205", state: "mounted", ocdata_link: "206" }
+     - { name: "206", src: "LABEL=206", state: "mounted", ocdata_link: "207" }
+     - { name: "207", src: "LABEL=207", state: "mounted", ocdata_link: "208" }
+     - { name: "208", src: "LABEL=208", state: "mounted", ocdata_link: "." }
 
 nfs_volumes:
   - ip: "{{nfs1_ip}}"
     volumes: "{{volumes_nfs1}}"
-  #- ip: "{{nfs2_ip}}"
-  #  volumes: "{{volumes_nfs2}}"
+  - ip: "{{nfs2_ip}}"
+    volumes: "{{volumes_nfs2}}"
 
 volumes_elk1:
      - { name: "000", src: "LABEL=000", state: "mounted" }

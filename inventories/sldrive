@@ -23,6 +23,7 @@
 
 [nfs]
 10.0.26.71 vols="{{volumes_nfs1}}"
+10.0.26.72 vols="{{volumes_nfs2}}"
 
 [web]
 10.0.26.[201:202] active=True
@@ -52,6 +53,7 @@
 [reg]
 
 [cmd]
+localhost ansible_connection=local
 
 [redis]
 10.0.26.[241:241]
@@ -60,7 +62,8 @@
 86.119.31.53
 
 [engines]
-controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass}}"
+#controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass}}"
+localhost
 
 [registry]
 
