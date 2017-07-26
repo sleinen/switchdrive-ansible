@@ -1,0 +1,127 @@
+
+[mariadb]
+# the first one is the master on cluster-reboot.
+#10.0.51.[31:36]
+10.0.51.[31:31]
+
+[nfs]
+10.0.51.71 vols="{{volumes_nfs1}}"
+
+[web]
+10.0.51.[201:202] active=True
+
+[sync]
+10.0.51.[101:102] active=True
+
+[registry]
+
+[elk]
+#10.0.51.[221:222]
+
+[lb]
+10.0.51.[51:52]
+
+[ldap]
+# the first one in the list has to be the provider!
+#10.0.51.51 provider=True
+#10.0.51.52 consumer=True
+#10.0.51.53 consumer=True
+# the one from "drive (production)"
+#86.119.34.136
+
+[mgmt]
+[dev]
+[reg]
+[cmd]
+localhost ansible_connection=local
+
+[redis]
+# the first one is active. Just run `ansible-playbook -i inventories/drive playbooks/(web|sync|dev|mgmt)servers.yml -t ocphp_fpm`
+10.0.51.241
+
+[jumphost]
+86.119.29.22 admin_users={{mgmt_users}}
+
+[engines]
+#controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass}}"
+localhost
+
+[graphite]
+#10.0.23.[231:232]
+
+[backup]
+#10.0.51.9
+
+[test]
+#10.0.51.15
+
+[lb_vip]
+10.0.51.[11:12]
+
+[carbon_vip]
+#10.0.51.13
+
+[production:children]
+mariadb
+nfs
+web
+sync
+mgmt
+registry
+lb
+ldap
+engines
+graphite
+backup
+test
+elk
+dev
+
+reg
+cmd
+redis
+jumphost
+
+[production:vars]
+
+site=nldrive
+internal_domain={{site}}
+private_network="10.0.51"
+
+#main_site=True
+service_name="drive-ncl.switch.ch"
+
+# network
+jumphost_internal="{{private_network}}.5"
+#reverse_dns_domain=23.0.10.in-addr.arpa
+
+# LDAP
+#ldap_ip=86.119.34.136
+#ldap_host=ldap1.{{internal_domain}}
+#stats_send_to=jens-christian.fischer@switch.ch
+#stats_from=jens-christian.fischer@switch.ch
+
+# NFS
+nfs1_ip=10.0.51.71
+volumes_inventory_name=ncl
+
+# owncloud
+enterprise=true
+stage_or_test_system=True
+
+# servers mails to root (cronjobs) are sent to this address
+notification_mail=drive-operations@switch.ch
+
+# Set the list of users that have access to these servers
+admin_users={{ production_users }}
+
+# cloud-id
+# host name for cloud-id
+cloud_id_service_name=cloud-id.switch.ch
+
+# mariadb
+mariadb_wsrep_cluster_address=gcomm://10.0.51.31,10.0.51.32,10.0.51.33
+
+# misc
+docker_registry="docker.drive.switch.ch"
+graphite_host_floating_ip=grafana.drive.switch.ch

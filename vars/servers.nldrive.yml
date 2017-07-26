@@ -1,0 +1,108 @@
+---
+
+#####################
+# networks
+os_network_name: "nldrive-drive"
+
+#####################
+# networks
+
+os_network:
+  - name: "nldrive-drive"
+    cidr: "10.0.51.0/24"
+    external: "yes"
+
+os_security_group:
+  - name: "ssh"
+    description: "ssh access"
+    rules:
+      - { protocol: "tcp", port_range_min: "22", port_range_max: "22", remote_ip_prefix: "0.0.0.0/0", state: "present" }
+  - name: "web"
+    description: "web access"
+    rules:
+      - { protocol: "tcp", port_range_min: "80", port_range_max: "80", remote_ip_prefix: "0.0.0.0/0", state: "present" }
+      - { protocol: "tcp", port_range_min: "443", port_range_max: "443", remote_ip_prefix: "0.0.0.0/0", state: "present" }
+
+#####################
+# server groups
+os_server_group:
+  list:
+    - { name: "load_balancers", policies: ['anti-affinity'] }
+    - { name: "redis",          policies: ['anti-affinity'] }
+    - { name: "graphite",       policies: ['anti-affinity'] }
+    - { name: "elk",            policies: ['anti-affinity'] }
+    - { name: "web",            policies: ['anti-affinity'] }
+    - { name: "sync",           policies: ['anti-affinity'] }
+    - { name: "mariadb",        policies: ['anti-affinity'] }
+    - { name: "ldap",           policies: ['anti-affinity'] }
+  # look up id after they were created: `openstack server group list`
+  load_balancers: "5869d416-68a5-4402-bd53-6cc3d1e1c5c4"
+  redis:          "8798bcf2-c508-4eec-a0bb-c8bec7936490"
+  graphite:       "e501e66b-4a30-458c-bcdb-6a400753e5f5"
+  elk:            "01f9d57a-f3bd-4404-9d5c-31354e09d6d3"
+  web:            "03fa7399-6127-42d3-9790-dfe7fbc7c01e"
+  sync:           "6bac3dd5-248f-43cc-8d62-9afab4ef6ec3"
+  mariadb:        "c29fee8f-8fb0-4c1a-8904-686b997310e5"
+  ldap:           "ea57c53c-1dea-44fa-a3b8-c94314f3ca8b"
+
+######################
+# servers
+os_server:
+  #jumphost1:  { ip: "{{ jumphost_internal }}",                                   flavor: "c1.small",     image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,ssh",                  hints: {}, floating_ip: '86.119.33.56' }
+  jumphost1:  { ip: "{{ jumphost_internal }}",                                   flavor: "c1.small",     image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,ssh",                  hints: {}, floating_ip: '86.119.29.22' }
+
+  lb1:        { ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}",        flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
+#  #lb2:        { ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}",        flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,development,ldap,web", hints: { group: "{{ os_server_group['load_balancers'] }}" } }
+
+  redis1:     { ip: "{{ hostvars[groups['redis'][0]].inventory_hostname }}",     flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['redis'] }}" } }
+
+  web1:       { ip: "{{ hostvars[groups['web'][0]].inventory_hostname }}",       flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['web'] }}" } }
+  web2:       { ip: "{{ hostvars[groups['web'][1]].inventory_hostname }}",       flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['web'] }}" } }
+  #web3:       { ip: "{{ hostvars[groups['web'][2]].inventory_hostname }}",       flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['web'] }}" } }
+  #web4:       { ip: "{{ hostvars[groups['web'][3]].inventory_hostname }}",       flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['web'] }}" } }
+
+  sync1:      { ip: "{{ hostvars[groups['sync'][0]].inventory_hostname }}",      flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['sync'] }}" } }
+  sync2:      { ip: "{{ hostvars[groups['sync'][1]].inventory_hostname }}",      flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['sync'] }}" } }
+  #sync3:      { ip: "{{ hostvars[groups['sync'][2]].inventory_hostname }}",      flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['sync'] }}" } }
+  #sync4:      { ip: "{{ hostvars[groups['sync'][3]].inventory_hostname }}",      flavor: "c1.xxlarge",   image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { group: "{{ os_server_group['sync'] }}" } }
+
+  #graphite1:  { ip: "{{ hostvars[groups['graphite'][0]].inventory_hostname }}",  flavor: "drive-40-4-4-120-ssd",     image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['graphite'] }}" } }
+  #graphite2:  { ip: "{{ hostvars[groups['graphite'][1]].inventory_hostname }}",  flavor: "drive-40-4-4-120-ssd",     image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: { group: "{{ os_server_group['graphite'] }}" } }
+
+  #elk1:       { ip: "{{ hostvars[groups['elk'][0]].inventory_hostname }}",       flavor: "drive-20-64-16",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default,elk",      hints: { group: "{{ os_server_group['elk'] }}" } }
+  #elk2:       { ip: "{{ hostvars[groups['elk'][1]].inventory_hostname }}",       flavor: "drive-20-64-16",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default,elk",      hints: { group: "{{ os_server_group['elk'] }}" } }
+
+  db1:        { ip: "{{ hostvars[groups['mariadb'][0]].inventory_hostname }}",   flavor: "drive-100-32-8-100-ssd", image: "{{os_image['xenial']}}", root_size: "80", security_groups: "default",          hints: { group: "{{ os_server_group['mariadb'] }}" } }
+
+  nfs1:       { ip: "{{ hostvars[groups['nfs'][0]].inventory_hostname }}",       flavor: "drive-40-4-4",             image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: {} }
+
+# ceph data volumes; do not add root volumes and ssd-ephemeral volumes like e.g. the one for graphite.
+os_volumes:
+  nfs1:
+    - { name: "data", name_prefix: "data", state: "mounted", device: "/dev/vdb", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "101"  }
+    - { name: "101", name_prefix: "data", state: "mounted", device: "/dev/vdc", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "102"  }
+    - { name: "102", name_prefix: "data", state: "mounted", device: "/dev/vdd", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "103"  }
+    - { name: "103", name_prefix: "data", state: "mounted", device: "/dev/vde", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "104"  }
+    - { name: "104", name_prefix: "data", state: "mounted", device: "/dev/vdf", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "105"  }
+    - { name: "105", name_prefix: "data", state: "mounted", device: "/dev/vdg", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "106"  }
+    - { name: "106", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "."  }
+
+
+#####################
+# vips
+
+# use `openstack port list` to find ports
+# verify settings with: `openstack port show <port>`
+
+os_vip:
+  ips:
+    - { name: "lb_vip1", ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }
+    - { name: "lb_vip2", ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" }
+    #- { name: "carbon_vip", ip: "{{ hostvars[groups['carbon_vip'][0]].inventory_hostname }}" }
+  ports:
+    # lb
+    - { name: '{{ site }}-lb1-port_{{ os_network_name }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
+    - { name: '{{ site }}-lb2-port_{{ os_network_name }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
+    # carbon
+    #- { name: '{{ site }}-graphite1-port_{{ os_network_name }}', ips: [ { ip_address: "{{ hostvars[groups['carbon_vip'][0]].inventory_hostname }}" } ] }
+    #- { name: '{{ site }}-graphite2-port_{{ os_network_name }}', ips: [ { ip_address: "{{ hostvars[groups['carbon_vip'][0]].inventory_hostname }}" } ] }
