@@ -66,6 +66,10 @@ COPY patches/username/v1.{{owncloud_major_version}}.php /var/www/owncloud/ocs/v1
 # master_password
 COPY patches/masterpasswd/apps/user_ldap/user_ldap.php /var/www/owncloud/apps/user_ldap/user_ldap.php
 
+# mimetypes
+COPY patches/mimetype/lib/private/files/cache/cache.{{owncloud_major_version}}.php  /var/www/owncloud/lib/private/files/cache/cache.php
+COPY patches/mimetype/lib/private/files/cache/updater.{{owncloud_major_version}}.php  /var/www/owncloud/lib/private/files/cache/updater.php
+
 
 ###########
 # config

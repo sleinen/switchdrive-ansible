@@ -35,7 +35,7 @@ give access to special flavors: (has to be done as user admin in zh and ls regio
 Create files:
 - inventories/nzdrive
 - vars/servers.nzdrive
-- vars/group_vars/user
+- vars/group_vars/all/user
 
 for nzdrive a chose a service name of drive-nc.switch.ch. For nldrive, that would have to be something different.
 

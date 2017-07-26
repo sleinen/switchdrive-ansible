@@ -14,7 +14,7 @@ docker_pull: true
 
 owncloud_major_version: "9.0"
 owncloud_version: "{{owncloud_major_version}}.10"
-owncloud_docker_image_version: 3
+owncloud_docker_image_version: 4
 
 #owncloud_major_version: "8.2"
 #owncloud_version: "{{owncloud_major_version}}.8"
