@@ -1,4 +1,4 @@
-/run/shm/owncloud.*.log {
+/run/shm/*owncloud.log {
   rotate 1
   daily
   size 10M
@@ -6,4 +6,5 @@
   nocompress
   missingok
   notifempty
+  su www-data www-data
 }
