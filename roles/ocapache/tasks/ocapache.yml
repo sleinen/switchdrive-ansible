@@ -55,3 +55,12 @@
       - "/var/run/php:/var/run/php"
   tags:
     - ocapache
+
+- name: install apache logrotate config
+  template:
+    src: "logrotate_apache2.j2"
+    dest: "/etc/logrotate.d/apache2_docker"
+  tags:
+    - ocapache
+    - logrotate
+

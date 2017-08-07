@@ -1,0 +1,13 @@
+/var/log/apache2/*.log {
+	daily
+	missingok
+	rotate 5
+	compress
+	delaycompress
+	notifempty
+	create 640 root adm
+	sharedscripts
+	postrotate
+          /usr/bin/docker exec ocapache /usr/sbin/apache2ctl graceful
+	endscript
+}
