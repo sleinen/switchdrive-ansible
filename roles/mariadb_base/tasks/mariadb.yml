@@ -10,11 +10,12 @@
 
 - name: 'Create directory for MariaDB tmp'
   file:
-    path: "{{mariadb_mount_point}}/tmp"
+    path: "{{data_mount_point}}/tmp"
     state: "directory"
     owner: "root"
     group: "root"
-    mode: "u+rwx,g+rwx,o+rwx"
+    mode: "0777"
+  #shell: mkdir -p "{{mariadb_mount_point}}/tmp"; chmod 0777 "{{mariadb_mount_point}}/tmp"
   tags: mariadb
 
 - name: 'Create directory for MariaDB configs'

@@ -7,8 +7,8 @@ $CONFIG = array (
   'overwrite.cli.url' => 'https://{{shards.overwritehost}}',
 
   'dbtype' => 'mysql',
-  'dbname' => 'owncloud',
-  #'dbname' => '{{shards.shard_name}}',
+  #'dbname' => 'owncloud',
+  'dbname' => '{{shards.shard_name}}',
   'dbtableprefix' => 'oc_',
   'dbuser' => 'owncloud',
   'dbhost' => '{{shards.db_host}}',
@@ -26,7 +26,7 @@ $CONFIG = array (
   'logfile' => '/var/log/owncloud/{{shards.shard_name}}.{{owncloud_logfile_name}}',
   'logdateformat' => 'U.u',
   'logtimezone' => 'Europe/Berlin',
-  'log_rotate_size' => 104857600,
+  'log_rotate_size' => false,
 
   'mail_domain' => 'switch.ch',
   'mail_smtpdebug' => false,
@@ -69,5 +69,17 @@ $CONFIG = array (
      'host' => '{{ hostvars[groups['redis'][0]].inventory_hostname }}',
      'port' => 6379,
       ),
+  'enabledPreviewProviders' =>
+  array (
+    0 => 'OC\\Preview\\PNG',
+    1 => 'OC\\Preview\\JPEG',
+    2 => 'OC\\Preview\\GIF',
+    3 => 'OC\\Preview\\XBitmap',
+    4 => 'OC\\Preview\\MP3',
+    5 => 'OC\\Preview\\TXT',
+    6 => 'OC\\Preview\\MarkDown',
+  ),
   'enable_certificate_management' => true,
+  'versions_retention_obligation' => 'auto',
+  'trashbin_retention_obligation' => '90, 90'
 );
