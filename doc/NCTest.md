@@ -101,6 +101,7 @@ This may hang. Then ^C and run
     ansible-playbook -i inventories/nzdrive jobs/mariadb_boot_single_node_cluster.yml
     
 Setting up the db for the first time is a brittle step and may go wrong several times in a row just run initdb several times until it is ok.
+Beware: /mnt/data/mariadb/tmp might not have the right permissions
 
 
 ## create db
@@ -109,12 +110,14 @@ Normally the steps above create an owncloud db ready to be used. However in this
 Let's create them manually:
 
     ssh db1.nzdrive
+    sudo -i
     /root/mariadb
     
     CREATE DATABASE IF NOT EXISTS `a01` ;
     GRANT ALL ON `a01`.* TO 'owncloud'@'%' ;
     FLUSH PRIVILEGES ;
 
+This, of course is best done as a SQL script, and sourced whilst in mariadb.
 
 # install nfs and redis servers
 
@@ -134,10 +137,11 @@ Add templates for new site to `roles/ocapache/templates`
 # install lb server
 
 add section in group_vars/all/keepalived.yml for the new site.
+add template for new site to 'roles/haproxy/templates'
 edit file `group_vars/all/certificates` add new service name to `service_cert` dictionary. 
 Leave it empty we'll create a cert with letsencrypt but we first want it to create a self signed cert to get started.
 
-    ansible-playbook -i inventories/nzdrive playbooks/lbservers.yml --limit=*1
+    ansible-playbook -i inventories/nzdrive playbooks/lbservers.yml --limit=\*1
 
 # DNS and Service IP & certificate
 

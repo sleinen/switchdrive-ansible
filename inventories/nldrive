@@ -96,8 +96,8 @@ jumphost_internal="{{private_network}}.5"
 reverse_dns_domain=23.0.10.in-addr.arpa
 
 # LDAP
-#ldap_ip=86.119.34.136
-#ldap_host=ldap1.{{internal_domain}}
+ldap_ip=86.119.34.136
+ldap_host=ldap1.{{internal_domain}}
 #stats_send_to=jens-christian.fischer@switch.ch
 #stats_from=jens-christian.fischer@switch.ch
 

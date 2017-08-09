@@ -66,6 +66,7 @@ letsencrypt:
     drive-stage.switch.ch:  '-d {{ domain_list | join("drive-stage.switch.ch -d ") }}{{service_name}}'
     drive-backup.switch.ch: '-d {{ domain_list | join("drive-backup.switch.ch -d ") }}{{service_name}}'
     drive-nc.switch.ch:     '-d {{ domain_list | join("drive-nc.switch.ch -d ") }}{{service_name}}'
+    drive-ncl.switch.ch:     '-d {{ domain_list | join("drive-ncl.switch.ch -d ") }}{{service_name}}'
   email: "christian.schnidrig@gmail.com"
 
 haproxy_state_file: "/var/lib/haproxy/state"
