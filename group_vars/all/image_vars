@@ -8,14 +8,22 @@ docker_pull: true
 ####################
 # image to be build
 
+#owncloud_fork_name: nc
+#owncloud_major_version: "12.0"
+#owncloud_version: "{{owncloud_major_version}}.1"
+#owncloud_docker_image_version: 2
+
+#owncloud_fork_name: oc
 #owncloud_major_version: "9.1"
 #owncloud_version: "{{owncloud_major_version}}.4"
 #owncloud_docker_image_version: 1
 
+owncloud_fork_name: oc
 owncloud_major_version: "9.0"
 owncloud_version: "{{owncloud_major_version}}.10"
-owncloud_docker_image_version: 4
+owncloud_docker_image_version: 5
 
+#owncloud_fork_name: oc
 #owncloud_major_version: "8.2"
 #owncloud_version: "{{owncloud_major_version}}.8"
 #owncloud_docker_image_version: 1
@@ -53,7 +61,7 @@ owncloud_php_conf_dir:
     "9.1": "/etc/php/7.0"
 owncloud_pkgs:
     "8.2": "php5-fpm php5-ldap php5-redis=2.2.4* php5-apcu php-xml-parser owncloud-server"
-    "9.0": "php-ldap php-redis php-apcu php-imagick php-bz2 php-xml-parser owncloud-enterprise"
+    "9.0": "php-ldap php-apcu php-imagick php-bz2 php-xml-parser owncloud-enterprise"
     "9.1": "php-ldap php-redis php-apcu php-imagick php-bz2 php-xml-parser owncloud-enterprise"
 owncloud_ubuntu_base_version:
     "8.2": "14.04"
@@ -63,6 +71,15 @@ owncloud_php_fpm:
     "8.2": "/usr/sbin/php5-fpm"
     "9.0": "/usr/sbin/php-fpm7.0"
     "9.1": "/usr/sbin/php-fpm7.0"
+
+nc_php_conf_dir:
+    "12.0": "/etc/php/7.0"
+nc_pkgs:
+    "12.0": "php php-gd php-mbstring php-zip php-pdo-mysql php-curl php-intl php-mcrypt php-ldap php-redis php-apcu php-imagick php-bz2 php-xml-parser"
+nc_ubuntu_base_version:
+    "12.0": "16.04"
+nc_php_fpm:
+    "12.0": "/usr/sbin/php-fpm7.0"
 
 ocphp_fpm_docker_name: "{{registry_url}}/ocphp_fpm"
 ocphp_fpm_docker_tag: "{{owncloud_version}}-{{owncloud_docker_image_version}}"

@@ -74,6 +74,7 @@ os_server:
   db1:        { ip: "{{ hostvars[groups['mariadb'][0]].inventory_hostname }}",   flavor: "drive-100-32-8-100-ssd", image: "{{os_image['xenial']}}", root_size: "80", security_groups: "default",          hints: { group: "{{ os_server_group['mariadb'] }}" } }
 
   nfs1:       { ip: "{{ hostvars[groups['nfs'][0]].inventory_hostname }}",       flavor: "drive-40-4-4",             image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: {} }
+  lookup1:    { ip: "{{ hostvars[groups['lookup'][0]].inventory_hostname }}",    flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",                      hints: { } }
 
 # ceph data volumes; do not add root volumes and ssd-ephemeral volumes like e.g. the one for graphite.
 os_volumes:

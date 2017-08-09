@@ -124,3 +124,7 @@ long_query_time = 1.000000
 {{mariadb_disable_plugins}}query_response_time_stats=1
 
 
+# https://mariadb.com/kb/en/mariadb/general-query-log/
+#general-log
+#general-log-file=queries.log
+#log-output=file

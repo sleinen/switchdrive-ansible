@@ -51,6 +51,9 @@ controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass
 [backup]
 10.0.50.9
 
+[lookup]
+10.0.50.19
+
 [test]
 10.0.50.15
 
