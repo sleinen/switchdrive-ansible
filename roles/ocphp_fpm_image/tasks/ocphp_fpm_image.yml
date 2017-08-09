@@ -22,8 +22,8 @@
     dest=/tmp/ocphp_fpm/{{item.dest}}
     mode={{item.mode}}
   with_items:
-    - { name: "Dockerfile.{{owncloud_major_version}}", dest: "Dockerfile", mode: "0644" }
-    - { name: "entrypoint.sh", dest: "entrypoint.sh", mode: "0755" }
+    - { name: "{{owncloud_fork_name}}.{{owncloud_major_version}}.dockerfile", dest: "Dockerfile", mode: "0644" }
+    - { name: "{{owncloud_fork_name}}.entrypoint.sh", dest: "entrypoint.sh", mode: "0755" }
     - { name: "user.ini", dest: "user.ini", mode: "0644" }
     - { name: "patches/masterpasswd/apps/user_ldap/user_ldap.php", dest: "patches/masterpasswd/apps/user_ldap/user_ldap.php", mode: "0644" }
   tags:

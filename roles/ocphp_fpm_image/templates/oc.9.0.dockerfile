@@ -8,6 +8,7 @@ MAINTAINER Christian Schnidrig
 RUN apt-get update && apt-get install -y \
        "php(5-|-)fpm" \
        php-xdebug \
+       php7.0-dev \
     && rm /etc/php/7.0/fpm/pool.d/www.conf || true \
     && rm /etc/php5/fpm/pool.d/www.conf || true \
     && rm -rf /var/lib/apt/lists/*
@@ -24,6 +25,14 @@ RUN apt-get update && apt-get install -y \
     && apt-key add - < /tmp/Release.key \
     && echo 'deb {{owncloud_repo_base_url}}/ /' >> /etc/apt/sources.list.d/owncloud.list \
     && rm -rf /var/lib/apt/lists/* /tmp/Release.key
+
+###########
+# newest php-redis
+
+RUN yes '' | pecl install redis && \
+    echo "extension=redis.so\n" > /etc/php/7.0/mods-available/redis.ini && \
+    cp /etc/php/7.0/mods-available/redis.ini /etc/php/7.0/cli/conf.d/redis.ini && \
+    cp /etc/php/7.0/mods-available/redis.ini /etc/php/7.0/fpm/conf.d/redis.ini
 
 ###########
 # install owncloud
