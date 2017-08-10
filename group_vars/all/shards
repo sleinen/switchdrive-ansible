@@ -22,6 +22,12 @@ ssd:
     image_version: 2
     version_in_config: '12.0.1.5'
     db_host: localhost
+  nldrive:
+    major_version: "9.0"
+    minor_version: "10"
+    image_version: 3
+    version_in_config: '9.0.10.2'
+    db_host: localhost
 
 # config deployment (ocapache, ocphp_fpm, cron)
 shard_config:
@@ -58,7 +64,7 @@ shard_mapping:
      #- { oc_major_version: '9.0', oc_minor_version: '7', oc_image_version: '1', , shards: [a04] }
      - { oc_major_version: '9.1', oc_minor_version: '4', oc_image_version: '1', shards: [a01, a02, a03, a05, a06] }
   drive-nc.switch.ch:
-     - { oc_major_version: '{{ ssd.nzdrive.major_version }}', oc_minor_version: '{{ ssd.nzdrive.minor_version }}', oc_image_version: '{{ ssd.nzdrive.image_version }}', shards: [a01] }
+     - { oc_major_version: '{{ ssd.nzdrive.major_version }}', oc_minor_version: '{{ ssd.nzdrive.minor_version }}', oc_image_version: '{{ ssd.nzdrive.image_version }}', shards: [a01, a02, a03, a04, a05] }
   drive-ncl.switch.ch:
      - { oc_major_version: '{{ ssd.nldrive.major_version }}', oc_minor_version: '{{ ssd.nldrive.minor_version }}', oc_image_version: '{{ ssd.nldrive.image_version }}', shards: [a01] }
 
