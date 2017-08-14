@@ -58,12 +58,6 @@ RUN curl -L https://{{git_hub_user}}:{{git_hub_passwd}}@github.com/switch-ch/swi
 # appconfig
 COPY patches/appconfig/lib/private/appconfig.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/appconfig.php
 
-# looping
-COPY patches/looping/lib/private/files/cache/propagator.{{owncloud_major_version}}.php  /var/www/owncloud/lib/private/files/cache/propagator.php
-COPY patches/looping/lib/private/files/cache/cache.{{owncloud_major_version}}.php  /var/www/owncloud/lib/private/files/cache/cache.php
-COPY patches/looping/lib/private/files/cache/wrapper/cachejail.{{owncloud_major_version}}.php  /var/www/owncloud/lib/private/files/cache/wrapper/cachejail.php
-COPY patches/looping/apps/files_sharing/lib/cache.{{owncloud_major_version}}.php  /var/www/owncloud/apps/files_sharing/lib/cache.php
-
 # ocdata
 COPY patches/ocdata/lib/private/util.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/util.php
 
@@ -75,9 +69,17 @@ COPY patches/username/v1.{{owncloud_major_version}}.php /var/www/owncloud/ocs/v1
 # master_password
 COPY patches/masterpasswd/apps/user_ldap/user_ldap.php /var/www/owncloud/apps/user_ldap/user_ldap.php
 
+# looping
+COPY patches/looping/*.patch /
+RUN cd /var/www/owncloud && \
+    patch -p1 < /28320.patch && \
+    patch -p1 < /28322.patch && \
+    patch -p1 < /patch.patch && \
+    rm /*.patch
+
 # mimetypes
-COPY patches/mimetype/lib/private/files/cache/cache.{{owncloud_major_version}}.php  /var/www/owncloud/lib/private/files/cache/cache.php
-COPY patches/mimetype/lib/private/files/cache/updater.{{owncloud_major_version}}.php  /var/www/owncloud/lib/private/files/cache/updater.php
+COPY patches/mimetype/mimetype.patch /
+RUN cd /var/www/owncloud && patch -p1 -R < /mimetype.patch && rm /mimetype.patch
 
 
 ###########
