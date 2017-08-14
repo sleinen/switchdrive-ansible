@@ -1,7 +1,7 @@
 ---
 
 - name: add owncloud logrotation config file
-  copy:
+  template:
     src=logrotate.d/{{item}}
     dest=/etc/logrotate.d/{{item}}
     mode=0644 owner=root

@@ -7,6 +7,6 @@
         delaycompress
         copytruncate
         postrotate
-                docker exec -ti ocphp_fpm /usr/lib/php/php7.0-fpm-reopenlogs
+                for id in `docker ps -f "name=php_fpm_*" -q`; do docker exec $id /usr/lib/php/php7.0-fpm-reopenlogs; done
         endscript
 }
