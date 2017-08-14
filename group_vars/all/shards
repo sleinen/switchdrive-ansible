@@ -27,7 +27,7 @@ ssd:
     minor_version: "10"
     image_version: 3
     version_in_config: '9.0.10.2'
-    db_host: localhost
+    db_host: '{{hostvars[groups["mariadb"][0]].inventory_hostname}}'
 
 # config deployment (ocapache, ocphp_fpm, cron)
 shard_config:
@@ -52,7 +52,7 @@ shard_config:
     - {shard_name: 'a05', cluster_config: 'cluster.config.{{ ssd.nzdrive.major_version }}.php', config: 'config.{{ ssd.nzdrive.major_version }}.php', instanceid: 'oc641cdd42e0', installed: 'true', version: '{{ ssd.nzdrive.major_version }}.{{ ssd.nzdrive.minor_version }}', version_in_config: '{{  ssd.nzdrive.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "a05.drive-nc.switch.ch", part_of_cluster: false, db_host: '{{  ssd.nzdrive.db_host }}', gss_mode: "slave" }
   drive-ncl.switch.ch:
     #- {shard_name: 'a01', cluster_config: 'cluster.config.{{ ssd.nldrive.major_version }}.php', config: 'config.{{ ssd.nldrive.major_version }}.php', instanceid: 'oc641cdd42e0', installed: 'false', version: '{{ ssd.nldrive.major_version }}.{{ ssd.nldrive.minor_version }}', version_in_config: '{{  ssd.nldrive.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-ncl.switch.ch", part_of_cluster: false, db_host: '{{  ssd.nldrive.db_host }}' }
-    - {shard_name: 'a01', cluster_config: 'cluster.config.{{ ssd.nldrive.major_version }}.php', config: 'config.{{ ssd.nldrive.major_version }}.php', instanceid: 'oc641cdd42e0', installed: 'true', version: '{{ ssd.nldrive.major_version }}.{{ ssd.nldrive.minor_version }}', version_in_config: '{{  ssd.nldrive.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "drive-ncl.switch.ch", part_of_cluster: false, db_host: '{{  ssd.nldrive.db_host }}' }
+    - {shard_name: 'a01', cluster_config: 'cluster.config.{{ ssd.nldrive.major_version }}.php', config: 'config.{{ ssd.nldrive.major_version }}.php', instanceid: 'oc641cdd42e0', installed: 'false', version: '{{ ssd.nldrive.major_version }}.{{ ssd.nldrive.minor_version }}', version_in_config: '{{  ssd.nldrive.version_in_config }}', hour: "*", minute: "5,20,35,50",  overwritehost: "a01.drive-ncl.switch.ch", part_of_cluster: false, db_host: '{{  ssd.nldrive.db_host }}' }
 
 # ocphp_fpm container deployment
 shard_mapping:
