@@ -91,10 +91,8 @@ user:
 
 
 users_admin:
-  - fischer
   - leinen
   - schnidri
-  - fritschi
   - herzog
   - furter
   - schmid2
@@ -131,13 +129,13 @@ remove_users:
   - bleh
   - usai
   - mueller2
+  - fischer
+  - fritschi
 
 ubuntu_keys:
   - schnidri
   - leinen
-  - fischer
   - furter
-  - fritschi
   - schmid2
   - vernon
   - buschor
