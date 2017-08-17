@@ -39,6 +39,8 @@ Create files:
 
 for nzdrive a chose a service name of drive-nc.switch.ch. For nldrive, that would have to be something different.
 
+for nldrive it is a service name of drive-ncl.switch.ch
+
 # create network & jumphost & jump-ip
 
     ansible-playbook -i inventories/nzdrive jobs/infra_create.yml -t os_network
@@ -155,6 +157,7 @@ Get DNS entry for that ip. For the site nzdrive I chose 'drive-nc.switch.ch'.
 (don't know yet what the requirements for lausanne by nextcloud are going to be....)
 
 ## certificate
+Note: Currently letsencrypt is broken, but you can just use the existing self-signed certificates.
 Once we have dns entry, we can request a letsencrypt certificate. 
 
 edit file `group_vars/all/defaults` add section in `letsencrypt.domain`
@@ -179,6 +182,8 @@ open `https://drive-nc.switch.ch/` in a browser -> you should have a working cer
 Set installed flag in config back to false: edit `shards` file -> in dictionary `shard_config.<service_name>` change `installed` to false
 
     ansible-playbook -i inventories/nzdrive playbooks/webservers.yml --limit=*1 -t ocphp_fpm
+
+Note: You'll need to escape the *1 if you're using anything but bash as your shell.
     
 installation with occ command seems to be broken -> install through the web:
 
@@ -190,6 +195,10 @@ In a browser load `https://drive-nc.switch.ch/`
 -> login with credentials from the file web1.nzdrive:/etc/owncloud/autoconfig.a01.php
 
 edit `shards` file -> in dictionary `shard_config.<service_name>` change `installed` to true
+
+Note: If this breaks, it is proably due to the DB being set to localhost, or not correctly,
+You'll need to set things in autoconfig.php.
+
 
 start web2 again
     ssh web2.nzdrive sudo docker start ocapache
@@ -211,5 +220,6 @@ start web2 again
 
 # Missing
 login as admin and setup ldap. -> do not run ldap ansible playbooks. That is something different.
+But remember to allow network connections to the LDAP server, otherwise logins won't work.
 
 replace ocphp_fpm docker image with a nc image (needs to be build first).
