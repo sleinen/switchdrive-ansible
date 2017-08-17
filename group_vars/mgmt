@@ -44,6 +44,7 @@ scripts:
    - { name: "mariadb", path: "/root", mode: "0550" }
    - { name: "mysqlcmd", path: "/root", mode: "0550" }
    - { name: "maxadmin", path: "/root", mode: "0550" }
+   - { name: "active_users", path: "/root", mode: "0550" }
 
 filebeat:
   configs:

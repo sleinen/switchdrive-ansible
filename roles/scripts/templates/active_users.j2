@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# This script retrieved the currently active users. It's needed to update the last login info of SWITCH EDUid
+# -> the info is retrieved from the cloud-id server.
+
+HOST=`hostname | sed -e 's&.*-&&'`
+
+/usr/bin/docker run --rm -i --net=host mariadb mysql \
+   -uowncloud -p'{{mariadb_passwd}}' -h $HOST.drive --default-character-set=utf8 -o --column-names=FALSE owncloud << END
+select userid, configvalue from owncloud.oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-86400) ;
+END
