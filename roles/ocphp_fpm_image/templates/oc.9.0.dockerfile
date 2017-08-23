@@ -81,6 +81,11 @@ RUN cd /var/www/owncloud && \
 COPY patches/mimetype/mimetype.patch /
 RUN cd /var/www/owncloud && patch -p1 -R < /mimetype.patch && rm /mimetype.patch
 
+#indexes
+COPY patches/index/lib/private/files/cache/cache.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/files/cache/cache.php
+COPY patches/index/lib/private/group/database.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/group/database.php
+COPY patches/index/lib/private/user/database.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/user/database.php
+
 
 ###########
 # config
