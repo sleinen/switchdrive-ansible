@@ -1,0 +1,73 @@
+diff --git a/3rdparty b/3rdparty
+index 04f5b05..afb726b 160000
+--- a/3rdparty
++++ b/3rdparty
+@@ -1 +1 @@
+-Subproject commit 04f5b05b43b928172d99c9283b89fcc279cee67b
++Subproject commit afb726b309490ce9df1bd521217da9bbf606593b
+diff --git a/lib/private/files/cache/cache.php b/lib/private/files/cache/cache.php
+index 950de08..4f366c4 100644
+--- a/lib/private/files/cache/cache.php
++++ b/lib/private/files/cache/cache.php
+@@ -135,12 +135,7 @@ class Cache implements ICache {
+ 		}
+ 
+ 		//merge partial data
+-		if (!$data and is_string($file)) {
+-			if (isset($this->partial[$file])) {
+-				$data = $this->partial[$file];
+-			}
+-			return $data;
+-		} else {
++		if($data) {
+ 			//fix types
+ 			$data['fileid'] = (int)$data['fileid'];
+ 			$data['parent'] = (int)$data['parent'];
+@@ -157,6 +152,13 @@ class Cache implements ICache {
+ 			}
+ 			$data['permissions'] = (int)$data['permissions'];
+ 			return new CacheEntry($data);
++		} else if (!$data and is_string($file)) {
++			if (isset($this->partial[$file])) {
++				$data = $this->partial[$file];
++			}
++			return $data;
++		} else {
++			return false;
+ 		}
+ 	}
+ 
+diff --git a/lib/private/group/database.php b/lib/private/group/database.php
+index 503c29b..bc053d1 100644
+--- a/lib/private/group/database.php
++++ b/lib/private/group/database.php
+@@ -219,7 +219,11 @@ class OC_Group_Database extends OC_Group_Backend {
+ 			->execute();
+ 
+ 		$groups = [];
+-		while( $row = $cursor->fetch()) {
++		while( $row = $cursor->fetch() ) {
++			if ( !isset($row['uid']) ) {
++				\OC::$server->getLogger()->error("Unexpected row for getUserGroups($uid):".print_r($row, true), ['app'=>'debug']);
++				continue;
++			}
+ 			$groups[] = $row["gid"];
+ 			$this->groupCache[$row['gid']] = $row['gid'];
+ 		}
+diff --git a/lib/private/user/database.php b/lib/private/user/database.php
+index 9421933..c26458d 100644
+--- a/lib/private/user/database.php
++++ b/lib/private/user/database.php
+@@ -233,7 +233,11 @@ class OC_User_Database extends OC_User_Backend implements \OCP\IUserBackend {
+ 			}
+ 
+ 			// "uid" is primary key, so there can only be a single result
+-			if ($row = $result->fetchRow()) {
++			if ( $row = $result->fetchRow() ) {
++				if ( !isset($row['uid']) || !isset($row['displayname']) ) {
++					\OC::$server->getLogger()->error("Unexpected row for loadUser($uid):".print_r($row, true), ['app'=>'debug']);
++					return false;
++				}
+ 				$this->cache[$uid]['uid'] = $row['uid'];
+ 				$this->cache[$uid]['displayname'] = $row['displayname'];
+ 			} else {
