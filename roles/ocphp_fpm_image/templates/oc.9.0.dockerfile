@@ -86,6 +86,8 @@ COPY patches/index/lib/private/files/cache/cache.{{owncloud_major_version}}.php 
 COPY patches/index/lib/private/group/database.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/group/database.php
 COPY patches/index/lib/private/user/database.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/user/database.php
 
+#reconnect
+COPY patches/reconnect/apps/dav/lib/connector/sabre/file.{{owncloud_major_version}}.php /var/www/owncloud/aps/dav/lib/connector/sabre/file.php
 
 ###########
 # config
