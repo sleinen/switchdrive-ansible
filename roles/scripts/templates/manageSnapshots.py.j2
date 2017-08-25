@@ -1,0 +1,97 @@
+#!/usr/bin/env python
+
+import sys
+import traceback
+
+from keystoneauth1 import session
+from keystoneauth1.identity import v3 as identity_v3
+from cinderclient.v3 import client as cinder_client
+
+from datetime import datetime, tzinfo, timedelta
+from dateutil import parser
+import time
+import pytz
+
+# This will fix proper printing of UTF-8 items
+# But we need a better fix, this is not good
+# http://stackoverflow.com/questions/3828723/why-should-we-not-use-sys-setdefaultencodingutf-8-in-a-py-script
+reload(sys)
+sys.setdefaultencoding("utf-8")
+
+local_timezone = pytz.timezone("CET")
+
+# Exit the current job before the next one is started by cron
+today = datetime.now(local_timezone)
+exit_time = today.replace(hour=23, minute=50)
+print("{}: Will exit at: {}".format(datetime.now(local_timezone).strftime("%Y%m%d-%H:%M %z"), exit_time.strftime("%Y%m%d-%H:%M %z")))
+
+def getAuth():
+    return identity_v3.Password(
+        auth_url="{{snapshot_auth_url}}",
+        username="{{snapshot_username}}",
+        password="{{snapshot_password}}",
+        project_name="{{snapshot_tenant_id}}",
+        user_domain_name="default",
+        project_domain_name="default")
+
+def getSession():
+    return session.Session(auth=getAuth())
+
+def getCinderClient(region):
+    return cinder_client.Client(
+        '3',
+        session=getSession(),
+        region_name=region)
+
+def create_snapshots(cinder, starts_with_pattern, sleep_time_seconds):
+    volumes = cinder.volumes.list(sort_key='name', sort_dir='asc')
+    if volumes:
+        for volume in volumes:
+            if volume.name and volume.name.startswith(starts_with_pattern) and volume.status == 'in-use':
+                now = datetime.now(local_timezone)
+                display_name = "backup-" + volume.name + "-" + datetime.now(local_timezone).strftime("%Y%m%d-%H:%M")
+                print ("{}: Creating snapshot: {}".format(now.strftime("%Y%m%d-%H:%M"), display_name))
+                cinder.volume_snapshots.create(volume.id, name=display_name, force=True)
+                time.sleep(sleep_time_seconds)
+
+
+def delete_snapshots(cinder, starts_with_pattern, max_age_total, max_age_daily, sleep_time_seconds):
+    snapshots = cinder.volume_snapshots.list(sort='created_at')
+    if snapshots:
+        tz_utc = datetime.now(pytz.utc)
+        midnight = datetime(year=today.year, month=today.month, day=today.day, tzinfo=local_timezone)
+        #for snapshot in reversed(snapshots):
+        for snapshot in snapshots:
+            if snapshot.name.startswith(starts_with_pattern):
+                creation_time = parser.parse(snapshot.created_at, default=tz_utc).astimezone(local_timezone)
+                age = midnight-creation_time
+                if (age > timedelta(days=max_age_total) or (creation_time.weekday() != 6 and age > timedelta(days=max_age_daily))):
+                    now = datetime.now(local_timezone)
+                    if exit_time < now:
+                        sys.exit(0)
+                    else:
+                        print ("{}: Deleting snapshot {}".format(now.strftime("%Y%m%d-%H:%M"), snapshot.name))
+                        try:
+                            snapshot.delete()
+                            time.sleep(sleep_time_seconds)
+                        except Exception as e:
+                            print("ERROR: {}".format(e))
+                            #traceback.print_exc(file=sys.stderr)
+
+def main():
+
+    try:
+        cinder = getCinderClient("ZH")
+        create_snapshots(cinder, "drive-data-", 60)
+        delete_snapshots(cinder, "backup-drive-data-", 50, 15, 240)
+
+    except Exception as e:
+        print("ERROR: {}".format(e))
+        print('-' * 60)
+        traceback.print_exc(file=sys.stderr)
+        print('-' * 60)
+        sys.exit(1)
+
+if __name__ == '__main__':
+    main()
+

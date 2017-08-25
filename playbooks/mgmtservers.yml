@@ -8,6 +8,7 @@
   vars_files:
     - ../vars/users.yml
     - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+    - ../vars/snapshots.yml
     - ../vars/servers.{{ site }}.yml
   roles:
     - common
@@ -20,5 +21,6 @@
     # no apache, that way we make sure this will never become an active oc server.
     #- ocapache
     - filebeat
-    - scripts
     - mgmt
+    - openstack
+    - scripts

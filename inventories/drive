@@ -79,10 +79,6 @@ localhost ansible_connection=local
 [jumphost]
 86.119.34.135 admin_users={{mgmt_users}}
 
-[engines]
-#controller.zhdk.cloud.switch.ch ansible_become_pass="{{vault_ansible_become_pass}}"
-localhost
-
 [graphite]
 10.0.23.[231:232]
 
@@ -108,7 +104,6 @@ registry
 lb
 ldap
 monitoring
-engines
 graphite
 backup
 test

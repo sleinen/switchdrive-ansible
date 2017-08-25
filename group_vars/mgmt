@@ -30,7 +30,11 @@ php_config:
   max_php_processes: 25
   pm_max_requests: 0
 
+scripts_pkgs:
+    - "python-dateutil"
+
 scripts:
+   - { name: "manageSnapshots.py", path: "/home/ubuntu/bin", mode: "0555" }
    - { name: "moveUserDirs", path: "/root", mode: "0550" }
    - { name: "occ", path: "/root", mode: "0550" }
    - { name: "rsyncAndMoveUsers", path: "/root", mode: "0550" }

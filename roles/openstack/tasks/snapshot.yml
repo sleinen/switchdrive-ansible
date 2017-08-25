@@ -1,62 +1,26 @@
 ---
 
-- name: create bin directory
-  file: path=/home/{{ snapshot_user_name }}/bin state=directory owner={{ snapshot_user_name }}
-
-- name: install snapshot script
-  template:
-    src=snapshotSWITCHdrive.sh.j2
-    dest=/home/{{ snapshot_user_name }}/bin/snapshotSWITCHdrive
-    mode=0500
-    owner={{ snapshot_user_name }}
+- name: create directories
+  file:
+    path: "{{item}}"
+    state: directory
+    owner: "{{ snapshot_user_name }}"
+  with_items:
+    - /home/{{ snapshot_user_name }}/bin
+    - /var/log/drive
   tags:
     - scripts
-
-- name: install snapshot delete script
-  template:
-    src=snapshotDelete.sh.j2
-    dest=/home/{{ snapshot_user_name }}/bin/snapshotDelete
-    mode=0500
-    owner={{ snapshot_user_name }}
-  tags:
-    - scripts
-
-- name: create .ssh directory
-  file: path=/home/{{ snapshot_user_name }}/.ssh state=directory mode=0700 owner={{ snapshot_user_name }}
-
-- name: drop snapshot user private key
-  template:
-     src=id_drive_snapshot_user.j2
-     dest=/home/peta/.ssh/id_drive_snapshot_user
-     mode=0500
-     owner={{ snapshot_user_name }}
 
 - name: create log directory
   file: path=/var/log/drive state=directory mode=0755 owner={{ snapshot_user_name }}
 
 - name: install snapshot cronjobs
   cron: cron_file=SWITCHdrive
-    hour={{ item.hour }} minute={{ item.minute }}
-    name="backup data disk {{item.name}}"
-    state={{item.state}}
+    hour=1 minute=0
+    name="backup data disks"
+    state=present
     user={{ snapshot_user_name }}
-    job="/home/{{ snapshot_user_name }}/bin/snapshotSWITCHdrive {{ item.region_name }} {{ item.volume_id }} {{ item.name }}"
-  with_items: "{{snapshot_volumes}}"
-  tags:
-    - config
-    - cron
-
-- name: install snapshot-delete cronjobs
-  cron:
-    cron_file: "SWITCHdrive"
-    hour: "{{ item.hour }}"
-    minute: "{{ item.minute }}"
-    name: "delete backup data disk {{item.name}}"
-    state: "{{item.state}}"
-    user: "{{ snapshot_user_name }}"
-    #job="/home/{{ snapshot_user_name }}/bin/snapshotDelete {{ item.region_name }} {{ item.volume_id }} '-9 weeks'"
-    job: "/home/{{ snapshot_user_name }}/bin/snapshotDelete {{ item.region_name }} {{ item.volume_id }} '-56 days'"
-  with_items: "{{snapshot_volumes}}"
+    job="/home/{{ snapshot_user_name }}/bin/manageSnapshots.py >> /var/log/drive/backup.log"
   tags:
     - config
     - cron

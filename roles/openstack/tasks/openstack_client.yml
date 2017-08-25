@@ -1,0 +1,24 @@
+---
+
+- name: install ubuntu cloud keyring
+  apt:
+    pkg: "{{item}}"
+    state: present
+  with_items:
+    - ubuntu-cloud-keyring
+    - python-shade
+  tags:
+    - openstack
+
+- apt_repository:
+    repo: "deb http://ubuntu-cloud.archive.canonical.com/ubuntu xenial-updates/newton main"
+  tags:
+    - openstack
+
+- name: install openstack client
+  apt:
+    pkg: python-openstackclient
+    update_cache: "{{apt_config.update_cache}}"
+    cache_valid_time: "{{apt_config.cache_valid_time}}"
+  tags:
+    - openstack

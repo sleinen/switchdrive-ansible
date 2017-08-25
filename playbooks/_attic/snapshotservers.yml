@@ -1,0 +1,33 @@
+
+#- hosts: jumphost
+#  tasks:
+#    - name: install ssh-key for peta user (jumphost)
+#      authorized_key:
+#        user=ubuntu
+#        key="{{ snapshot_user_key }}"
+#  vars_files:
+#    - ../vars/snapshots.yml
+#    - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+#  become: true
+
+#- hosts: nfs
+#  tasks:
+#    - name: install ssh-key for peta user (nfs-server)
+#      authorized_key:
+#        user=ubuntu
+#        key='command="/home/ubuntu/.ssh/freeze.sh $SSH_ORIGINAL_COMMAND" {{ snapshot_user_key }}'
+#    - name: install freeze.sh
+#      copy: src=roles/openstack/files/freeze.sh dest=/home/ubuntu/.ssh/freeze.sh mode=0500 owner=ubuntu
+#  vars_files:
+#    - ../vars/snapshots.yml
+#    - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+#  become: true
+
+- hosts: engines
+  roles:
+    - openstack
+  vars_files:
+    - ../vars/snapshots.yml
+    - ../vars/data-volumes.{{ volumes_inventory_name }}.yml
+  become: true
+
