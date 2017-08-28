@@ -1,0 +1,1002 @@
+From 08cdba79d98af2c0ddce81135e9d73c63be537bb Mon Sep 17 00:00:00 2001
+From: Tom Needham <needham.thomas@gmail.com>
+Date: Thu, 6 Jul 2017 10:22:39 +0100
+Subject: [PATCH 1/3] Block corrupted filecache updates
+
+---
+ lib/private/files/cache/cache.php | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/lib/private/files/cache/cache.php b/lib/private/files/cache/cache.php
+index c16393cf42e..8e3e53e5a4b 100644
+--- a/lib/private/files/cache/cache.php
++++ b/lib/private/files/cache/cache.php
+@@ -231,6 +231,7 @@ public function put($file, array $data) {
+ 	 * @throws \RuntimeException
+ 	 */
+ 	public function insert($file, array $data) {
++
+ 		// normalize file
+ 		$file = $this->normalize($file);
+ 
+@@ -284,6 +285,13 @@ public function insert($file, array $data) {
+ 	 */
+ 	public function update($id, array $data) {
+ 
++		if(isset($data['parent']) && $data['parent'] === $id) {
++			// Catch the case when we are trying to update the parent to be itself
++			$trace = json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 50));
++			\OC::$server->getLogger()->error("Trying to set parent of file: $id to itself! Trace: $trace");
++			throw new \InvalidArgumentException('Parent cannot be same as self during filecache update');
++		}
++
+ 		if (isset($data['path'])) {
+ 			// normalize path
+ 			$data['path'] = $this->normalize($data['path']);
+
+From 9948d4863df6becf8c8b9703b497a863a953640e Mon Sep 17 00:00:00 2001
+From: Vincent Petry <pvince81@owncloud.com>
+Date: Tue, 25 Jul 2017 15:27:16 +0200
+Subject: [PATCH 2/3] Log filecache changes
+
+Also patches the cache updater to prevent changing the mime type for
+trashed items which would likely cause false positives to be logged
+---
+ lib/private/files/cache/cache.php   |  6 ++++++
+ lib/private/files/cache/updater.php | 13 +++++++++----
+ 2 files changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/lib/private/files/cache/cache.php b/lib/private/files/cache/cache.php
+index 8e3e53e5a4b..950de0806ed 100644
+--- a/lib/private/files/cache/cache.php
++++ b/lib/private/files/cache/cache.php
+@@ -302,6 +302,12 @@ public function update($id, array $data) {
+ 			$data['name'] = $this->normalize($data['name']);
+ 		}
+ 
++		if (isset($data['mimetype']) && $data['mimetype'] !== 'httpd/unix-directory') {
++			$trace = json_encode(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 50));
++			$mime = $data['mimetype'];
++			\OC::$server->getLogger()->warning("Setting mime type of file $id to \"$mime\" Trace: $trace");
++		}
++
+ 		list($queryParts, $params) = $this->buildParts($data);
+ 		// duplicate $params because we need the parts twice in the SQL statement
+ 		// once for the SET part, once in the WHERE clause
+diff --git a/lib/private/files/cache/updater.php b/lib/private/files/cache/updater.php
+index 9e4214ad72a..07292db4562 100644
+--- a/lib/private/files/cache/updater.php
++++ b/lib/private/files/cache/updater.php
+@@ -188,10 +188,15 @@ public function renameFromStorage(IStorage $sourceStorage, $source, $target) {
+ 		}
+ 
+ 		if (pathinfo($source, PATHINFO_EXTENSION) !== pathinfo($target, PATHINFO_EXTENSION)) {
+-			// handle mime type change
+-			$mimeType = $this->storage->getMimeType($target);
+-			$fileId = $this->cache->getId($target);
+-			$this->cache->update($fileId, ['mimetype' => $mimeType]);
++			$isTrash = (($sourceStorage->instanceOfStorage('\OCP\Files\IHomeStorage') && explode('/', $source)[0] === 'files_trashbin')
++				|| ($this->storage->instanceOfStorage('\OCP\Files\IHomeStorage') && explode('/', $target)[0] === 'files_trashbin'));
++
++			if (!$isTrash) {
++				// handle mime type change
++				$mimeType = $this->storage->getMimeType($target);
++				$fileId = $this->cache->getId($target);
++				$this->cache->update($fileId, ['mimetype' => $mimeType]);
++			}
+ 		}
+ 
+ 		if ($sourceCache instanceof Cache) {
+
+From 0e9250f40116f2b9aea105d18d87d7b0ad745999 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?J=C3=B6rn=20Friedrich=20Dreyer?= <jfd@butonic.de>
+Date: Thu, 24 Aug 2017 14:48:38 +0200
+Subject: [PATCH 3/3] double check results
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Signed-off-by: Jörn Friedrich Dreyer <jfd@butonic.de>
+---
+ apps/files_sharing/api/local.php         |   4 +
+ apps/files_sharing/api/server2server.php |  12 ++-
+ apps/files_sharing/lib/share/file.php    |  20 ++++-
+ apps/files_sharing/lib/share/folder.php  |  27 ++++++-
+ apps/files_trashbin/lib/trashbin.php     |   4 +
+ lib/private/allconfig.php                |   4 +
+ lib/private/appconfig.php                |  10 ++-
+ lib/private/files/cache/cache.php        | 134 +++++++++++++++++++++++++++++--
+ lib/private/files/cache/storage.php      |  22 ++++-
+ lib/private/group/database.php           |  27 ++++++-
+ lib/private/ocs/privatedata.php          |   4 +
+ lib/private/share/helper.php             |  11 +++
+ lib/private/share/hooks.php              |  12 +++
+ lib/private/share/share.php              |  97 +++++++++++++++++++---
+ lib/private/tags.php                     |   8 ++
+ lib/private/user/database.php            |  37 +++++++--
+ 16 files changed, 392 insertions(+), 41 deletions(-)
+
+diff --git a/apps/files_sharing/api/local.php b/apps/files_sharing/api/local.php
+index 7d59d68ca6f..339908ab0ea 100644
+--- a/apps/files_sharing/api/local.php
++++ b/apps/files_sharing/api/local.php
+@@ -635,6 +635,10 @@ private static function getShareFromId($shareID) {
+ 			return null;
+ 		}
+ 		if ($share = $result->fetchRow()) {
++			if ($unexpected = $result->fetchRow()) {
++				\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($shareID):".print_r($unexpected, true), ['app'=>'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
+ 			return $share;
+ 		}
+ 
+diff --git a/apps/files_sharing/api/server2server.php b/apps/files_sharing/api/server2server.php
+index 11b24d9148b..c98e3af1b8d 100644
+--- a/apps/files_sharing/api/server2server.php
++++ b/apps/files_sharing/api/server2server.php
+@@ -213,6 +213,10 @@ public function unshare($params) {
+ 		$query = \OCP\DB::prepare('SELECT * FROM `*PREFIX*share_external` WHERE `remote_id` = ? AND `share_token` = ?');
+ 		$query->execute(array($id, $token));
+ 		$share = $query->fetchRow();
++		if ($unexpected = $query->fetchRow()) {
++			\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."(".print_r($params, true)."):".print_r($unexpected, true), ['app'=>'debug']);
++			throw new \LengthException('An internal error occurred, please try again');
++		}
+ 
+ 		if ($token && $id && !empty($share)) {
+ 
+@@ -261,8 +265,12 @@ private function cleanupRemote($remote) {
+ 	 */
+ 	private function getShare($id, $token) {
+ 		$query = \OCP\DB::prepare('SELECT * FROM `*PREFIX*share` WHERE `id` = ? AND `token` = ? AND `share_type` = ?');
+-		$query->execute(array($id, $token, \OCP\Share::SHARE_TYPE_REMOTE));
+-		$share = $query->fetchRow();
++		$result = $query->execute(array($id, $token, \OCP\Share::SHARE_TYPE_REMOTE));
++		$share = $result->fetchRow();
++		if ($unexpected = $result->fetchRow()) {
++			\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($id, $token):".print_r($unexpected, true), ['app'=>'debug']);
++			throw new \LengthException('An internal error occurred, please try again');
++		}
+ 
+ 		return $share;
+ 	}
+diff --git a/apps/files_sharing/lib/share/file.php b/apps/files_sharing/lib/share/file.php
+index 113675508fb..a890901ed62 100644
+--- a/apps/files_sharing/lib/share/file.php
++++ b/apps/files_sharing/lib/share/file.php
+@@ -189,11 +189,23 @@ protected static function resolveReshares($source) {
+ 			$parent = $source['parent'];
+ 			while (isset($parent)) {
+ 				$query = \OCP\DB::prepare('SELECT `parent`, `uid_owner` FROM `*PREFIX*share` WHERE `id` = ?', 1);
+-				$item = $query->execute(array($parent))->fetchRow();
+-				if (isset($item['parent'])) {
+-					$parent = $item['parent'];
++				$result = $query->execute(array($parent));
++				if($item = $result->fetchRow()) {
++					if ($unexpected = $result->fetchRow()) {
++						\OC::$server->getLogger()->error("Too many rows for " . __METHOD__ . "(" . print_r($source, true) . "):" . print_r($unexpected, true), ['app' => 'debug']);
++						throw new \LengthException('An internal error occurred, please try again');
++					}
++					if (!array_key_exists('parent', $item) || !array_key_exists('uid_owner', $item)) {
++						\OC::$server->getLogger()->error("Unexpected row for " . __METHOD__ . "(" . print_r($source, true) . "):" . print_r($item, true), ['app' => 'debug']);
++						throw new \OutOfBoundsException('An internal error occurred, please try again');
++					}
++					if (isset($item['parent'])) {
++						$parent = $item['parent'];
++					} else {
++						$fileOwner = $item['uid_owner'];
++						break;
++					}
+ 				} else {
+-					$fileOwner = $item['uid_owner'];
+ 					break;
+ 				}
+ 			}
+diff --git a/apps/files_sharing/lib/share/folder.php b/apps/files_sharing/lib/share/folder.php
+index 1004f049866..5a8af640e41 100644
+--- a/apps/files_sharing/lib/share/folder.php
++++ b/apps/files_sharing/lib/share/folder.php
+@@ -68,10 +68,19 @@ public function getParents($itemSource, $shareWith = null, $owner = null) {
+ 	private function getParentId($child) {
+ 		$query = \OCP\DB::prepare('SELECT `parent` FROM `*PREFIX*filecache` WHERE `fileid` = ?');
+ 		$result = $query->execute(array($child));
+-		$row = $result->fetchRow();
+-		$parent = ($row) ? $row['parent'] : null;
++		if ($row = $result->fetchRow()) {
++			if ($unexpected = $result->fetchRow()) {
++				\OC::$server->getLogger()->error("Too many rows for " . __METHOD__ . "($child):" . print_r($unexpected, true), ['app' => 'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if (!array_key_exists('parent', $row)) {
++				\OC::$server->getLogger()->error("Unexpected row for " . __METHOD__ . "($child):" . print_r($row, true), ['app' => 'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
++			return $row['parent'];
++		}
+ 
+-		return $parent;
++		return null;
+ 	}
+ 
+ 	public function getChildren($itemSource) {
+@@ -80,6 +89,14 @@ public function getChildren($itemSource) {
+ 		$query = \OCP\DB::prepare('SELECT `id` FROM `*PREFIX*mimetypes` WHERE `mimetype` = ?');
+ 		$result = $query->execute(array('httpd/unix-directory'));
+ 		if ($row = $result->fetchRow()) {
++			if ($unexpected = $result->fetchRow()) {
++				\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($itemSource):".print_r($unexpected, true), ['app'=>'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if ( !array_key_exists('id', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($itemSource)#1:".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			$mimetype = $row['id'];
+ 		} else {
+ 			$mimetype = -1;
+@@ -91,6 +108,10 @@ public function getChildren($itemSource) {
+ 			$result = $query->execute();
+ 			$parents = array();
+ 			while ($file = $result->fetchRow()) {
++				if ( !array_key_exists('fileid', $file) || !array_key_exists('name', $file) || !array_key_exists('mimetype', $file) ) {
++					\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($itemSource)#2:".print_r($file, true), ['app'=>'debug']);
++					throw new \OutOfBoundsException('An internal error occured, please try again');
++				}
+ 				$children[] = array('source' => $file['fileid'], 'file_path' => $file['name']);
+ 				// If a child folder is found look inside it
+ 				if ($file['mimetype'] == $mimetype) {
+diff --git a/apps/files_trashbin/lib/trashbin.php b/apps/files_trashbin/lib/trashbin.php
+index 69636fa0988..0e385da6d76 100644
+--- a/apps/files_trashbin/lib/trashbin.php
++++ b/apps/files_trashbin/lib/trashbin.php
+@@ -115,6 +115,10 @@ public static function getLocations($user) {
+ 		$result = $query->execute(array($user));
+ 		$array = array();
+ 		while ($row = $result->fetchRow()) {
++			if ( !array_key_exists('id', $row) || !array_key_exists('timestamp', $row) || !array_key_exists('location', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($user):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			if (isset($array[$row['id']])) {
+ 				$array[$row['id']][$row['timestamp']] = $row['location'];
+ 			} else {
+diff --git a/lib/private/allconfig.php b/lib/private/allconfig.php
+index e982b064736..7464baaff66 100644
+--- a/lib/private/allconfig.php
++++ b/lib/private/allconfig.php
+@@ -340,6 +340,10 @@ private function getUserValues($userId) {
+ 		$query = 'SELECT `appid`, `configkey`, `configvalue` FROM `*PREFIX*preferences` WHERE `userid` = ?';
+ 		$result = $this->connection->executeQuery($query, array($userId));
+ 		while ($row = $result->fetch()) {
++			if ( !array_key_exists('appid', $row) || !array_key_exists('configkey', $row) || !array_key_exists('configvalue', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($userId):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			$appId = $row['appid'];
+ 			if (!isset($data[$appId])) {
+ 				$data[$appId] = array();
+diff --git a/lib/private/appconfig.php b/lib/private/appconfig.php
+index 14c48299a8a..33a58d9150d 100644
+--- a/lib/private/appconfig.php
++++ b/lib/private/appconfig.php
+@@ -41,6 +41,11 @@ class AppConfig implements IAppConfig {
+ 	 */
+ 	protected $conn;
+ 
++	/**
++	 * @var bool
++	 */
++	protected $configLoaded;
++
+ 	private $cache = array();
+ 
+ 	/**
+@@ -274,13 +279,16 @@ protected function loadConfigValues() {
+ 		$result = $sql->execute();
+ 
+ 		while ($row = $result->fetch()) {
++			if ( !array_key_exists('appid', $row) || !array_key_exists('configkey', $row) || !array_key_exists('configvalue', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."():".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			if (!isset($this->cache[$row['appid']])) {
+ 				$this->cache[$row['appid']] = [];
+ 			}
+ 
+ 			$this->cache[$row['appid']][$row['configkey']] = $row['configvalue'];
+ 		}
+-		$result->closeCursor();
+ 
+ 		$this->configLoaded = true;
+ 	}
+diff --git a/lib/private/files/cache/cache.php b/lib/private/files/cache/cache.php
+index 950de0806ed..88a7921d0ce 100644
+--- a/lib/private/files/cache/cache.php
++++ b/lib/private/files/cache/cache.php
+@@ -127,6 +127,10 @@ public function get($file) {
+ 				FROM `*PREFIX*filecache` ' . $where;
+ 		$result = $this->connection->executeQuery($sql, $params);
+ 		$data = $result->fetch();
++		if ($unexpected = $result->fetch()) {
++			\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($file):".print_r($unexpected, true), ['app'=>'debug']);
++			throw new \LengthException('An internal error occurred, please try again');
++		}
+ 
+ 		//FIXME hide this HACK in the next database layer, or just use doctrine and get rid of MDB2 and PDO
+ 		//PDO returns false, MDB2 returns null, oracle always uses MDB2, so convert null to false
+@@ -135,12 +139,25 @@ public function get($file) {
+ 		}
+ 
+ 		//merge partial data
+-		if (!$data and is_string($file)) {
+-			if (isset($this->partial[$file])) {
+-				$data = $this->partial[$file];
++		if($data) {
++			if (   !array_key_exists('fileid', $data)
++				|| !array_key_exists('storage', $data)
++				|| !array_key_exists('path', $data)
++				|| !array_key_exists('parent', $data)
++				|| !array_key_exists('name', $data)
++				|| !array_key_exists('mimetype', $data)
++				|| !array_key_exists('mimepart', $data)
++				|| !array_key_exists('size', $data)
++				|| !array_key_exists('mtime', $data)
++				|| !array_key_exists('storage_mtime', $data)
++				|| !array_key_exists('encrypted', $data)
++				|| !array_key_exists('etag', $data)
++				|| !array_key_exists('permissions', $data)
++				|| !array_key_exists('checksum', $data)
++			) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($file):".print_r($data, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occured, please try again');
+ 			}
+-			return $data;
+-		} else {
+ 			//fix types
+ 			$data['fileid'] = (int)$data['fileid'];
+ 			$data['parent'] = (int)$data['parent'];
+@@ -157,6 +174,13 @@ public function get($file) {
+ 			}
+ 			$data['permissions'] = (int)$data['permissions'];
+ 			return new CacheEntry($data);
++		} else if (!$data and is_string($file)) {
++			if (isset($this->partial[$file])) {
++				$data = $this->partial[$file];
++			}
++			return $data;
++		} else {
++			return false;
+ 		}
+ 	}
+ 
+@@ -395,6 +419,14 @@ public function getId($file) {
+ 		$sql = 'SELECT `fileid` FROM `*PREFIX*filecache` WHERE `storage` = ? AND `path_hash` = ?';
+ 		$result = $this->connection->executeQuery($sql, array($this->getNumericStorageId(), $pathHash));
+ 		if ($row = $result->fetch()) {
++			if ($unexpected = $result->fetch()) {
++				\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($file):".print_r($unexpected, true), ['app'=>'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if ( !array_key_exists('fileid', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($file):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			return $row['fileid'];
+ 		} else {
+ 			return -1;
+@@ -572,6 +604,14 @@ public function getStatus($file) {
+ 		$sql = 'SELECT `size` FROM `*PREFIX*filecache` WHERE `storage` = ? AND `path_hash` = ?';
+ 		$result = $this->connection->executeQuery($sql, array($this->getNumericStorageId(), $pathHash));
+ 		if ($row = $result->fetch()) {
++			if ($unexpected = $result->fetch()) {
++				\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($file):".print_r($unexpected, true), ['app'=>'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if ( !array_key_exists('size', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($file):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			if ((int)$row['size'] === -1) {
+ 				return self::SHALLOW;
+ 			} else {
+@@ -609,6 +649,23 @@ public function search($pattern) {
+ 
+ 		$files = [];
+ 		while ($row = $result->fetch()) {
++			if (   !array_key_exists('fileid', $row)
++				|| !array_key_exists('storage', $row)
++				|| !array_key_exists('path', $row)
++				|| !array_key_exists('parent', $row)
++				|| !array_key_exists('name', $row)
++				|| !array_key_exists('mimetype', $row)
++				|| !array_key_exists('mimepart', $row)
++				|| !array_key_exists('size', $row)
++				|| !array_key_exists('mtime', $row)
++				|| !array_key_exists('encrypted', $row)
++				|| !array_key_exists('etag', $row)
++				|| !array_key_exists('permissions', $row)
++				|| !array_key_exists('checksum', $row)
++			) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($pattern):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occured, please try again');
++			}
+ 			$row['mimetype'] = $this->mimetypeLoader->getMimetypeById($row['mimetype']);
+ 			$row['mimepart'] = $this->mimetypeLoader->getMimetypeById($row['mimepart']);
+ 			$files[] = $row;
+@@ -637,6 +694,23 @@ public function searchByMime($mimetype) {
+ 		$result = $this->connection->executeQuery($sql, array($mimetype, $this->getNumericStorageId()));
+ 		$files = array();
+ 		while ($row = $result->fetch()) {
++			if (   !array_key_exists('fileid', $row)
++				|| !array_key_exists('storage', $row)
++				|| !array_key_exists('path', $row)
++				|| !array_key_exists('parent', $row)
++				|| !array_key_exists('name', $row)
++				|| !array_key_exists('mimetype', $row)
++				|| !array_key_exists('mimepart', $row)
++				|| !array_key_exists('size', $row)
++				|| !array_key_exists('mtime', $row)
++				|| !array_key_exists('encrypted', $row)
++				|| !array_key_exists('etag', $row)
++				|| !array_key_exists('permissions', $row)
++				|| !array_key_exists('checksum', $row)
++			) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($mimetype):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occured, please try again');
++			}
+ 			$row['mimetype'] = $this->mimetypeLoader->getMimetypeById($row['mimetype']);
+ 			$row['mimepart'] = $this->mimetypeLoader->getMimetypeById($row['mimepart']);
+ 			$files[] = $row;
+@@ -686,6 +760,23 @@ public function searchByTag($tag, $userId) {
+ 		);
+ 		$files = array();
+ 		while ($row = $result->fetch()) {
++			if (   !array_key_exists('fileid', $row)
++				|| !array_key_exists('storage', $row)
++				|| !array_key_exists('path', $row)
++				|| !array_key_exists('parent', $row)
++				|| !array_key_exists('name', $row)
++				|| !array_key_exists('mimetype', $row)
++				|| !array_key_exists('mimepart', $row)
++				|| !array_key_exists('size', $row)
++				|| !array_key_exists('mtime', $row)
++				|| !array_key_exists('encrypted', $row)
++				|| !array_key_exists('etag', $row)
++				|| !array_key_exists('permissions', $row)
++				|| !array_key_exists('checksum', $row)
++			) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($tag, $userId):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occured, please try again');
++			}
+ 			$files[] = $row;
+ 		}
+ 		return array_map(function (array $data) {
+@@ -729,7 +820,10 @@ public function calculateFolderSize($path, $entry = null) {
+ 				'WHERE `parent` = ? AND `storage` = ?';
+ 			$result = $this->connection->executeQuery($sql, array($id, $this->getNumericStorageId()));
+ 			if ($row = $result->fetch()) {
+-				$result->closeCursor();
++				if ($unexpected = $result->fetch()) {
++					\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($path, ".print_r($entry, true)."):".print_r($unexpected, true), ['app'=>'debug']);
++					throw new \LengthException('An internal error occurred, please try again');
++				}
+ 				list($sum, $min) = array_values($row);
+ 				$sum = 0 + $sum;
+ 				$min = 0 + $min;
+@@ -762,6 +856,10 @@ public function getAll() {
+ 		$result = $this->connection->executeQuery($sql, array($this->getNumericStorageId()));
+ 		$ids = array();
+ 		while ($row = $result->fetch()) {
++			if ( !array_key_exists('fileid', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."():".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occured, please try again');
++			}
+ 			$ids[] = $row['fileid'];
+ 		}
+ 		return $ids;
+@@ -781,6 +879,14 @@ public function getIncomplete() {
+ 			. ' WHERE `storage` = ? AND `size` = -1 ORDER BY `fileid` DESC', 1);
+ 		$query->execute([$this->getNumericStorageId()]);
+ 		if ($row = $query->fetch()) {
++			if ($unexpected = $query->fetch()) {
++				\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."():".print_r($unexpected, true), ['app'=>'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if ( !array_key_exists('path', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."():".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			return $row['path'];
+ 		} else {
+ 			return false;
+@@ -797,6 +903,14 @@ public function getPathById($id) {
+ 		$sql = 'SELECT `path` FROM `*PREFIX*filecache` WHERE `fileid` = ? AND `storage` = ?';
+ 		$result = $this->connection->executeQuery($sql, array($id, $this->getNumericStorageId()));
+ 		if ($row = $result->fetch()) {
++			if ($unexpected = $result->fetch()) {
++				\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."():".print_r($unexpected, true), ['app'=>'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if ( !array_key_exists('path', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($id):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			// Oracle stores empty strings as null...
+ 			if ($row['path'] === null) {
+ 				return '';
+@@ -821,6 +935,14 @@ static public function getById($id) {
+ 		$sql = 'SELECT `storage`, `path` FROM `*PREFIX*filecache` WHERE `fileid` = ?';
+ 		$result = $connection->executeQuery($sql, array($id));
+ 		if ($row = $result->fetch()) {
++			if ($unexpected = $result->fetch()) {
++				\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($id):".print_r($unexpected, true), ['app'=>'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if ( !array_key_exists('storage', $row) || !array_key_exists('path', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($id):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			$numericId = $row['storage'];
+ 			$path = $row['path'];
+ 		} else {
+diff --git a/lib/private/files/cache/storage.php b/lib/private/files/cache/storage.php
+index 035c57e0e4c..9bae66937db 100644
+--- a/lib/private/files/cache/storage.php
++++ b/lib/private/files/cache/storage.php
+@@ -151,7 +151,19 @@ private static function getStorageByIdFromCache($storageId) {
+ 	private static function getStorageByIdFromDb($storageId) {
+ 		$sql = 'SELECT * FROM `*PREFIX*storages` WHERE `id` = ?';
+ 		$result = \OC_DB::executeAudited($sql, array($storageId));
+-		return $result->fetchRow();
++		if($row = $result->fetchRow()) {
++			if ($unexpected = $result->fetchRow()) {
++				\OC::$server->getLogger()->error("Too many rows for " . __METHOD__ . "($storageId):" . print_r($unexpected, true), ['app' => 'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if (!array_key_exists('id', $row) || !array_key_exists('numeric_id', $row)) {
++				\OC::$server->getLogger()->error("Unexpected row for " . __METHOD__ . "($storageId):" . print_r($row, true), ['app' => 'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
++			return $row;
++		} else {
++			return null;
++		}
+ 	}
+ 
+ 	private static function unsetCache($storageId) {
+@@ -196,6 +208,14 @@ public static function getStorageId($numericId) {
+ 		$sql = 'SELECT `id` FROM `*PREFIX*storages` WHERE `numeric_id` = ?';
+ 		$result = \OC_DB::executeAudited($sql, array($numericId));
+ 		if ($row = $result->fetchRow()) {
++			if ($unexpected = $result->fetchRow()) {
++				\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($numericId):".print_r($unexpected, true), ['app'=>'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if (!array_key_exists('id', $row)) {
++				\OC::$server->getLogger()->error("Unexpected row for " . __METHOD__ . "($numericId):" . print_r($row, true), ['app' => 'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			return $row['id'];
+ 		} else {
+ 			return null;
+diff --git a/lib/private/group/database.php b/lib/private/group/database.php
+index 503c29b99c0..da3c9e6f64d 100644
+--- a/lib/private/group/database.php
++++ b/lib/private/group/database.php
+@@ -220,6 +220,10 @@ public function getUserGroups( $uid ) {
+ 
+ 		$groups = [];
+ 		while( $row = $cursor->fetch()) {
++			if ( !array_key_exists('gid', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($uid):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			$groups[] = $row["gid"];
+ 			$this->groupCache[$row['gid']] = $row['gid'];
+ 		}
+@@ -249,6 +253,10 @@ public function getGroups($search = '', $limit = null, $offset = null) {
+ 		$result = $stmt->execute($parameters);
+ 		$groups = array();
+ 		while ($row = $result->fetchRow()) {
++			if ( !array_key_exists('gid', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($search, $limit, $offset):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			$groups[] = $row['gid'];
+ 		}
+ 		return $groups;
+@@ -272,14 +280,21 @@ public function groupExists($gid) {
+ 			->from('groups')
+ 			->where($qb->expr()->eq('gid', $qb->createNamedParameter($gid)))
+ 			->execute();
+-		$result = $cursor->fetch();
+-		$cursor->closeCursor();
+ 
+-		if ($result !== false) {
++		if ($row = $cursor->fetch()) {
++			if ($unexpected = $cursor->fetch()) {
++				\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($gid):".print_r($unexpected, true), ['app'=>'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if (!array_key_exists('gid', $row)) {
++				\OC::$server->getLogger()->error("Unexpected row for " . __METHOD__ . "($gid):" . print_r($row, true), ['app' => 'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			$this->groupCache[$gid] = $gid;
+ 			return true;
++		} else {
++			return false;
+ 		}
+-		return false;
+ 	}
+ 
+ 	/**
+@@ -304,6 +319,10 @@ public function usersInGroup($gid, $search = '', $limit = null, $offset = null)
+ 		$result = $stmt->execute($parameters);
+ 		$users = array();
+ 		while ($row = $result->fetchRow()) {
++			if ( !array_key_exists('uid', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($gid, $search, $limit, $offset):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			$users[] = $row['uid'];
+ 		}
+ 		return $users;
+diff --git a/lib/private/ocs/privatedata.php b/lib/private/ocs/privatedata.php
+index e514c05a3dd..233f6f2feb6 100644
+--- a/lib/private/ocs/privatedata.php
++++ b/lib/private/ocs/privatedata.php
+@@ -50,6 +50,10 @@ public static function get($parameters) {
+ 		
+ 		$xml = array();
+ 		while ($row = $result->fetchRow()) {
++			if ( !array_key_exists('key', $row) || !array_key_exists('app', $row) || !array_key_exists('value', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."(".print_r($parameters, true)."):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occured, please try again');
++			}
+ 			$data=array();
+ 			$data['key']=$row['key'];
+ 			$data['app']=$row['app'];
+diff --git a/lib/private/share/helper.php b/lib/private/share/helper.php
+index f9581e48e62..7be280e43b7 100644
+--- a/lib/private/share/helper.php
++++ b/lib/private/share/helper.php
+@@ -111,6 +111,17 @@ public static function delete($parent, $excludeParent = false, $uidOwner = null,
+ 			// Reset parents array, only go through loop again if items are found
+ 			$parents = array();
+ 			while ($item = $result->fetchRow()) {
++				if (   !array_key_exists('id', $item)
++					|| !array_key_exists('share_with', $item)
++					|| !array_key_exists('item_type', $item)
++					|| !array_key_exists('share_type', $item)
++					|| !array_key_exists('item_target', $item)
++					|| !array_key_exists('file_target', $item)
++					|| !array_key_exists('parent', $item)
++				) {
++					\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($parent, $excludeParent, $uidOwner, $newParent, $excludeGroupChildren):".print_r($item, true), ['app'=>'debug']);
++					throw new \OutOfBoundsException('An internal error occurred, please try again');
++				}
+ 				$tmpItem = array(
+ 					'id' => $item['id'],
+ 					'shareWith' => $item['share_with'],
+diff --git a/lib/private/share/hooks.php b/lib/private/share/hooks.php
+index 750486ba80f..26e5b805378 100644
+--- a/lib/private/share/hooks.php
++++ b/lib/private/share/hooks.php
+@@ -45,6 +45,10 @@ public static function post_deleteUser($arguments) {
+ 		$query = \OC_DB::prepare('SELECT `id` FROM `*PREFIX*share` WHERE `uid_owner` = ?');
+ 		$result = $query->execute(array($arguments['uid']));
+ 		while ($item = $result->fetchRow()) {
++			if ( !array_key_exists('id', $item) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."(".print_r($arguments, true)."):".print_r($item, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			Helper::delete($item['id']);
+ 		}
+ 	}
+@@ -171,6 +175,10 @@ public static function post_removeFromGroup($arguments) {
+ 		$result = \OC_DB::executeAudited($sql, array(self::SHARE_TYPE_GROUP, $arguments['gid'],
+ 			self::$shareTypeGroupUserUnique, $arguments['uid']));
+ 		while ($item = $result->fetchRow()) {
++			if ( !array_key_exists('id', $item) || !array_key_exists('share_type', $item) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."(".print_r($arguments, true)."):".print_r($item, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			if ($item['share_type'] == self::SHARE_TYPE_GROUP) {
+ 				// Delete all reshares by this user of the group share
+ 				Helper::delete($item['id'], true, $arguments['uid']);
+@@ -188,6 +196,10 @@ public static function post_deleteGroup($arguments) {
+ 		$sql = 'SELECT `id` FROM `*PREFIX*share` WHERE `share_type` = ? AND `share_with` = ?';
+ 		$result = \OC_DB::executeAudited($sql, array(self::SHARE_TYPE_GROUP, $arguments['gid']));
+ 		while ($item = $result->fetchRow()) {
++			if ( !array_key_exists('id', $item) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."(".print_r($arguments, true)."):".print_r($item, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			Helper::delete($item['id']);
+ 		}
+ 	}
+diff --git a/lib/private/share/share.php b/lib/private/share/share.php
+index 7598b400127..24a015a065e 100644
+--- a/lib/private/share/share.php
++++ b/lib/private/share/share.php
+@@ -179,6 +179,10 @@ public static function getUsersSharingFile($path, $ownerUser, $includeOwner = fa
+ 				\OCP\Util::writeLog('OCP\Share', \OC_DB::getErrorMessage(), \OCP\Util::ERROR);
+ 			} else {
+ 				while ($row = $result->fetchRow()) {
++					if ( !array_key_exists('share_with', $row) || !array_key_exists('file_source', $row) || !array_key_exists('file_target', $row) ) {
++						\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($path, $ownerUser, ...)#1:".print_r($row, true), ['app'=>'debug']);
++						throw new \OutOfBoundsException('An internal error occurred, please try again');
++					}
+ 					$shares[] = $row['share_with'];
+ 					if ($returnUserPaths) {
+ 						$fileTargets[(int) $row['file_source']][$row['share_with']] = $row;
+@@ -201,6 +205,10 @@ public static function getUsersSharingFile($path, $ownerUser, $includeOwner = fa
+ 				\OCP\Util::writeLog('OCP\Share', \OC_DB::getErrorMessage(), \OCP\Util::ERROR);
+ 			} else {
+ 				while ($row = $result->fetchRow()) {
++					if ( !array_key_exists('share_with', $row) || !array_key_exists('file_source', $row) || !array_key_exists('file_target', $row) ) {
++						\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($path, $ownerUser, ...)#2:".print_r($row, true), ['app'=>'debug']);
++						throw new \OutOfBoundsException('An internal error occurred, please try again');
++					}
+ 					$usersInGroup = \OC_Group::usersInGroup($row['share_with']);
+ 					$shares = array_merge($shares, $usersInGroup);
+ 					if ($returnUserPaths) {
+@@ -229,7 +237,15 @@ public static function getUsersSharingFile($path, $ownerUser, $includeOwner = fa
+ 				if (\OCP\DB::isError($result)) {
+ 					\OCP\Util::writeLog('OCP\Share', \OC_DB::getErrorMessage(), \OCP\Util::ERROR);
+ 				} else {
+-					if ($result->fetchRow()) {
++					if ($row = $result->fetchRow()) {
++						if ($unexpected = $result->fetchRow()) {
++							\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($path, $ownerUser, ...)#1:".print_r($unexpected, true), ['app'=>'debug']);
++							throw new \LengthException('An internal error occurred, please try again');
++						}
++						if ( !array_key_exists('share_with', $row) ) {
++							\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($path, $ownerUser, ...)#3:".print_r($row, true), ['app'=>'debug']);
++							throw new \OutOfBoundsException('An internal error occurred, please try again');
++						}
+ 						$publicShare = true;
+ 					}
+ 				}
+@@ -248,7 +264,15 @@ public static function getUsersSharingFile($path, $ownerUser, $includeOwner = fa
+ 				if (\OCP\DB::isError($result)) {
+ 					\OCP\Util::writeLog('OCP\Share', \OC_DB::getErrorMessage(), \OCP\Util::ERROR);
+ 				} else {
+-					if ($result->fetchRow()) {
++					if ($row = $result->fetchRow()) {
++						if ($unexpected = $result->fetchRow()) {
++							\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($path, $ownerUser, ...)#2:".print_r($unexpected, true), ['app'=>'debug']);
++							throw new \LengthException('An internal error occurred, please try again');
++						}
++						if ( !array_key_exists('share_with', $row) ) {
++							\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($path, $ownerUser, ...)#4:".print_r($row, true), ['app'=>'debug']);
++							throw new \OutOfBoundsException('An internal error occurred, please try again');
++						}
+ 						$remoteShare = true;
+ 					}
+ 				}
+@@ -284,6 +308,10 @@ public static function getUsersSharingFile($path, $ownerUser, $includeOwner = fa
+ 					\OCP\Util::writeLog('OCP\Share', \OC_DB::getErrorMessage(), \OCP\Util::ERROR);
+ 				} else {
+ 					while ($row = $result->fetchRow()) {
++						if ( !array_key_exists('fileid', $row) ||  !array_key_exists('path', $row) ) {
++							\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($path, $ownerUser, ...)#5:".print_r($row, true), ['app'=>'debug']);
++							throw new \OutOfBoundsException('An internal error occurred, please try again');
++						}
+ 						foreach ($fileTargets[$row['fileid']] as $uid => $shareData) {
+ 							$sharedPath = $shareData['file_target'];
+ 							$sharedPath .= substr($path, strlen($row['path']) -5);
+@@ -498,8 +526,16 @@ public static function getShareByToken($token, $checkPasswordProtection = true)
+ 		if ($result === false) {
+ 			\OCP\Util::writeLog('OCP\Share', \OC_DB::getErrorMessage() . ', token=' . $token, \OCP\Util::ERROR);
+ 		}
+-		$row = $result->fetchRow();
+-		if ($row === false) {
++		if( $row = $result->fetchRow() ) {
++			if ($unexpected = $result->fetchRow()) {
++				\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($token, $checkPasswordProtection):".print_r($unexpected, true), ['app'=>'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if ( !array_key_exists('token', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($token, $checkPasswordProtection):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
++		} else {
+ 			return false;
+ 		}
+ 		if (is_array($row) and self::expireItem($row)) {
+@@ -525,9 +561,21 @@ public static function resolveReShare($linkItem)
+ 			$parent = $linkItem['parent'];
+ 			while (isset($parent)) {
+ 				$query = \OC_DB::prepare('SELECT * FROM `*PREFIX*share` WHERE `id` = ?', 1);
+-				$item = $query->execute(array($parent))->fetchRow();
+-				if (isset($item['parent'])) {
+-					$parent = $item['parent'];
++				$result = $query->execute(array($parent));
++				if ( $item = $result->fetchRow() ) {
++					if ($unexpected = $result->fetchRow()) {
++						\OC::$server->getLogger()->error("Too many rows for " . __METHOD__ . "(" . print_r($linkItem, true) . "):" . print_r($unexpected, true), ['app' => 'debug']);
++						throw new \LengthException('An internal error occurred, please try again');
++					}
++					if (!array_key_exists('parent', $item)) {
++						\OC::$server->getLogger()->error("Unexpected row for " . __METHOD__ . "(" . print_r($linkItem, true) . "):" . print_r($item, true), ['app' => 'debug']);
++						throw new \OutOfBoundsException('An internal error occurred, please try again');
++					}
++					if (isset($item['parent'])) {
++						$parent = $item['parent'];
++					} else {
++						return $item;
++					}
+ 				} else {
+ 					return $item;
+ 				}
+@@ -950,6 +998,10 @@ public static function unshareAll($itemType, $itemSource) {
+ 		$shares = array();
+ 		// Add each owner's shares to the array of all shares for this item.
+ 		while ($row = $result->fetchRow()) {
++			if ( !array_key_exists('uid_owner', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($itemType, $itemSource):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			$shares = array_merge($shares, self::getItems($itemType, $itemSource, null, null, $row['uid_owner']));
+ 		}
+ 		if (!empty($shares)) {
+@@ -1817,6 +1869,14 @@ public static function getItems($itemType, $item = null, $shareType = null, $sha
+ 			if ($fileDependent && !self::isFileReachable($row['path'], $row['storage_id'])) {
+ 				continue;
+ 			}
++			if (    !array_key_exists('share_type', $row)
++				||  !array_key_exists('share_with', $row)
++				||  !array_key_exists('uid_owner', $row)
++				||  !array_key_exists('stime', $row)
++			) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($itemType, ...):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			if ($row['share_type'] == self::$shareTypeGroupUserUnique && isset($items[$row['parent']])) {
+ 				$row['share_type'] = self::SHARE_TYPE_GROUP;
+ 				$row['unique_name'] = true; // remember that we use a unique name for this user
+@@ -1866,12 +1926,15 @@ public static function getItems($itemType, $item = null, $shareType = null, $sha
+ 				if (isset($row['parent'])) {
+ 					$query = \OC_DB::prepare('SELECT `file_target` FROM `*PREFIX*share` WHERE `id` = ?');
+ 					$parentResult = $query->execute(array($row['parent']));
+-					if ($result === false) {
+-						\OCP\Util::writeLog('OCP\Share', 'Can\'t select parent: ' .
+-							\OC_DB::getErrorMessage() . ', select=' . $select . ' where=' . $where,
+-							\OCP\Util::ERROR);
+-					} else {
+-						$parentRow = $parentResult->fetchRow();
++					if ($parentRow = $parentResult->fetchRow()) {
++						if ($unexpected = $parentResult->fetchRow()) {
++							\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($itemType, ...):".print_r($unexpected, true), ['app'=>'debug']);
++							throw new \LengthException('An internal error occurred, please try again');
++						}
++						if ( !array_key_exists('file_target', $parentRow) ) {
++							\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($itemType, ...):".print_r($parentRow, true), ['app'=>'debug']);
++							throw new \OutOfBoundsException('An internal error occurred, please try again');
++						}
+ 						$tmpPath = $parentRow['file_target'];
+ 						// find the right position where the row path continues from the target path
+ 						$pos = strrpos($row['path'], $parentRow['file_target']);
+@@ -1881,6 +1944,10 @@ public static function getItems($itemType, $item = null, $shareType = null, $sha
+ 							$tmpPath = $tmpPath . '/' . $pathPart;
+ 						}
+ 						$row['path'] = $tmpPath;
++					} else {
++						\OCP\Util::writeLog('OCP\Share', 'Can\'t select parent: ' .
++							\OC_DB::getErrorMessage() . ', select=' . $select . ' where=' . $where,
++							\OCP\Util::ERROR);
+ 					}
+ 				} else {
+ 					if (!isset($mounts[$row['storage']])) {
+@@ -2458,6 +2525,10 @@ public static function removeAllLinkShares() {
+ 		$query = \OC_DB::prepare('SELECT `id` FROM `*PREFIX*share` WHERE `share_type` = ?');
+ 		$result = $query->execute(array(self::SHARE_TYPE_LINK));
+ 		while ($item = $result->fetchRow()) {
++			if ( !array_key_exists('id', $item) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."():".print_r($item, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occurred, please try again');
++			}
+ 			Helper::delete($item['id']);
+ 		}
+ 	}
+diff --git a/lib/private/tags.php b/lib/private/tags.php
+index cf39a9a9759..02b2cca0ecb 100644
+--- a/lib/private/tags.php
++++ b/lib/private/tags.php
+@@ -296,6 +296,10 @@ public function getIdsForTag($tag) {
+ 
+ 		if(!is_null($result)) {
+ 			while( $row = $result->fetchRow()) {
++				if ( !array_key_exists('objid', $row) ) {
++					\OC::$server->getLogger()->error("Unexpected row for getIdsForTag($tag):".print_r($row, true), ['app'=>'debug']);
++					throw new \OutOfBoundsException('An internal error occured, please try again');
++				}
+ 				$id = (int)$row['objid'];
+ 
+ 				if ($this->includeShared) {
+@@ -524,6 +528,10 @@ public static function post_deleteUser($arguments) {
+ 				$stmt = \OCP\DB::prepare('DELETE FROM `' . self::RELATION_TABLE . '` '
+ 					. 'WHERE `categoryid` = ?');
+ 				while( $row = $result->fetchRow()) {
++					if ( !array_key_exists('id', $row) ) {
++						\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."(".print_r($arguments, true)."):".print_r($row, true), ['app'=>'debug']);
++						throw new \OutOfBoundsException('An internal error occured, please try again');
++					}
+ 					try {
+ 						$stmt->execute(array($row['id']));
+ 					} catch(\Exception $e) {
+diff --git a/lib/private/user/database.php b/lib/private/user/database.php
+index 94219338900..35946fadba9 100644
+--- a/lib/private/user/database.php
++++ b/lib/private/user/database.php
+@@ -180,6 +180,10 @@ public function getDisplayNames($search = '', $limit = null, $offset = null) {
+ 			. $searchLike .' ORDER BY `uid` ASC', $limit, $offset);
+ 		$result = $query->execute($parameters);
+ 		while ($row = $result->fetchRow()) {
++			if ( !array_key_exists('uid', $row) || !array_key_exists('displayname', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($search, $limit, $offset):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occured, please try again');
++			}
+ 			$displayNames[$row['uid']] = $row['displayname'];
+ 		}
+ 
+@@ -201,6 +205,14 @@ public function checkPassword($uid, $password) {
+ 
+ 		$row = $result->fetchRow();
+ 		if ($row) {
++			if ($unexpected = $result->fetchRow()) {
++				\OC::$server->getLogger()->error("Too many rows for ".__METHOD__."($uid, ...):".print_r($unexpected, true), ['app'=>'debug']);
++				throw new \LengthException('An internal error occurred, please try again');
++			}
++			if ( !array_key_exists('uid', $row) || !array_key_exists('password', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($uid, ...):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occured, please try again');
++			}
+ 			$storedHash = $row['password'];
+ 			$newHash = '';
+ 			if(\OC::$server->getHasher()->verify($password, $storedHash, $newHash)) {
+@@ -224,16 +236,23 @@ public function checkPassword($uid, $password) {
+ 	private function loadUser($uid) {
+ 		// if not in cache (false is a valid value)
+ 		if (!isset($this->cache[$uid]) && $this->cache[$uid] !== false) {
+-			$query = OC_DB::prepare('SELECT `uid`, `displayname` FROM `*PREFIX*users` WHERE LOWER(`uid`) = LOWER(?)');
+-			$result = $query->execute(array($uid));
+ 
+-			if ($result === false) {
+-				\OCP\Util::writeLog('core', OC_DB::getErrorMessage(), \OCP\Util::ERROR);
+-				return false;
+-			}
++			$qb = \OC::$server->getDatabaseConnection()->getQueryBuilder();
++			$result = $qb->select(['uid', 'displayname'])
++				->from('users')
++				->where($qb->expr()->eq($qb->createFunction('LOWER(`uid`)'), $qb->createNamedParameter(strtolower($uid))))
++				->execute();
+ 
+ 			// "uid" is primary key, so there can only be a single result
+-			if ($row = $result->fetchRow()) {
++			if ( $row = $result->fetch() ) {
++				if ($unexpected = $result->fetch()) {
++					\OC::$server->getLogger()->error("Too many rows for " . __METHOD__ . "($uid):" . print_r($unexpected, true), ['app' => 'debug']);
++					throw new \LengthException('An internal error occurred, please try again');
++				}
++				if ( !array_key_exists('uid', $row) || !array_key_exists('displayname', $row) ) {
++					\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($uid):".print_r($row, true), ['app'=>'debug']);
++					throw new \OutOfBoundsException('An internal error occured, please try again');
++				}
+ 				$this->cache[$uid]['uid'] = $row['uid'];
+ 				$this->cache[$uid]['displayname'] = $row['displayname'];
+ 			} else {
+@@ -265,6 +284,10 @@ public function getUsers($search = '', $limit = null, $offset = null) {
+ 		$result = $query->execute($parameters);
+ 		$users = array();
+ 		while ($row = $result->fetchRow()) {
++			if ( !array_key_exists('uid', $row) ) {
++				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."($search, $limit, $offset):".print_r($row, true), ['app'=>'debug']);
++				throw new \OutOfBoundsException('An internal error occured, please try again');
++			}
+ 			$users[] = $row['uid'];
+ 		}
+ 		return $users;

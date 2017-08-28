@@ -1,0 +1,394 @@
+From ca48e4684ee93e50776baf4368f28e9556c416b1 Mon Sep 17 00:00:00 2001
+From: Vincent Petry <pvince81@owncloud.com>
+Date: Fri, 26 May 2017 15:11:57 +0200
+Subject: [PATCH 1/6] Fix cross-storage move info when moving between two
+ received shares
+
+Need to properly resolve the given path to a source path in
+`getMoveInfo`. This was missing when adding this new method.
+---
+ lib/private/files/cache/wrapper/cachejail.php | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lib/private/files/cache/wrapper/cachejail.php b/lib/private/files/cache/wrapper/cachejail.php
+index 83329bbbd9c..2e411dedbf2 100644
+--- a/lib/private/files/cache/wrapper/cachejail.php
++++ b/lib/private/files/cache/wrapper/cachejail.php
+@@ -292,4 +292,8 @@ public function getPathById($id) {
+ 		$path = $this->cache->getPathById($id);
+ 		return $this->getJailedPath($path);
+ 	}
++
++	protected function getMoveInfo($path) {
++		return [$this->getNumericStorageId(), $this->getSourcePath($path)];
++	}
+ }
+
+From aca28b6b48201838085362f711c7344d999b635d Mon Sep 17 00:00:00 2001
+From: Sergio Bertolin <sbertolin@solidgear.es>
+Date: Fri, 26 May 2017 12:02:49 +0000
+Subject: [PATCH 2/6] Trying to reproduce core#28018
+
+---
+ build/integration/features/bootstrap/WebDav.php   | 40 +++++++++++++++++++++++
+ build/integration/features/webdav-related.feature | 29 ++++++++++++++++
+ 2 files changed, 69 insertions(+)
+
+diff --git a/build/integration/features/bootstrap/WebDav.php b/build/integration/features/bootstrap/WebDav.php
+index 316b682b7d0..341c2fa2bcc 100644
+--- a/build/integration/features/bootstrap/WebDav.php
++++ b/build/integration/features/bootstrap/WebDav.php
+@@ -19,6 +19,8 @@
+ 	private $response;
+ 	/** @var map with user as key and another map as value, which has path as key and etag as value */
+ 	private $storedETAG = NULL;
++	/** @var integer */
++	private $storedFileID = NULL;
+ 
+ 	/**
+ 	 * @Given /^using dav path "([^"]*)"$/
+@@ -652,4 +654,42 @@ public function thereAreNoDuplicateHeaders() {
+ 			}
+ 		}
+     }
++
++	/**
++	 * @param string $user
++	 * @param string $path
++	 * @return int
++	 */
++	private function getFileIdForPath($user, $path) {
++		$propertiesTable = new \Behat\Gherkin\Node\TableNode([["{http://owncloud.org/ns}fileid"]]);
++		$this->asGetsPropertiesOfFolderWith($user, 'file', $path, $propertiesTable);
++		if (is_array($this->response)) {
++			return (int) $this->response['{http://owncloud.org/ns}fileid'];
++		} else {
++			return null;
++		}
++	}
++
++	/**
++	 * @Given /^User "([^"]*)" stores id of file "([^"]*)"$/
++	 * @param string $user
++	 * @param string $path
++	 * @param string $fileid
++	 * @return int
++	 */
++	public function userStoresFileIdForPath($user, $path) {
++		$this->storedFileID = $this->getFileIdForPath($user, $path);
++	}
++
++	/**
++	 * @Given /^User "([^"]*)" checks id of file "([^"]*)"$/
++	 * @param string $user
++	 * @param string $path
++	 * @param string $fileid
++	 * @return int
++	 */
++	public function userChecksFileIdForPath($user, $path) {
++		$currentFileID = $this->getFileIdForPath($user, $path);
++		PHPUnit_Framework_Assert::assertEquals($currentFileID, $this->storedFileID);
++	}
+ }
+diff --git a/build/integration/features/webdav-related.feature b/build/integration/features/webdav-related.feature
+index 2ef4c0b09b5..eb8583f46d0 100644
+--- a/build/integration/features/webdav-related.feature
++++ b/build/integration/features/webdav-related.feature
+@@ -386,3 +386,32 @@ Feature: webdav-related
+ 		When as "user0" gets properties of folder "/test_folder:5" with
+ 		  |{DAV:}resourcetype|
+ 		Then the single response should contain a property "{DAV:}resourcetype" with value "{DAV:}collection"
++
++	Scenario: Checking file id after a move between received shares
++		Given using old dav path
++		And user "user0" exists
++		And user "user1" exists
++		And user "user0" created a folder "/folderA"
++		And user "user0" created a folder "/folderB"
++		And folder "/folderA" of user "user0" is shared with user "user1"
++		And folder "/folderB" of user "user0" is shared with user "user1"
++		And user "user1" created a folder "/folderA/ONE"
++		And user "user1" created a folder "/folderA/ONE/TWO"
++		And User "user1" stores id of file "/folderA/ONE"
++		And User "user1" moves folder "/folderA/ONE" to "/folderB"
++		When user "user1" created a folder "/folderB/ONE/TWO/THREE"
++		And using old dav path
++		Then user "user1" should see following elements
++			| /FOLDER/ |
++			| /PARENT/ |
++			| /PARENT/parent.txt |
++			| /textfile0.txt |
++			| /textfile1.txt |
++			| /textfile2.txt |
++			| /textfile3.txt |
++			| /textfile4.txt |
++			| /folderA |
++			| /folderB |
++			| /folderB/ONE |
++			| /folderB/ONE/TWO |
++			| /folderB/ONE/TWO/THREE |
+
+From 2ca19dcb05a3ea0b319cb2ca2c5f3a30afefbd09 Mon Sep 17 00:00:00 2001
+From: Vincent Petry <pvince81@owncloud.com>
+Date: Fri, 26 May 2017 15:56:47 +0200
+Subject: [PATCH 3/6] Improve tests
+
+---
+ build/integration/features/webdav-related.feature | 27 ++++++++---------------
+ 1 file changed, 9 insertions(+), 18 deletions(-)
+
+diff --git a/build/integration/features/webdav-related.feature b/build/integration/features/webdav-related.feature
+index eb8583f46d0..1c125376985 100644
+--- a/build/integration/features/webdav-related.feature
++++ b/build/integration/features/webdav-related.feature
+@@ -396,22 +396,13 @@ Feature: webdav-related
+ 		And folder "/folderA" of user "user0" is shared with user "user1"
+ 		And folder "/folderB" of user "user0" is shared with user "user1"
+ 		And user "user1" created a folder "/folderA/ONE"
+-		And user "user1" created a folder "/folderA/ONE/TWO"
+ 		And User "user1" stores id of file "/folderA/ONE"
+-		And User "user1" moves folder "/folderA/ONE" to "/folderB"
+-		When user "user1" created a folder "/folderB/ONE/TWO/THREE"
+-		And using old dav path
+-		Then user "user1" should see following elements
+-			| /FOLDER/ |
+-			| /PARENT/ |
+-			| /PARENT/parent.txt |
+-			| /textfile0.txt |
+-			| /textfile1.txt |
+-			| /textfile2.txt |
+-			| /textfile3.txt |
+-			| /textfile4.txt |
+-			| /folderA |
+-			| /folderB |
+-			| /folderB/ONE |
+-			| /folderB/ONE/TWO |
+-			| /folderB/ONE/TWO/THREE |
++		And user "user1" created a folder "/folderA/ONE/TWO"
++		When User "user1" moves folder "/folderA/ONE" to "/folderB/ONE"
++		Then as "user1" the folder "/folderA" exists
++		And as "user1" the folder "/folderA/ONE" does not exist
++		# yes, a weird bug used to make this one fail
++		And as "user1" the folder "/folderA/ONE/TWO" does not exist
++		And as "user1" the folder "/folderB/ONE" exists
++		And as "user1" the folder "/folderB/ONE/TWO" exists
++		And User "user1" checks id of file "/folderB/ONE"
+
+From 6a19c400fdcc30671ec260fc853bf1a4930ccb7d Mon Sep 17 00:00:00 2001
+From: Vincent Petry <pvince81@owncloud.com>
+Date: Thu, 16 Feb 2017 11:47:16 +0100
+Subject: [PATCH 4/6] Remove SharedCache::getNumericStorageId to let
+ CacheWrapper do it
+
+The CacheWrapper will properly forward the call to the wrapped cache.
+---
+ apps/files_sharing/lib/cache.php                   |  8 --------
+ apps/files_sharing/tests/cache.php                 | 24 ++++++++++++++++++++++
+ .../integration/features/external-storage.feature  | 23 +++++++++++++++++++++
+ build/integration/features/sharing-v1.feature      | 10 +++++++++
+ build/integration/run.sh                           |  3 +++
+ lib/private/files/cache/cache.php                  |  8 ++++++++
+ 6 files changed, 68 insertions(+), 8 deletions(-)
+
+diff --git a/apps/files_sharing/lib/cache.php b/apps/files_sharing/lib/cache.php
+index 4dcdaa892ad..4754dd73da3 100644
+--- a/apps/files_sharing/lib/cache.php
++++ b/apps/files_sharing/lib/cache.php
+@@ -71,14 +71,6 @@ public function __construct($storage, IStorage $sourceStorage, ICacheEntry $sour
+ 		);
+ 	}
+ 
+-	public function getNumericStorageId() {
+-		if (isset($this->numericId)) {
+-			return $this->numericId;
+-		} else {
+-			return false;
+-		}
+-	}
+-
+ 	protected function formatCacheEntry($entry) {
+ 		$path = $entry['path'];
+ 		$entry = parent::formatCacheEntry($entry);
+diff --git a/apps/files_sharing/tests/cache.php b/apps/files_sharing/tests/cache.php
+index c137ba0728d..4dfed60566d 100644
+--- a/apps/files_sharing/tests/cache.php
++++ b/apps/files_sharing/tests/cache.php
+@@ -505,4 +505,28 @@ public function testGetPathByIdShareSubFolder() {
+ 		$this->assertEquals('', $sharedCache->getPathById($folderInfo->getId()));
+ 		$this->assertEquals('bar/test.txt', $sharedCache->getPathById($fileInfo->getId()));
+ 	}
++
++	public function testNumericStorageId() {
++		self::loginHelper(self::TEST_FILES_SHARING_API_USER1);
++		\OC\Files\Filesystem::mkdir('foo');
++
++		$rootFolder = \OC::$server->getUserFolder(self::TEST_FILES_SHARING_API_USER1);
++		$node = $rootFolder->get('foo');
++		$share = $this->shareManager->newShare();
++		$share->setNode($node)
++			->setShareType(\OCP\Share::SHARE_TYPE_USER)
++			->setSharedWith(self::TEST_FILES_SHARING_API_USER2)
++			->setSharedBy(self::TEST_FILES_SHARING_API_USER1)
++			->setPermissions(\OCP\Constants::PERMISSION_ALL);
++		$this->shareManager->createShare($share);
++		\OC_Util::tearDownFS();
++
++		list($sourceStorage) = \OC\Files\Filesystem::resolvePath('/' . self::TEST_FILES_SHARING_API_USER1 . '/files/foo');
++
++		self::loginHelper(self::TEST_FILES_SHARING_API_USER2);
++		$this->assertTrue(\OC\Files\Filesystem::file_exists('/foo'));
++		list($sharedStorage) = \OC\Files\Filesystem::resolvePath('/' . self::TEST_FILES_SHARING_API_USER2 . '/files/foo');
++
++		$this->assertEquals($sourceStorage->getCache()->getNumericStorageId(), $sharedStorage->getCache()->getNumericStorageId());
++	}
+ }
+diff --git a/build/integration/features/external-storage.feature b/build/integration/features/external-storage.feature
+index 7fbdf828fb8..48e02ef048e 100644
+--- a/build/integration/features/external-storage.feature
++++ b/build/integration/features/external-storage.feature
+@@ -23,4 +23,27 @@ Feature: external-storage
+       | token | A_TOKEN |
+       | mimetype | httpd/unix-directory |
+ 
++  @local_storage
++  @no_encryption
++  Scenario: Move a file into storage works
++    Given user "user0" exists
++    And user "user1" exists
++    And As an "user0"
++    And user "user0" created a folder "/local_storage/foo1"
++    When User "user0" moved file "/textfile0.txt" to "/local_storage/foo1/textfile0.txt"
++    Then as "user1" the file "/local_storage/foo1/textfile0.txt" exists
++    And as "user0" the file "/local_storage/foo1/textfile0.txt" exists
++
++  @local_storage
++  @no_encryption
++  Scenario: Move a file out of the storage works
++    Given user "user0" exists
++    And user "user1" exists
++    And As an "user0"
++    And user "user0" created a folder "/local_storage/foo2"
++    And User "user0" moved file "/textfile0.txt" to "/local_storage/foo2/textfile0.txt"
++    When User "user1" moved file "/local_storage/foo2/textfile0.txt" to "/local.txt"
++    Then as "user1" the file "/local_storage/foo2/textfile0.txt" does not exist
++    And as "user0" the file "/local_storage/foo2/textfile0.txt" does not exist
++    And as "user1" the file "/local.txt" exists
+ 
+diff --git a/build/integration/features/sharing-v1.feature b/build/integration/features/sharing-v1.feature
+index 65631a3e2ca..fa34edc4b89 100644
+--- a/build/integration/features/sharing-v1.feature
++++ b/build/integration/features/sharing-v1.feature
+@@ -977,3 +977,13 @@ Feature: sharing
+     And the HTTP status code should be "200"
+     And last share_id is not included in the answer
+ 
++  Scenario: moving a file into a share as recipient
++    Given As an "admin"
++    And user "user0" exists
++    And user "user1" exists
++    And user "user0" created a folder "/shared"
++    And folder "/shared" of user "user0" is shared with user "user1"
++    When User "user1" moved file "/textfile0.txt" to "/shared/shared_file.txt"
++    Then as "user1" the file "/shared/shared_file.txt" exists
++    And as "user0" the file "/shared/shared_file.txt" exists
++
+diff --git a/build/integration/run.sh b/build/integration/run.sh
+index 2fe0eb1dda5..5e971f7c18f 100755
+--- a/build/integration/run.sh
++++ b/build/integration/run.sh
+@@ -88,6 +88,9 @@ $OCC files_external:delete -y $ID_STORAGE
+ #Disable external storage app
+ $OCC app:disable files_external
+ 
++# Clear storage folder
++rm -Rf work/local_storage/*
++
+ if test "$OC_TEST_ALT_HOME" = "1"; then
+ 	env_alt_home_clear
+ fi
+diff --git a/lib/private/files/cache/cache.php b/lib/private/files/cache/cache.php
+index c16393cf42e..a678d92bef3 100644
+--- a/lib/private/files/cache/cache.php
++++ b/lib/private/files/cache/cache.php
+@@ -491,6 +491,7 @@ protected function getMoveInfo($path) {
+ 	 * @param string $sourcePath
+ 	 * @param string $targetPath
+ 	 * @throws \OC\DatabaseException
++	 * @throws \Exception if the given storages have an invalid id
+ 	 */
+ 	public function moveFromCache(ICache $sourceCache, $sourcePath, $targetPath) {
+ 		if ($sourceCache instanceof Cache) {
+@@ -505,6 +506,13 @@ public function moveFromCache(ICache $sourceCache, $sourcePath, $targetPath) {
+ 			list($sourceStorageId, $sourcePath) = $sourceCache->getMoveInfo($sourcePath);
+ 			list($targetStorageId, $targetPath) = $this->getMoveInfo($targetPath);
+ 
++			if (is_null($sourceStorageId) || $sourceStorageId === false) {
++				throw new \Exception('Invalid source storage id: ' . $sourceStorageId);
++			}
++			if (is_null($targetStorageId) || $targetStorageId === false) {
++				throw new \Exception('Invalid target storage id: ' . $targetStorageId);
++			}
++
+ 			// sql for final update
+ 			$moveSql = 'UPDATE `*PREFIX*filecache` SET `storage` =  ?, `path` = ?, `path_hash` = ?, `name` = ?, `parent` =? WHERE `fileid` = ?';
+ 
+
+From 0086803abe9d549c2b26079428c18059347e7a9f Mon Sep 17 00:00:00 2001
+From: Roeland Jago Douma <rullzer@owncloud.com>
+Date: Tue, 19 Apr 2016 14:03:39 +0200
+Subject: [PATCH 5/6] Move moveFromCache to CacheJail
+
+---
+ lib/private/files/cache/wrapper/cachejail.php | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/lib/private/files/cache/wrapper/cachejail.php b/lib/private/files/cache/wrapper/cachejail.php
+index 2e411dedbf2..04a0c138e80 100644
+--- a/lib/private/files/cache/wrapper/cachejail.php
++++ b/lib/private/files/cache/wrapper/cachejail.php
+@@ -293,6 +293,22 @@ public function getPathById($id) {
+ 		return $this->getJailedPath($path);
+ 	}
+ 
++	/**
++	 * Move a file or folder in the cache
++	 *
++	 * Note that this should make sure the entries are removed from the source cache
++	 *
++	 * @param \OCP\Files\Cache\ICache $sourceCache
++	 * @param string $sourcePath
++	 * @param string $targetPath
++	 */
++	public function moveFromCache(\OCP\Files\Cache\ICache $sourceCache, $sourcePath, $targetPath) {
++		if ($sourceCache === $this) {
++			return $this->move($sourcePath, $targetPath);
++		}
++		return $this->cache->moveFromCache($sourceCache, $sourcePath, $targetPath);
++	}
++
+ 	protected function getMoveInfo($path) {
+ 		return [$this->getNumericStorageId(), $this->getSourcePath($path)];
+ 	}
+
+From 55864e65390f99e4116a1f56de92df26be5e2868 Mon Sep 17 00:00:00 2001
+From: Roeland Jago Douma <rullzer@owncloud.com>
+Date: Mon, 25 Apr 2016 09:33:17 +0200
+Subject: [PATCH 6/6] Properly get the internal path for a cachejail move
+
+---
+ lib/private/files/cache/wrapper/cachejail.php | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lib/private/files/cache/wrapper/cachejail.php b/lib/private/files/cache/wrapper/cachejail.php
+index 04a0c138e80..bd34636cafb 100644
+--- a/lib/private/files/cache/wrapper/cachejail.php
++++ b/lib/private/files/cache/wrapper/cachejail.php
+@@ -306,7 +306,7 @@ public function moveFromCache(\OCP\Files\Cache\ICache $sourceCache, $sourcePath,
+ 		if ($sourceCache === $this) {
+ 			return $this->move($sourcePath, $targetPath);
+ 		}
+-		return $this->cache->moveFromCache($sourceCache, $sourcePath, $targetPath);
++		return $this->cache->moveFromCache($sourceCache, $sourcePath, $this->getSourcePath($targetPath));
+ 	}
+ 
+ 	protected function getMoveInfo($path) {

@@ -70,24 +70,33 @@ COPY patches/username/v1.{{owncloud_major_version}}.php /var/www/owncloud/ocs/v1
 COPY patches/masterpasswd/apps/user_ldap/user_ldap.php /var/www/owncloud/apps/user_ldap/user_ldap.php
 
 # looping
-COPY patches/looping/*.patch /
-RUN cd /var/www/owncloud && \
-    patch -p1 < /28320.patch && \
-    patch -p1 < /28322.patch && \
-    patch -p1 < /patch.patch && \
-    rm /*.patch
+#jCOPY patches/looping/*.patch /
+#jRUN cd /var/www/owncloud && \
+    #jpatch -p1 < /28320.patch && \
+    #jpatch -p1 < /28322.patch && \
+    #jpatch -p1 < /patch.patch && \
+    #jrm /*.patch
 
 # mimetypes
-COPY patches/mimetype/mimetype.patch /
-RUN cd /var/www/owncloud && patch -p1 -R < /mimetype.patch && rm /mimetype.patch
+#COPY patches/mimetype/mimetype.patch /
+#RUN cd /var/www/owncloud && patch -p1 -R < /mimetype.patch && rm /mimetype.patch
 
 #indexes
-COPY patches/index/lib/private/files/cache/cache.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/files/cache/cache.php
-COPY patches/index/lib/private/group/database.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/group/database.php
-COPY patches/index/lib/private/user/database.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/user/database.php
+#COPY patches/index/lib/private/files/cache/cache.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/files/cache/cache.php
+#COPY patches/index/lib/private/group/database.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/group/database.php
+#COPY patches/index/lib/private/user/database.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/user/database.php
 
 #reconnect
-COPY patches/reconnect/apps/dav/lib/connector/sabre/file.{{owncloud_major_version}}.php /var/www/owncloud/aps/dav/lib/connector/sabre/file.php
+#COPY patches/reconnect/apps/dav/lib/connector/sabre/file.{{owncloud_major_version}}.php /var/www/owncloud/aps/dav/lib/connector/sabre/file.php
+
+#storagefix
+COPY patches/storagefix/*.patch /
+RUN cd /var/www/owncloud && \
+    patch -p1 < /28284.patch && \
+    patch -p1 < /28320.patch && \
+    patch -p1 < /28792.patch && \
+  #  patch -p1 < /reconnect-after-assemble.patch && \
+    rm /*.patch
 
 ###########
 # config
