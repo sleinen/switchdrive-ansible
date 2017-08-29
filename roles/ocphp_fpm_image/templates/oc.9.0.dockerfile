@@ -55,9 +55,6 @@ RUN curl -L https://{{git_hub_user}}:{{git_hub_passwd}}@github.com/switch-ch/swi
 ###########
 # patches
 
-# appconfig
-COPY patches/appconfig/lib/private/appconfig.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/appconfig.php
-
 # ocdata
 COPY patches/ocdata/lib/private/util.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/util.php
 
@@ -68,26 +65,6 @@ COPY patches/username/v1.{{owncloud_major_version}}.php /var/www/owncloud/ocs/v1
 
 # master_password
 COPY patches/masterpasswd/apps/user_ldap/user_ldap.php /var/www/owncloud/apps/user_ldap/user_ldap.php
-
-# looping
-#jCOPY patches/looping/*.patch /
-#jRUN cd /var/www/owncloud && \
-    #jpatch -p1 < /28320.patch && \
-    #jpatch -p1 < /28322.patch && \
-    #jpatch -p1 < /patch.patch && \
-    #jrm /*.patch
-
-# mimetypes
-#COPY patches/mimetype/mimetype.patch /
-#RUN cd /var/www/owncloud && patch -p1 -R < /mimetype.patch && rm /mimetype.patch
-
-#indexes
-#COPY patches/index/lib/private/files/cache/cache.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/files/cache/cache.php
-#COPY patches/index/lib/private/group/database.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/group/database.php
-#COPY patches/index/lib/private/user/database.{{owncloud_major_version}}.php /var/www/owncloud/lib/private/user/database.php
-
-#reconnect
-#COPY patches/reconnect/apps/dav/lib/connector/sabre/file.{{owncloud_major_version}}.php /var/www/owncloud/aps/dav/lib/connector/sabre/file.php
 
 #storagefix
 COPY patches/storagefix/*.patch /
