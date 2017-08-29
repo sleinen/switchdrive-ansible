@@ -13,6 +13,9 @@ $CONFIG = array (
   'dbuser' => 'owncloud',
   'dbhost' => '{{shards.db_host}}',
   'dbpassword' => '{{mariadb_passwd}}',
+  'dbdriveroptions' => [
+   PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
+  ],
 
   'version' => '{{shards.version_in_config}}',
   'installed' => {{shards.installed}},

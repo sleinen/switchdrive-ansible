@@ -14,6 +14,9 @@ $CONFIG = array (
   #  'dbhost' => '{{hostvars[groups["mariadb"][0]].inventory_hostname}}',
   'dbhost' => 'localhost',
   'dbpassword' => '{{mariadb_passwd}}',
+  'dbdriveroptions' => [
+   PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
+  ],
 
   'version' => '{{shards.version_in_config}}',
   'installed' => {{shards.installed}},

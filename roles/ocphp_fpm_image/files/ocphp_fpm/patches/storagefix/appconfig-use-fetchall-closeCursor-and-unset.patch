@@ -1,14 +1,16 @@
 diff --git a/lib/private/appconfig.php b/lib/private/appconfig.php
-index 33a58d9..6262fdb 100644
+index 33a58d9..f8cc06c 100644
 --- a/lib/private/appconfig.php
 +++ b/lib/private/appconfig.php
-@@ -278,7 +278,9 @@ class AppConfig implements IAppConfig {
+@@ -278,7 +278,11 @@ class AppConfig implements IAppConfig {
  			->from('appconfig');
  		$result = $sql->execute();
  
 -		while ($row = $result->fetch()) {
 +		$rows = $result->fetchAll();
 +		$result->closeCursor();
++		unset($result);
++		unset($sql);
 +		foreach ($rows as $row) {
  			if ( !array_key_exists('appid', $row) || !array_key_exists('configkey', $row) || !array_key_exists('configvalue', $row) ) {
  				\OC::$server->getLogger()->error("Unexpected row for ".__METHOD__."():".print_r($row, true), ['app'=>'debug']);
