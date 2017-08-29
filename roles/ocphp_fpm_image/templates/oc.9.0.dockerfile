@@ -73,6 +73,7 @@ RUN cd /var/www/owncloud && \
     patch -p1 < /28320.patch && \
     patch -p1 < /28792.patch && \
     patch -p1 < /reconnect-after-assemble.patch && \
+    patch -p1 < /appconfig-use-fetchall-and-closeCursor.patch && \
     rm /*.patch
 
 ###########
