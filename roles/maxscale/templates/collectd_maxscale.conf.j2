@@ -28,7 +28,8 @@ LoadPlugin dbi
          </Result>
     </Query>
     <Query filesSizeCache >
-         Statement "select sum(size) AS filesSize from oc_filecache where path = 'cache';"
+         #Statement "select sum(size) AS filesSize from oc_filecache where path = 'cache';"
+         Statement "select sum(size) AS filesSize from oc_filecache where path_hash = '0fea6a13c52b4d4725368f24b045ca84';"
          <Result>
              Type gauge
              InstancePrefix "filesSizeCache"
@@ -36,7 +37,8 @@ LoadPlugin dbi
          </Result>
     </Query>
     <Query filesSizeFiles >
-         Statement "select sum(size) AS filesSize from oc_filecache where path = 'files';"
+         #Statement "select sum(size) AS filesSize from oc_filecache where path = 'files';"
+         Statement "select sum(size) AS filesSize from oc_filecache where path_hash = '45b963397aa40d4a0063e0d85e4fe7a1';"
          <Result>
              Type gauge
              InstancePrefix "filesSizeFiles"
@@ -44,7 +46,8 @@ LoadPlugin dbi
          </Result>
     </Query>
     <Query filesSizeTrashbin >
-         Statement "select sum(size) AS filesSize from oc_filecache where path = 'files_trashbin';"
+         #Statement "select sum(size) AS filesSize from oc_filecache where path = 'files_trashbin';"
+         Statement "select sum(size) AS filesSize from oc_filecache where path_hash = 'fb66dca5f27af6f15c1d1d81e6f8d28b';"
          <Result>
              Type gauge
              InstancePrefix "filesSizeTrashbin"
@@ -52,7 +55,8 @@ LoadPlugin dbi
          </Result>
     </Query>
     <Query filesSizeVersions >
-         Statement "select sum(size) AS filesSize from oc_filecache where path = 'files_versions';"
+         #Statement "select sum(size) AS filesSize from oc_filecache where path = 'files_versions';"
+         Statement "select sum(size) AS filesSize from oc_filecache where path_hash = '9692aae50022f45f1098646939b287b1';"
          <Result>
              Type gauge
              InstancePrefix "filesSizeVersions"
@@ -60,7 +64,8 @@ LoadPlugin dbi
          </Result>
     </Query>
     <Query filesSizeGallery >
-         Statement "select sum(size) AS filesSize from oc_filecache where path = 'gallery';"
+         #Statement "select sum(size) AS filesSize from oc_filecache where path = 'gallery';"
+         Statement "select sum(size) AS filesSize from oc_filecache where path_hash = '2767cc3ede7592a47bd6657e3799565c';"
          <Result>
              Type gauge
              InstancePrefix "filesSizeGallery"
@@ -68,7 +73,8 @@ LoadPlugin dbi
          </Result>
     </Query>
     <Query filesSizeThumbnails >
-         Statement "select sum(size) AS filesSize from oc_filecache where path = 'thumbnails';"
+         #Statement "select sum(size) AS filesSize from oc_filecache where path = 'thumbnails';"
+         Statement "select sum(size) AS filesSize from oc_filecache where path_hash = '3b8779ba05b8f0aed49650f3ff8beb4b';"
          <Result>
              Type gauge
              InstancePrefix "filesSizeThumbnails"
