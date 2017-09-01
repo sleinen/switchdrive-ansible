@@ -36,6 +36,8 @@ apache_config:
 
 scripts: []
 scripts_pkgs: []
+scripts_pip: []
+
 
 nagios_gid: 792
 nagios_uid: 499

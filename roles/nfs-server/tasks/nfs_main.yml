@@ -66,5 +66,6 @@
     user: root
     job: "/root/cleanUpMovedUserDirs"
     cron_file: moveUserDirs
+    state: absent
   tags:
     - cron

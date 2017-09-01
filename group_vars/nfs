@@ -13,5 +13,5 @@ iptables:
 collectd_processes:
    - nfsd
 
-scripts:
-   - { name: "cleanUpMovedUserDirs", path: "/root", mode: "0550" }
+#scripts:
+#   - { name: "cleanUpMovedUserDirs", path: "/root", mode: "0550" }

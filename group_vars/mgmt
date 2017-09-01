@@ -30,17 +30,22 @@ php_config:
   max_php_processes: 25
   pm_max_requests: 0
 
+scripts_pip:
+    - "ruamel.yaml"
 scripts_pkgs:
     - "python-dateutil"
+    # - "python-ruamel.yaml" version is too old
+    - "python-pathlib"
+    - "python-ldap3"
+    - "python-mysql.connector"
+    - "python-pymysql"
+    - "python-subprocess32"
 
 scripts:
-   - { name: "manageSnapshots.py", path: "/home/ubuntu/bin", mode: "0555" }
-   - { name: "moveUserDirs", path: "/root", mode: "0550" }
+   - { name: "manageUserDirs.py", path: "/root", mode: "0550" }
+   - { name: "manageUserDirs.yml", path: "/root", mode: "0550" }
+   - { name: "manageSnapshots.py", path: "/home/ubuntu/bin", mode: "0550", owner: ubuntu }
    - { name: "occ", path: "/root", mode: "0550" }
-   - { name: "rsyncAndMoveUsers", path: "/root", mode: "0550" }
-   - { name: "tarAndMoveUsers", path: "/root", mode: "0550" }
-   - { name: "createUserLists", path: "/root", mode: "0550" }
-   - { name: "mvLinks", path: "/root", mode: "0550" }
    - { name: "scanUser", path: "/usr/bin", mode: "0755" }
    - { name: "sh.scanUser", path: "/usr/bin", mode: "0755" }
    - { name: "cacheCleaner", path: "/usr/bin", mode: "0755" }

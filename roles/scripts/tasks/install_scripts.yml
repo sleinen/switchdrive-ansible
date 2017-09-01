@@ -2,9 +2,18 @@
 
 
 - name: install dependencies for scripts
-  apt: name={{ item }}
+  apt:
+    name: "{{ item }}"
   with_items:
     - "{{ scripts_pkgs }}"
+  tags:
+    - scripts
+
+- name: install pip dependencies for scripts
+  pip:
+    name: "{{ item }}"
+  with_items:
+    - "{{ scripts_pip }}"
   tags:
     - scripts
 
@@ -18,7 +27,7 @@
 #    - scripts
 
 - name: install scripts
-  template: src={{ item.name }}.j2 dest={{ item.path }}/{{ item.name }} mode={{ item.mode }}
+  template: src={{ item.name }}.j2 dest={{ item.path }}/{{ item.name }} mode={{ item.mode }} owner={{item.owner | default('root')}}
   with_items:
     - "{{ scripts }}"
   tags:

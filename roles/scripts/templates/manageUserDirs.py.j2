@@ -1,0 +1,626 @@
+#!/usr/bin/env python
+
+import sys, os, random
+import signal
+import traceback
+from ldap3 import Server, Connection, ALL
+import pymysql.cursors
+import subprocess32 as subprocess
+
+import argparse
+
+
+from keystoneauth1 import session
+from keystoneauth1.identity import v3 as identity_v3
+from cinderclient.v3 import client as cinder_client
+
+from datetime import datetime, tzinfo, timedelta
+from dateutil import parser
+import time
+import pytz
+
+from pathlib import Path
+#https://yaml.readthedocs.io/en/latest/index.html
+from ruamel.yaml import YAML
+
+import logging
+
+#########################################
+# constants
+__all__ = ['Openstack', 'Config', 'UserDirManager']
+
+configuration_file = "/root/manageUserDirs.yml"
+
+logger_base_name = 'script'
+
+
+#########################################
+# misc
+
+class Base():
+    def __init__(self):
+        self.logger = logging.getLogger(logger_base_name + '.' + self.__class__.__name__)
+
+#########################################
+class SignalHandler(Base):
+    def __init__(self):
+        Base.__init__(self)
+        self.exit = False
+        signal.signal(signal.SIGINT, self.exit_gracefully)
+        signal.signal(signal.SIGTERM, self.exit_gracefully)
+
+    def exit_gracefully(self, signum, frame):
+        self.logger.warning("Caught signal. Starting graceful shutdown.")
+        self.exit = True
+
+    def isExit(self):
+        return self.exit
+
+
+#########################################
+# Openstack stuff
+
+class Openstack(Base):
+    def __init__(self, config, tz, dry_run=False):
+        Base.__init__(self)
+        self.config = config
+        self.cinder = self._getCinderClient(config['region'])
+        self.tz = tz
+        self.dry_run = dry_run
+
+    def _getCinderClient(self, region):
+        return cinder_client.Client(
+            '3',
+            session=session.Session(
+                auth=identity_v3.Password(**self.config['auth'])
+            ),
+            region_name=region)
+
+    def create_snapshots(self, volume_number):
+        try:
+            volume_name = self.config['volume_base_name'] + str(volume_number)
+            volume = self.cinder.volumes.find(name=volume_name)
+            if volume:
+                now = datetime.now(self.tz)
+                display_name = "backup-" + volume.name + "-" + datetime.now(self.tz).strftime("%Y%m%d-%H:%M")
+                self.logger.info("Creating snapshot: {}".format(display_name))
+                if self.dry_run:
+                    return True
+                else:
+                    return self.cinder.volume_snapshots.create(volume.id, name=display_name, force=True)
+        except Exception as e:
+            self.logger.error("{}".format(e))
+        return False
+
+#########################################
+# Configuration
+
+class Config(Base):
+    def __init__(self, configuration_file, debug=None):
+        Base.__init__(self)
+        self.yaml=YAML(typ='safe')
+        self.config = self.yaml.load(Path(configuration_file))
+        self._configureLogging(debug)
+        self.logger = logging.getLogger(logger_base_name + '.' + self.__class__.__name__)
+        self.timezone = pytz.timezone(self.config['timezone'])
+
+        # db stuff
+        self.db_file_name = self.config['db_file']
+        try:
+            self.db = self.yaml.load(Path(self.db_file_name))
+        except IOError as e:
+            self.logger.warning("No db file found. Creating new file: " + self.db_file_name)
+            self.deleteJob()
+
+    def _saveDB(self):
+        if not self.isDryRun():
+            self.yaml.dump(self.db, Path(self.db_file_name))
+
+    def setJob(self, job):
+        self.db['job'] = job
+        self._saveDB()
+
+    def deleteJob(self):
+        self.db = {'job': {'type': None}}
+        self._saveDB()
+
+    def getJob(self):
+        return self.db.get('job')
+
+    def getOSConfig(self):
+        return self.config['openstack']
+
+    def getLdapConfig(self):
+        return self.config['ldap']
+
+    def getDBConfig(self):
+        return self.config['mysql']
+
+    def getMountPoint(self):
+        return self.config['disks']['mount_point']
+    def getOCDataDir(self):
+        return self.config['disks']['oc_data_dir']
+    def getMovedSubdir(self):
+        return self.config['disks']['moved_user_subdir']
+
+    def getConfig(self):
+        return self.config
+
+    def _configureLogging(self, debug):
+        logging.basicConfig(**self.config['logging']['basic_config'])
+        for logger_name in self.config['logging']['loggers']:
+            level = self.config['logging']['loggers'][logger_name].get('level')
+            if level:
+                logging.getLogger(logger_name).setLevel(level)
+        if debug:
+            logging.getLogger('script').setLevel('DEBUG')
+
+    def getDisks(self):
+        disks_config = self.config['disks']
+        types = ['source', 'target']
+        all_disks = {}
+        for type in types:
+            expanded_sets =[]
+            for set in disks_config[type]:
+                #self.logger.debug(set)
+                disks = set.get('disks')
+                list = []
+                for item in disks:
+                    parts = str(item).split('::')
+                    if len(parts) == 1:
+                        list.append(parts[0])
+                        all_disks[parts[0]] = 1
+                    else:
+                        i = int(parts[0]);
+                        while (i <= int(parts[1])):
+                            list.append(str(i))
+                            all_disks[str(i)] = 1
+                            i = int(i) + 1
+                set['disks'] = list
+                expanded_sets.append(set)
+            disks_config[type] = expanded_sets
+            disks_config['all_disks'] = all_disks.keys()
+        self.logger.debug(disks_config)
+        return disks_config
+
+    def getTZ(self):
+        return self.timezone
+    def isOfflineTest(self):
+        if self.config.get('offline_test'):
+            return self.config['offline_test']
+        else:
+            return False
+    def setOfflineTest(self, offline):
+        self.config['offline_test'] = offline
+    def isDryRun(self):
+        if self.config.get('dry_run'):
+            return self.config['dry_run'] or self.isOfflineTest()
+        else:
+            return False
+    def setDryRun(self, dry_run):
+        self.config['dry_run'] = dry_run
+    def getSleepTime(self):
+        return self.config['sleep_time']
+
+    def getJobs(self):
+        return self.db.get('jobs')
+
+
+#########################################
+# DB
+
+class DB(Base):
+    def __init__(self, config):
+        Base.__init__(self)
+        self.config = config
+
+    def getEtag(self, user):
+        if self.config.isOfflineTest():
+            return "testing"
+
+        connection = pymysql.connect(**self.config.getDBConfig())
+        try:
+            with connection.cursor() as cursor:
+                sql ="select etag from oc_filecache where path = 'files' and storage = (select numeric_id from oc_storages where id = %s);"
+                cursor.execute(sql, ('home::'+user,))
+                return cursor.fetchone()
+        finally:
+            connection.close()
+
+#########################################
+# Disks
+
+class Disks(Base):
+    def __init__(self, config):
+        Base.__init__(self)
+        self.config = config
+        self.disks_config = config.getDisks()
+        self.available = {}
+        self.full = []
+        self.target = []
+        self._getFreeDiskSpace()
+        self._findFullDisks()
+        self._findTargetDisks()
+
+    def _getFreeDiskSpace(self):
+        for disk in self.disks_config['all_disks']:
+            stats = (os.statvfs(str(Path(self.config.getMountPoint()).joinpath(disk))))
+            #free_bytes = stats.f_frsize * stats.f_bfree
+            #size_bytes = stats.f_frsize * stats.f_blocks
+            avail = stats.f_frsize * stats.f_bavail / 1073741824
+            self.available[disk] = avail
+        self.logger.debug(self.available)
+
+    def _findFullDisks(self):
+        for set in reversed(self.disks_config['source']):
+            items = []
+            min_available = set['min_available']
+            for disk in set['disks']:
+                if self.available[disk] < min_available:
+                    items.append([disk, int(self.available[disk]), set['batch_size']])
+            items = sorted(items, key=lambda x: x[1])
+            self.logger.debug(items)
+            for item in items:
+                self.full.append({'disk_number': item[0], 'batch_size': item[2]})
+        self.logger.debug("Disks full: " + str(self.full))
+
+    def getFullDisks(self):
+        return self.full
+
+    def _findTargetDisks(self):
+        max_quota = self.disks_config['max_user_quota']
+        for set in reversed(self.disks_config['target']):
+            items = []
+            min_available = set['min_available']
+            found = False
+            for disk in set['disks']:
+                if self.available[disk] > min_available:
+                    self.target.append({'min_quota': set['quota'], 'max_quota': max_quota, 'disk_number': disk})
+                    found = True
+                    break # only one for each quota range
+            if not found:
+                self.logger.warning("No target disks found for quota range: " + str(set['quota']) + "-" + str(max_quota))
+            max_quota = set['quota']
+        self.logger.info("Target Disks: " + str(self.target))
+
+    def getTargetDisks(self):
+        return self.target
+
+#########################################
+# Users
+
+class Users(Base):
+    def __init__(self, config):
+        Base.__init__(self)
+        self.config = config
+
+    def _getLdapConnection(self):
+        ldap_config = self.config.getLdapConfig()
+        server = Server(
+            ldap_config['server'],
+            use_ssl=ldap_config['ssl'],
+            port=ldap_config['port'],
+            get_info=ALL)
+        return Connection(server,
+            user=ldap_config['dn'],
+            password=ldap_config['password'],
+            auto_bind=True)
+
+    def getUsersWithQuota(self, disk, min_quota, max_quota):
+        root_dir = os.path.join(self.config.getMountPoint(), disk)
+
+        users = []
+        dir_list = []
+        for item in os.listdir(root_dir):
+            candidate = os.path.join(root_dir, item)
+            if os.path.isdir(candidate) and not os.path.islink(candidate):
+                dir_list.append(item)
+
+        if self.config.isOfflineTest():
+            return dir_list
+        else:
+            ldap = self._getLdapConnection()
+            ldap_search_base = self.config.getLdapConfig()['base']
+            for item in dir_list:
+                ldap.search(ldap_search_base, '(uid='+ item +')', attributes=['ownCloudQuota'])
+                if len(ldap.entries) > 0:
+                    user_quota = int(str(ldap.entries[0]['ownCloudQuota']).rstrip('G'))
+                    if (user_quota >= int(min_quota) and user_quota <= int(max_quota)):
+                        # verify the link on /mnt/data is correct
+                        user_dir = os.path.join(root_dir, item)
+                        link = os.path.join(self.config.getOCDataDir(), item)
+                        if (os.path.islink(link) and os.path.realpath(link) == user_dir):
+                            users.append(item)
+                        else:
+                            self.logger.error("Found user with corrupted home dir setup (check links): " + user_dir)
+
+        return users
+
+
+#########################################
+# job
+
+class MoveJob(Base):
+    def __init__(self, config, job_config, os, db):
+        Base.__init__(self)
+        self.config = config
+        self.job_config = job_config
+        self.os = os
+        self.db = db
+        if not self.job_config.get('stage'):
+            self.job_config['stage'] = 'init'
+        if not self.job_config.get('type'):
+            self.job_config['type'] = self.__class__.__name__
+
+    def _update_job_stage(self, stage):
+        self.job_config['stage'] = stage
+        self.config.setJob(self.job_config)
+
+    def run(self):
+        self.logger.info("Running Job: " + str(self.job_config))
+        if (self.job_config['stage']== 'init'):
+            self._update_job_stage('tar')
+        elif self.job_config['stage'] == 'tar':
+            self.config.setJob(self.job_config)
+            if self.run_tar():
+                self._update_job_stage('sync')
+        elif self.job_config['stage'] == 'sync':
+            if self.run_sync():
+                self._update_job_stage('snapshot')
+        elif self.job_config['stage'] == 'snapshot':
+            if self.run_snapshot():
+                self._update_job_stage('clean_up')
+        elif self.job_config['stage'] == 'clean_up':
+            if self.run_clean_up():
+                self.config.deleteJob()
+
+    def _get_nfs_servers(self, disk_number):
+        disk_root_dir = str(Path(self.config.getMountPoint()).joinpath(disk_number))
+        if self.config.isOfflineTest():
+            return subprocess.check_output(
+                "cat ./mount.test | grep " + disk_root_dir + " | sed -e 's/:.*//'",
+                shell=True,
+                stderr=subprocess.STDOUT).rstrip()
+        else:
+            return subprocess.check_output(
+                "/bin/mount | /bin/grep " + disk_root_dir + " | /bin/sed -e 's/:.*//'",
+                shell=True,
+                stderr=subprocess.STDOUT).rstrip()
+
+    def _move_user(self, user, source_root_dir, target_root_dir):
+        self.logger.info("Now moving user: " + user + "; from: " + source_root_dir + "; to: " + target_root_dir)
+        moved_dir = str(Path(source_root_dir).joinpath(self.config.getMovedSubdir()))
+        link = str(Path(self.config.getOCDataDir()).joinpath(user))
+        target_user_home_dir = str(Path(target_root_dir).joinpath(user))
+        source_user_home_dir = str(Path(source_root_dir).joinpath(user))
+
+        self._execute("/bin/mkdir -p " + moved_dir)
+        self._execute("/bin/rm " + link)
+        self._execute("/bin/ln -s " + target_user_home_dir + " " + link)
+        self._execute("/bin/mv " + source_user_home_dir + " " + str(Path(moved_dir)))
+
+    def _execute(self, command):
+        if self.config.isDryRun():
+            self.logger.info("DryRun. Not executing: " + command)
+        else:
+            subprocess.check_call(command, shell=True, stderr=subprocess.STDOUT)
+
+    def run_tar(self):
+        # determine source & target nfs servers
+        target_server = self._get_nfs_servers(self.job_config['target'])
+        source_server = self._get_nfs_servers(self.job_config['source'])
+
+        source_root_dir = str(Path(self.config.getMountPoint()).joinpath(self.job_config['source']))
+        target_root_dir = str(Path(self.config.getMountPoint()).joinpath(self.job_config['target']))
+
+        # loop on users
+        for user in self.job_config['users']:
+            try:
+                # verify we had not tried to move before...
+                source_user_home_dir = str(Path(source_root_dir).joinpath(user))
+                target_user_home_dir = str(Path(target_root_dir).joinpath(user))
+                if os.path.isdir(target_user_home_dir):
+                    self.logger.info("Found users target home dir (" + target_user_home_dir + "). Probably tried moving it before. Skipping....")
+                elif os.path.islink(source_user_home_dir):
+                    self.logger.error(
+                        "Source is a link. Something is wrong with " + source_user_home_dir + ", please check. Skipping....")
+                elif not os.path.isdir(source_user_home_dir):
+                    self.logger.error(
+                        "Source is not a directory " + source_user_home_dir + ", please check. Skipping....")
+                else:
+                    self.logger.info("Copying user " + user)
+                    etag_before = self.db.getEtag(user)
+                    self.logger.debug("Etag before: " + str(etag_before))
+                    command = "/usr/bin/ssh " + source_server + " /bin/tar -C '" + source_root_dir + "' -cf - '" + user + "' | "
+                    if target_server != source_server:
+                        command = command + "/usr/bin/ssh " + target_server + " "
+                    command = command + "/bin/tar -xf - -C '" + target_root_dir + "'"
+                    self._execute(command)
+
+                    etag_after = self.db.getEtag(user)
+                    self.logger.debug("Etag after: " + str(etag_before))
+                    if etag_before != etag_after:
+                        self.logger.debug("Etag1: " + str(etag_before) + "; Etag2: " + str(etag_after))
+                        self.logger.info("User was active. Skipping: " + user)
+                    else:
+                        self.logger.debug("Etag1: " + str(etag_before) + "; Etag2: " + str(etag_after))
+                        self._move_user(user, source_root_dir, target_root_dir)
+            except Exception as e:
+                self.logger.error("{}".format(e))
+                self.logger.error("Skipping user " + user)
+        return True
+
+    def run_sync(self):
+        all_users_ok = True
+
+        # determine source & target nfs servers
+        target_server = self._get_nfs_servers(self.job_config['target'])
+        source_server = self._get_nfs_servers(self.job_config['source'])
+
+        source_root_dir = str(Path(self.config.getMountPoint()).joinpath(self.job_config['source']))
+        target_root_dir = str(Path(self.config.getMountPoint()).joinpath(self.job_config['target']))
+
+        # loop on users
+        for user in self.job_config['users']:
+            try:
+                # verify we had not tried to move before...
+                source_user_home_dir = str(Path(source_root_dir).joinpath(user))
+                target_user_home_dir = str(Path(target_root_dir).joinpath(user))
+                if os.path.isdir(source_user_home_dir) and not os.path.islink(source_user_home_dir): # otherwise the user was already moved away
+                    self.logger.info("Synching user " + user + ".")
+
+                    etag_before = self.db.getEtag(user)
+                    self.logger.debug("Etag before: " + str(etag_before))
+                    command = "/usr/bin/ssh " + source_server + " /usr/bin/rsync -axS --delete --stats '" + source_user_home_dir + "/' "
+                    if target_server != source_server:
+                        command = command + "'" + target_server + ":"
+                    command = command + target_user_home_dir + "'"
+                    self._execute(command)
+
+                    etag_after = self.db.getEtag(user)
+                    self.logger.debug("Etag after: " + str(etag_before))
+                    if etag_before != etag_after:
+                        self.logger.debug("Etag1: " + str(etag_before) + "; Etag2: " + str(etag_after))
+                        self.logger.info("User was active. Skipping: " + user)
+                        all_users_ok = False
+                    else:
+                        self.logger.debug("Etag1: " + str(etag_before) + "; Etag2: " + str(etag_after))
+                        self._move_user(user, source_root_dir, target_root_dir)
+            except Exception as e:
+                self.logger.error("{}".format(e))
+                self.logger.error("Skipping user " + user)
+                all_users_ok = False
+
+        return all_users_ok
+
+    def run_snapshot(self):
+        return self.os.create_snapshots(self.job_config['source'])
+
+    def run_clean_up(self):
+        ok = True
+        source_server = self._get_nfs_servers(self.job_config['source'])
+        source_root_dir = str(Path(self.config.getMountPoint()).joinpath(self.job_config['source']))
+        moved_dir = str(Path(source_root_dir).joinpath(self.config.getMovedSubdir()))
+        for user in self.job_config['users']:
+            moved_user_dir = str(Path(moved_dir).joinpath(user))
+            source_user_home_dir = str(Path(source_root_dir).joinpath(user))
+            try:
+                if os.path.isdir(source_user_home_dir):
+                    self.logger.error("The old home directory of a user (" + source_user_home_dir + ") had not been moved out of the way. Something went wrong. Please check.")
+                    ok = False
+                if os.path.isdir(moved_user_dir):
+                    self._execute("/usr/bin/ssh " + source_server + " rm -rf '" + moved_user_dir + "'")
+            except Exception as e:
+                self.logger.error("{}".format(e))
+                self.logger.error("Skipping user " + user)
+                ok = False
+        return ok
+
+
+class MoveUsers(Base):
+    def __init__(self, config, disks, users, os, db):
+        Base.__init__(self)
+        self.config = config
+        self.disks = disks
+        self.users = users
+        self.os = os
+        self.db = db
+
+    def run(self):
+        job =  self._findJob()
+        if job:
+            self.logger.debug("Found new job: " + str(job.config))
+            job.run()
+            return True
+        else:
+            return False
+
+    def _findJob(self):
+        target_disks = self.disks.getTargetDisks()
+        job = False
+        for disk in self.disks.getFullDisks():
+            disk_number = disk['disk_number']
+            batch_size = disk['batch_size']
+            self.logger.debug("Full disk: " + disk_number + ": Batch size: " + str(batch_size))
+            for target in target_disks:
+                users = self.users.getUsersWithQuota(disk_number, target['min_quota'], target['max_quota'])
+                self.logger.debug("Users: " + str(users) + "; disk number: " + disk_number + "; max quota: " + str(target['max_quota']))
+                if len(users) > 0:
+                    del users[batch_size:]
+                    job = {'source': disk_number, 'target': target['disk_number'], 'users': users}
+                    return MoveJob(self.config, job, self.os, self.db)
+        return False
+
+
+#########################################
+# UserDirManager
+
+class UserDirManager(Base):
+    def __init__(self, configuration_file, lifeCycle, dry_run, offline, single_step, debug):
+        Base.__init__(self)
+        self.configuration_file = configuration_file
+        self.lifeCycle = lifeCycle
+        self.dry_run = dry_run
+        self.offline = offline
+        self.single_step = single_step or dry_run or offline
+        self.debug = debug
+
+    def run(self):
+        while not self.lifeCycle.isExit():
+            config = Config(configuration_file, self.debug)
+            try:
+                config.setDryRun(self.dry_run)
+                config.setOfflineTest(self.offline)
+                os = Openstack(config.getOSConfig(), config.getTZ(), dry_run=config.isDryRun())
+                users = Users(config)
+                db = DB(config)
+
+                job = config.getJob()
+                if (job['type'] == 'MoveJob'):
+                    move_job = MoveJob(config, job, os, db)
+                    move_job.run()
+                else:
+                    disks = Disks(config)
+                    move_users = MoveUsers(config, disks, users, os, db)
+                    if not move_users.run():
+                        self.logger.info("Nothing to do. Sleeping for " + str(config.getSleepTime()) + " seconds.")
+                        time.sleep(config.getSleepTime())
+                if self.single_step:
+                    break
+            except Exception as e:
+                self.logger.error("{}".format(e))
+                self.logger.error('-' * 60)
+                self.logger.error(traceback.format_exc())
+                self.logger.error('-' * 60)
+                self.logger.info("Retrying in " + str(config.getSleepTime()) + " seconds.")
+                if self.single_step:
+                    break
+                time.sleep(config.getSleepTime())
+
+        self.logger.info("exiting")
+
+#########################################
+# main
+def main():
+    logger = logging.getLogger('root')
+    try:
+        parser = argparse.ArgumentParser(description='Manage/Move user home directories.')
+        parser.add_argument('--debug', help='be very verbose', action='store_true')
+        parser.add_argument('--dry-run', help='do not actually move any users (implies single-step)', action='store_true')
+        parser.add_argument('--offline', help='run offline test (implies dry-run)', action='store_true')
+        parser.add_argument('--single-step', help='only execute one step then exit', action='store_true')
+        args = vars(parser.parse_args())
+        signalHandler = SignalHandler()
+        UserDirManager(configuration_file, signalHandler, args['dry_run'], args['offline'], args['single_step'], args['debug']).run()
+
+    except Exception as e:
+        logging.basicConfig()
+        logger.error("{}".format(e))
+        logger.error('-' * 60)
+        logger.error(traceback.format_exc())
+        logger.error('-' * 60)
+        sys.exit(1)
+
+if __name__ == '__main__':
+    main()
+
