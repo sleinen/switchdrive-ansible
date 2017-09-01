@@ -72,7 +72,7 @@ os_server:
   elk1:       { ip: "{{ hostvars[groups['elk'][0]].inventory_hostname }}",       flavor: "drive-20-64-16",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default,elk",      hints: { group: "{{ os_server_group['elk'] }}" } }
   elk2:       { ip: "{{ hostvars[groups['elk'][1]].inventory_hostname }}",       flavor: "drive-20-64-16",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default,elk",      hints: { group: "{{ os_server_group['elk'] }}" } }
 
-  db6:        { ip: "{{ hostvars[groups['mariadb'][5]].inventory_hostname }}",   flavor: "drive-100-245-46-1.2-ssd", image: "{{os_image['xenial']}}", root_size: "80", security_groups: "default",          hints: { group: "{{ os_server_group['mariadb'] }}" } }
+  #db6:        { ip: "{{ hostvars[groups['mariadb'][5]].inventory_hostname }}",   flavor: "drive-100-245-46-1.2-ssd", image: "{{os_image['xenial']}}", root_size: "80", security_groups: "default",          hints: { group: "{{ os_server_group['mariadb'] }}" } }
 
   nfs6:       { ip: "{{ hostvars[groups['nfs'][5]].inventory_hostname }}",       flavor: "drive-40-4-4",             image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: {} }
 
