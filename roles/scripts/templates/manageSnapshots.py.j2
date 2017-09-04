@@ -83,7 +83,8 @@ def main():
     try:
         cinder = getCinderClient("ZH")
         create_snapshots(cinder, "drive-data-", 60)
-        delete_snapshots(cinder, "backup-drive-data-", 50, 15, 240)
+        # choose max_age_total such that weekly snapshots end up beeing deleted on sundays
+        delete_snapshots(cinder, "backup-drive-data-", 55, 15, 240)
 
     except Exception as e:
         print("ERROR: {}".format(e))
