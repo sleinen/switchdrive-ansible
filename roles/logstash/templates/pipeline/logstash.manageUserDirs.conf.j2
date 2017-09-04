@@ -1,0 +1,11 @@
+filter {
+  if [logtype] == "manage_user_dirs" {
+    json {
+        source => "message"
+    }
+    date {
+        match => ["created", "UNIX"]
+        remove_field => ["created"]
+    }
+  }
+}

@@ -1,21 +1,20 @@
 #!/usr/bin/env python
 
-import sys, os, random
+import sys, os
 import signal
 import traceback
+
 from ldap3 import Server, Connection, ALL
 import pymysql.cursors
 import subprocess32 as subprocess
 
 import argparse
 
-
 from keystoneauth1 import session
 from keystoneauth1.identity import v3 as identity_v3
 from cinderclient.v3 import client as cinder_client
 
 from datetime import datetime, tzinfo, timedelta
-from dateutil import parser
 import time
 import pytz
 
@@ -23,22 +22,64 @@ from pathlib import Path
 #https://yaml.readthedocs.io/en/latest/index.html
 from ruamel.yaml import YAML
 
-import logging
+import logging, logging.config
+import inspect
+
+#import logging_tree
 
 #########################################
 # constants
-__all__ = ['Openstack', 'Config', 'UserDirManager']
-
-configuration_file = "/root/manageUserDirs.yml"
-
-logger_base_name = 'script'
-
+configuration_dir = "/root"
+configuration_file_name = "manageUserDirs"
+configuration_suffix = "yml"
 
 #########################################
-# misc
+# logging
+
+logging_configuration_file = "/root//manageUserDirs.logging.conf"
+logger_base_name = 'script'
+
+global_extra = {}
+logging.instance_suffix = ""
+logging.config.fileConfig(logging_configuration_file)
+
+class ScriptLogger(logging.Logger):
+    def __init__(self, name):
+        logging.Logger.__init__(self, name)
+        self.extra = {}
+
+    def setExtra(self, extra):
+        self.extra = extra
+    def getExtra(self,):
+        return self.extra
+
+    def _log(self, level, msg, args, exc_info=None, extra=None):
+        if (extra == None):
+            #extra = dict(dict(global_extra, **self.extra), method=inspect.stack()[2][3])
+            extra = dict(global_extra, **self.extra)
+        logging.Logger._log(self, level, msg, args, exc_info=exc_info, extra=extra)
+
+    def setExtra(self, extra):
+        self.logger.setExtra(extra)
+
+    def addExtra(self, key, value):
+        self.extra[key] = value
+
+    def addGlobalExtra(self, key, value):
+        global_extra[key] = value
+
+    def delExtra(self, key):
+        del self.extra[key]
+
+    def delGlobalExtra(self, key):
+        del global_extra[key]
+
+#########################################
+# Base
 
 class Base():
     def __init__(self):
+        logging.setLoggerClass(ScriptLogger)
         self.logger = logging.getLogger(logger_base_name + '.' + self.__class__.__name__)
 
 #########################################
@@ -83,6 +124,7 @@ class Openstack(Base):
             if volume:
                 now = datetime.now(self.tz)
                 display_name = "backup-" + volume.name + "-" + datetime.now(self.tz).strftime("%Y%m%d-%H:%M")
+                self.logger.addExtra('volume_number', str(volume_number))
                 self.logger.info("Creating snapshot: {}".format(display_name))
                 if self.dry_run:
                     return True
@@ -95,12 +137,17 @@ class Openstack(Base):
 #########################################
 # Configuration
 
+a = logging._handlers.values()
+
 class Config(Base):
     def __init__(self, configuration_file, debug=None):
         Base.__init__(self)
         self.yaml=YAML(typ='safe')
-        self.config = self.yaml.load(Path(configuration_file))
-        self._configureLogging(debug)
+        try:
+            self.config = self.yaml.load(Path(configuration_file))
+        except IOError as e:
+            self.logger.error("Could not load configuration file: %s", configuration_file)
+            raise e
         self.logger = logging.getLogger(logger_base_name + '.' + self.__class__.__name__)
         self.timezone = pytz.timezone(self.config['timezone'])
 
@@ -146,15 +193,6 @@ class Config(Base):
     def getConfig(self):
         return self.config
 
-    def _configureLogging(self, debug):
-        logging.basicConfig(**self.config['logging']['basic_config'])
-        for logger_name in self.config['logging']['loggers']:
-            level = self.config['logging']['loggers'][logger_name].get('level')
-            if level:
-                logging.getLogger(logger_name).setLevel(level)
-        if debug:
-            logging.getLogger('script').setLevel('DEBUG')
-
     def getDisks(self):
         disks_config = self.config['disks']
         types = ['source', 'target']
@@ -193,10 +231,7 @@ class Config(Base):
     def setOfflineTest(self, offline):
         self.config['offline_test'] = offline
     def isDryRun(self):
-        if self.config.get('dry_run'):
-            return self.config['dry_run'] or self.isOfflineTest()
-        else:
-            return False
+        return (self.config.get('dry_run') != None and self.config['dry_run']) or self.isOfflineTest()
     def setDryRun(self, dry_run):
         self.config['dry_run'] = dry_run
     def getSleepTime(self):
@@ -252,7 +287,7 @@ class Disks(Base):
         self.logger.debug(self.available)
 
     def _findFullDisks(self):
-        for set in reversed(self.disks_config['source']):
+        for set in self.disks_config['source']:
             items = []
             min_available = set['min_available']
             for disk in set['disks']:
@@ -341,12 +376,13 @@ class Users(Base):
 # job
 
 class MoveJob(Base):
-    def __init__(self, config, job_config, os, db):
+    def __init__(self, config, job_config, os, db, lifeCycle):
         Base.__init__(self)
         self.config = config
         self.job_config = job_config
         self.os = os
         self.db = db
+        self.lifeCycle = lifeCycle
         if not self.job_config.get('stage'):
             self.job_config['stage'] = 'init'
         if not self.job_config.get('type'):
@@ -358,19 +394,26 @@ class MoveJob(Base):
 
     def run(self):
         self.logger.info("Running Job: " + str(self.job_config))
+        self.logger.addExtra('source_disk', self.job_config['source'])
+        self.logger.addExtra('target_disk', self.job_config['target'])
         if (self.job_config['stage']== 'init'):
+            self.logger.addGlobalExtra('stage', 'init')
             self._update_job_stage('tar')
         elif self.job_config['stage'] == 'tar':
+            self.logger.addGlobalExtra('stage', 'tar')
             self.config.setJob(self.job_config)
             if self.run_tar():
                 self._update_job_stage('sync')
         elif self.job_config['stage'] == 'sync':
+            self.logger.addGlobalExtra('stage', 'sync')
             if self.run_sync():
                 self._update_job_stage('snapshot')
         elif self.job_config['stage'] == 'snapshot':
+            self.logger.addGlobalExtra('stage', 'snapshot')
             if self.run_snapshot():
                 self._update_job_stage('clean_up')
         elif self.job_config['stage'] == 'clean_up':
+            self.logger.addGlobalExtra('stage', 'clean_up')
             if self.run_clean_up():
                 self.config.deleteJob()
 
@@ -400,10 +443,16 @@ class MoveJob(Base):
         self._execute("/bin/mv " + source_user_home_dir + " " + str(Path(moved_dir)))
 
     def _execute(self, command):
-        if self.config.isDryRun():
-            self.logger.info("DryRun. Not executing: " + command)
-        else:
-            subprocess.check_call(command, shell=True, stderr=subprocess.STDOUT)
+        try:
+            if self.config.isDryRun():
+                self.logger.info("DryRun. Not executing: " + command)
+            else:
+                output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT)
+                if output != "":
+                    self.logger.info(output)
+        except Exception as e:
+            self.logger.error("{}".format(e.output))
+            raise e
 
     def run_tar(self):
         # determine source & target nfs servers
@@ -415,7 +464,10 @@ class MoveJob(Base):
 
         # loop on users
         for user in self.job_config['users']:
+            self.logger.addExtra('user', user)
             try:
+                if self.lifeCycle.isExit():
+                    return False;
                 # verify we had not tried to move before...
                 source_user_home_dir = str(Path(source_root_dir).joinpath(user))
                 target_user_home_dir = str(Path(target_root_dir).joinpath(user))
@@ -448,6 +500,7 @@ class MoveJob(Base):
             except Exception as e:
                 self.logger.error("{}".format(e))
                 self.logger.error("Skipping user " + user)
+        self.logger.delExtra('user')
         return True
 
     def run_sync(self):
@@ -462,7 +515,10 @@ class MoveJob(Base):
 
         # loop on users
         for user in self.job_config['users']:
+            self.logger.addExtra('user', user)
             try:
+                if self.lifeCycle.isExit():
+                    return False;
                 # verify we had not tried to move before...
                 source_user_home_dir = str(Path(source_root_dir).joinpath(user))
                 target_user_home_dir = str(Path(target_root_dir).joinpath(user))
@@ -491,6 +547,7 @@ class MoveJob(Base):
                 self.logger.error("Skipping user " + user)
                 all_users_ok = False
 
+        self.logger.delExtra('user')
         return all_users_ok
 
     def run_snapshot(self):
@@ -502,6 +559,9 @@ class MoveJob(Base):
         source_root_dir = str(Path(self.config.getMountPoint()).joinpath(self.job_config['source']))
         moved_dir = str(Path(source_root_dir).joinpath(self.config.getMovedSubdir()))
         for user in self.job_config['users']:
+            if self.lifeCycle.isExit():
+                return False;
+            self.logger.addExtra('user', user)
             moved_user_dir = str(Path(moved_dir).joinpath(user))
             source_user_home_dir = str(Path(source_root_dir).joinpath(user))
             try:
@@ -514,17 +574,19 @@ class MoveJob(Base):
                 self.logger.error("{}".format(e))
                 self.logger.error("Skipping user " + user)
                 ok = False
+        self.logger.delExtra('user')
         return ok
 
 
 class MoveUsers(Base):
-    def __init__(self, config, disks, users, os, db):
+    def __init__(self, config, disks, users, os, db, lifeCycle):
         Base.__init__(self)
         self.config = config
         self.disks = disks
         self.users = users
         self.os = os
         self.db = db
+        self.lifeCycle = lifeCycle
 
     def run(self):
         job =  self._findJob()
@@ -548,7 +610,7 @@ class MoveUsers(Base):
                 if len(users) > 0:
                     del users[batch_size:]
                     job = {'source': disk_number, 'target': target['disk_number'], 'users': users}
-                    return MoveJob(self.config, job, self.os, self.db)
+                    return MoveJob(self.config, job, self.os, self.db, self.lifeCycle)
         return False
 
 
@@ -567,23 +629,26 @@ class UserDirManager(Base):
 
     def run(self):
         while not self.lifeCycle.isExit():
-            config = Config(configuration_file, self.debug)
+            config = Config(self.configuration_file, self.debug)
             try:
                 config.setDryRun(self.dry_run)
                 config.setOfflineTest(self.offline)
                 os = Openstack(config.getOSConfig(), config.getTZ(), dry_run=config.isDryRun())
+                self.logger.addGlobalExtra("dry_run", config.isDryRun())
                 users = Users(config)
                 db = DB(config)
 
                 job = config.getJob()
                 if (job['type'] == 'MoveJob'):
-                    move_job = MoveJob(config, job, os, db)
+                    move_job = MoveJob(config, job, os, db, self.lifeCycle)
                     move_job.run()
                 else:
                     disks = Disks(config)
-                    move_users = MoveUsers(config, disks, users, os, db)
+                    move_users = MoveUsers(config, disks, users, os, db, self.lifeCycle)
                     if not move_users.run():
                         self.logger.info("Nothing to do. Sleeping for " + str(config.getSleepTime()) + " seconds.")
+                        if self.single_step:
+                            break
                         time.sleep(config.getSleepTime())
                 if self.single_step:
                     break
@@ -603,18 +668,27 @@ class UserDirManager(Base):
 # main
 def main():
     logger = logging.getLogger('root')
+    logging.setLoggerClass(ScriptLogger)
+
     try:
         parser = argparse.ArgumentParser(description='Manage/Move user home directories.')
         parser.add_argument('--debug', help='be very verbose', action='store_true')
         parser.add_argument('--dry-run', help='do not actually move any users (implies single-step)', action='store_true')
         parser.add_argument('--offline', help='run offline test (implies dry-run)', action='store_true')
         parser.add_argument('--single-step', help='only execute one step then exit', action='store_true')
+        parser.add_argument('--instance', help='run some other config (e.g. "evacuate")')
         args = vars(parser.parse_args())
         signalHandler = SignalHandler()
+        configuration_file = configuration_dir + "/" + configuration_file_name + "."
+        if args['instance'] != None:
+            configuration_file = configuration_file + args['instance'] + "."
+            logging.instance_suffix = args['instance'] + "."
+            logging.config.fileConfig(logging_configuration_file)
+            global_extra['instance'] = args['instance']
+        configuration_file = configuration_file + configuration_suffix
         UserDirManager(configuration_file, signalHandler, args['dry_run'], args['offline'], args['single_step'], args['debug']).run()
 
     except Exception as e:
-        logging.basicConfig()
         logger.error("{}".format(e))
         logger.error('-' * 60)
         logger.error(traceback.format_exc())

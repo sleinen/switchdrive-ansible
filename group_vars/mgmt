@@ -32,6 +32,7 @@ php_config:
 
 scripts_pip:
     - "ruamel.yaml"
+    - "python-json-logger"
 scripts_pkgs:
     - "python-dateutil"
     # - "python-ruamel.yaml" version is too old
@@ -44,6 +45,8 @@ scripts_pkgs:
 scripts:
    - { name: "manageUserDirs.py", path: "/root", mode: "0550" }
    - { name: "manageUserDirs.yml", path: "/root", mode: "0550" }
+   - { name: "manageUserDirs.evacuate.yml", path: "/root", mode: "0550" }
+   - { name: "manageUserDirs.logging.conf", path: "/root", mode: "0550" }
    - { name: "manageSnapshots.py", path: "/home/ubuntu/bin", mode: "0550", owner: ubuntu }
    - { name: "occ", path: "/root", mode: "0550" }
    - { name: "scanUser", path: "/usr/bin", mode: "0755" }
@@ -60,3 +63,4 @@ filebeat:
     - { src: "filebeat.yml.j2", dst: "filebeat.yml" }
     - { src: "apache.yml.j2",   dst: "conf.d/apache.yml" }
     - { src: "owncloud.yml.j2",   dst: "conf.d/owncloud.yml" }
+    - { src: "manageUserDirs.yml.j2",   dst: "conf.d/owncloud.yml" }

@@ -1,5 +1,5 @@
 ---
-db_file: "/tmp/manageUserDirs.db.yml"
+db_file: "/tmp/manageUserDirs.db.evacuate.yml"
 
 # sizes are in GiB
 disks:
@@ -8,26 +8,18 @@ disks:
   moved_user_subdir: "_moved_"
   max_user_quota: 1000 # ignore any users with a higher quota
   source:
-    - min_available: 500
-      batch_size: 1
+    - min_available: 2048
+      batch_size: 1000
       disks:
-        - 301
-        - 302
-    - min_available: 200
-      batch_size: 40
-      disks:
-        - 107::160
-        - 201::220
-    - min_available: 1024
-      batch_size: 60
-      disks:
-         - data
+        - 131::136
   target:
     - quota: 0
-      min_available: 400
+      min_available: 1024
       disks:
-        - 216::220
-        - 201::211
+        - 215
+        - 214
+        - 213
+        - 212
     - quota: 300
       min_available: 1024
       disks:
@@ -37,6 +29,7 @@ disks:
 
 timezone: "CET"
 sleep_time: 3600
+
 
 openstack:
   auth:

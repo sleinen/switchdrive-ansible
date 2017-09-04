@@ -27,6 +27,7 @@ logstash:
     - "logstash.logspout"
     - "logstash.owncloud"
     - "logstash.syslog-stats"
+    - "logstash.manageUserDirs"
   patterns:
     - "ansible"
     - "apache"

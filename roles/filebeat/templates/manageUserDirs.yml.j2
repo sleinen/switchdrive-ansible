@@ -1,0 +1,8 @@
+filebeat:
+  prospectors:
+    - paths:
+        - /var/log/drive/manageUserDirs.*log
+      input_type: log
+      fields:
+        logtype: manage_user_dirs
+      fields_under_root: true
