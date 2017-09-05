@@ -33,3 +33,6 @@ create index share_with_index on oc_share (share_with);
 create index uid_index on oc_group_user(uid);
 create index argument_index on oc_jobs(argument);
 
+Added 30 August 2017, and allowed us to reduce from 6 to 3 DB
+CREATE INDEX share_with_index ON oc_share (share_with);
+
