@@ -80,13 +80,13 @@ os_server:
 os_volumes:
   nfs1:
     # the label is wong on disk "data"!!!! it is currently "000"
-    - { name: "data", name_prefix: "data", state: "mounted", device: "/dev/vdb", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "101"  }
-    - { name: "101", name_prefix: "data", state: "mounted", device: "/dev/vdc", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "102"  }
-    - { name: "102", name_prefix: "data", state: "mounted", device: "/dev/vdd", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "103"  }
-    - { name: "103", name_prefix: "data", state: "mounted", device: "/dev/vde", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "104"  }
-    - { name: "104", name_prefix: "data", state: "mounted", device: "/dev/vdf", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "105"  }
-    - { name: "105", name_prefix: "data", state: "mounted", device: "/dev/vdg", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "106"  }
-    - { name: "106", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "107"  }
+    - { name: "data", name_prefix: "data", state: "mounted", device: "/dev/vdb", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "107"  }
+    - { name: "101", name_prefix: "data", state: "absent", device: "/dev/vdc", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "102"  }
+    - { name: "102", name_prefix: "data", state: "absent", device: "/dev/vdd", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "103"  }
+    - { name: "103", name_prefix: "data", state: "absent", device: "/dev/vde", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "104"  }
+    - { name: "104", name_prefix: "data", state: "absent", device: "/dev/vdf", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "105"  }
+    - { name: "105", name_prefix: "data", state: "absent", device: "/dev/vdg", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "106"  }
+    - { name: "106", name_prefix: "data", state: "absent", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "107"  }
     - { name: "131", name_prefix: "data", state: "mounted", device: "/dev/vdi", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "132"  }
     - { name: "132", name_prefix: "data", state: "mounted", device: "/dev/vdj", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "133"  }
     - { name: "133", name_prefix: "data", state: "mounted", device: "/dev/vdk", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "134"  }
