@@ -46,6 +46,7 @@ scripts:
    - { name: "manageUserDirs.py", path: "/root", mode: "0550" }
    - { name: "manageUserDirs.yml", path: "/root", mode: "0550" }
    - { name: "manageUserDirs.evacuate.yml", path: "/root", mode: "0550" }
+   - { name: "manageUserDirs.inject.yml", path: "/root", mode: "0550" }
    - { name: "manageUserDirs.logging.conf", path: "/root", mode: "0550" }
    - { name: "manageSnapshots.py", path: "/home/ubuntu/bin", mode: "0550", owner: ubuntu }
    - { name: "occ", path: "/root", mode: "0550" }

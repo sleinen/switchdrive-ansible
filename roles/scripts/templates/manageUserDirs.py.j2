@@ -618,7 +618,7 @@ class MoveUsers(Base):
 # UserDirManager
 
 class UserDirManager(Base):
-    def __init__(self, configuration_file, lifeCycle, dry_run, offline, single_step, debug):
+    def __init__(self, configuration_file, lifeCycle, dry_run, offline, single_step, finish, debug, inject_job):
         Base.__init__(self)
         self.configuration_file = configuration_file
         self.lifeCycle = lifeCycle
@@ -626,6 +626,8 @@ class UserDirManager(Base):
         self.offline = offline
         self.single_step = single_step or dry_run or offline
         self.debug = debug
+        self.finish = finish
+        self.inject_job = inject_job
 
     def run(self):
         while not self.lifeCycle.isExit():
@@ -637,12 +639,21 @@ class UserDirManager(Base):
                 self.logger.addGlobalExtra("dry_run", config.isDryRun())
                 users = Users(config)
                 db = DB(config)
-
                 job = config.getJob()
                 if (job['type'] == 'MoveJob'):
+                    if self.inject_job != None:
+                        self.logger.error("There is still a job that did not finish yet. Therefore, injection of new job is not allowed.")
+                        sys.exit(1)
                     move_job = MoveJob(config, job, os, db, self.lifeCycle)
                     move_job.run()
+                elif self.inject_job != None:
+                    self.logger.info("injecting job: " + str(self.inject_job))
+                    move_job = MoveJob(config, self.inject_job, os, db, self.lifeCycle)
+                    move_job.run()
+                    self.inject_job = None
                 else:
+                    if self.finish:
+                        break
                     disks = Disks(config)
                     move_users = MoveUsers(config, disks, users, os, db, self.lifeCycle)
                     if not move_users.run():
@@ -677,16 +688,33 @@ def main():
         parser.add_argument('--offline', help='run offline test (implies dry-run)', action='store_true')
         parser.add_argument('--single-step', help='only execute one step then exit', action='store_true')
         parser.add_argument('--instance', help='run some other config (e.g. "evacuate")')
+        parser.add_argument('--finish', help='finish current job', action='store_true')
+        parser.add_argument('--inject', help='inject a job manually. The format is: source:target:user1[,user2].. ;\n\n it implies --finish --instance inject')
         args = vars(parser.parse_args())
         signalHandler = SignalHandler()
         configuration_file = configuration_dir + "/" + configuration_file_name + "."
+        inject_job = None
+        if args['inject'] != None:
+            if args['instance'] != None:
+                logger.error("the options --instance and --inject are mutually exclusive")
+                parser.print_help()
+                sys.exit(1)
+            args['instance'] = 'inject'
+            args['finish'] = True
+            parts = args['inject'].split(':')
+            print(parts)
+            if len(parts) < 3:
+                logger.error("Could not parse --inject argument")
+                parser.print_help()
+                sys.exit(1)
+            inject_job = {'source': parts[0], 'target': parts[1], 'users': parts[2].split(',')}
         if args['instance'] != None:
             configuration_file = configuration_file + args['instance'] + "."
             logging.instance_suffix = args['instance'] + "."
             logging.config.fileConfig(logging_configuration_file)
             global_extra['instance'] = args['instance']
         configuration_file = configuration_file + configuration_suffix
-        UserDirManager(configuration_file, signalHandler, args['dry_run'], args['offline'], args['single_step'], args['debug']).run()
+        UserDirManager(configuration_file, signalHandler, args['dry_run'], args['offline'], args['single_step'], args['finish'], args['debug'], inject_job).run()
 
     except Exception as e:
         logger.error("{}".format(e))
