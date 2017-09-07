@@ -57,6 +57,15 @@ ldap:
   ssl: False
   port: 389
 
+# use this instead of ldap when testing from outside
+ldap_external:
+  server: "drive.switch.ch"
+  password: "changeme"
+  base: "dc=cloud,dc=switch,dc=ch"
+  dn: "cn=admin,dc=cloud,dc=switch,dc=ch"
+  ssl: True
+  port: 636
+
 mysql:
   host: 'localhost'
   user: '{{mariadb_user}}'
