@@ -359,7 +359,14 @@ class Users(Base):
             for item in dir_list:
                 ldap.search(ldap_search_base, '(uid='+ item +')', attributes=['ownCloudQuota'])
                 if len(ldap.entries) > 0:
-                    user_quota = int(str(ldap.entries[0]['ownCloudQuota']).rstrip('G'))
+                    user_quota = 0
+                    try:
+                        user_quota = ldap.entries[0]['owncloudquota']
+                        user_quota = int(str(user_quota).rstrip('G'))
+                    except Exception as e:
+                        self.logger.error("Could not get quota for user {}".format(item))
+                        self.logger.error("{}".format(e))
+                        self.logger.error(traceback.format_exc())
                     if (user_quota >= int(min_quota) and user_quota <= int(max_quota)):
                         # verify the link on /mnt/data is correct
                         user_dir = os.path.join(root_dir, item)
