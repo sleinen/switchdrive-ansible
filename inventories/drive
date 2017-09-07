@@ -29,6 +29,7 @@
 10.0.23.74 vols="{{volumes_nfs4}}"
 10.0.23.75 vols="{{volumes_nfs5}}"
 10.0.23.76
+10.0.23.77
 
 [web]
 10.0.23.[201:204] active=True
