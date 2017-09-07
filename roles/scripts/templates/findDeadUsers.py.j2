@@ -1,0 +1,154 @@
+#!/usr/bin/env python
+
+import argparse
+import traceback
+import pymysql.cursors
+import sys
+import datetime
+
+#########################################
+# config
+
+db_config = {
+    'user': '{{mariadb_user}}',
+    'password': '{{mariadb_passwd}}',
+    'db': '{{mariadb_database}}',
+    'charset': 'utf8'
+}
+
+#########################################
+# logging
+
+import logging
+
+logger_base_name = 'script'
+
+#########################################
+# Base
+
+class Base():
+    def __init__(self):
+        #logging.setLoggerClass(ScriptLogger)
+        self.logger = logging.getLogger(logger_base_name + '.' + self.__class__.__name__)
+
+#########################################
+# DB
+
+
+# select distinct uid_owner as sharer, ifnull(user, share_with) as sharing_with, configvalue as last_login, share_with as internal, user as external
+# from oc_ldap_user_mapping
+#     left join oc_preferences on owncloud_name = userid and appid = 'login' and configkey = 'lastLogin'
+#     join oc_share on userid = uid_owner
+#     left join oc_share_external on share_token = token
+#     where (userid is NULL or cast(configvalue as int) < (UNIX_TIMESTAMP(now())-61536000))
+#     and not (user is NULL and token is not NULL)
+#     ;
+#
+# select distinct uid_owner as sharer, share_with as sharing_with
+# from oc_ldap_user_mapping
+#     left join oc_preferences on owncloud_name = userid and appid = 'login' and configkey = 'lastLogin'
+#     join oc_share on userid = uid_owner
+#     where (userid is NULL or cast(configvalue as int) < (UNIX_TIMESTAMP(now())-61536000)) and token is NULL
+#     ;
+#
+# select distinct uid_owner as sharer, user as sharing_with
+# from oc_ldap_user_mapping
+#     left join oc_preferences on owncloud_name = userid and appid = 'login' and configkey = 'lastLogin'
+#     join oc_share on userid = uid_owner
+#     join oc_share_external on share_token = token
+#     where (userid is NULL or cast(configvalue as int) < (UNIX_TIMESTAMP(now())-61536000))
+#     ;
+#
+
+
+class DB(Base):
+    def __init__(self, config):
+        Base.__init__(self)
+        self.config = config
+
+    def getExpiredUsers(self, date):
+        connection = pymysql.connect(**self.config)
+        sql = """
+            select owncloud_name as user
+            from oc_ldap_user_mapping
+                left join oc_preferences on owncloud_name = userid and appid = 'login' and configkey = 'lastLogin'
+                where (userid is NULL or cast(configvalue as int) < (%s))
+                ;"""
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(sql, (date.strftime("%s")))
+                return cursor.fetchall()
+        finally:
+            connection.close()
+
+
+    def getAffectedUsers(self, date):
+
+        connection = pymysql.connect(**self.config)
+        sql = """
+            select distinct uid_owner as sharer, ifnull(user, share_with) as sharing_with
+            from oc_ldap_user_mapping
+                left join oc_preferences on owncloud_name = userid and appid = 'login' and configkey = 'lastLogin'
+                join oc_share on userid = uid_owner
+                left join oc_share_external on share_token = token
+                where (userid is NULL or cast(configvalue as int) < (%s))
+                and not (user is NULL and token is not NULL)
+                ;"""
+
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute(sql, (date.strftime("%s")))
+                return cursor.fetchall()
+        finally:
+            connection.close()
+
+#########################################
+# main
+def main():
+    logger = logging.getLogger('root')
+
+    try:
+        parser = argparse.ArgumentParser(description='get users that did not login since "<date>.')
+        parser.add_argument('--debug', help='be very verbose', action='store_true')
+        parser.add_argument('--date', help='day.month.year')
+        parser.add_argument('--share_with_info', help='print share_with information (default)', action='store_true')
+        parser.add_argument('--user_list', help='print "expired" users', action='store_true')
+        args = vars(parser.parse_args())
+        if (args['debug']):
+            logging.basicConfig(level=logging.DEBUG)
+        else:
+            logging.basicConfig(level=logging.INFO)
+        db = DB(db_config)
+        if  args['date'] == None:
+            parser.print_help()
+            sys.exit(1)
+        date_parts = args['date'].split('.')
+        date = datetime.date(year=int(date_parts[2]), day=int(date_parts[0]), month=int(date_parts[1]))
+        if args['user_list']:
+            data = db.getExpiredUsers(date)
+            for row in data:
+                print(row[0])
+        else:
+            data = db.getAffectedUsers(date)
+            sharees = {}
+            for row in data:
+                sharer = row[0]
+                sharee = row[1]
+                if sharees.get(sharee) == None:
+                    sharees[sharee] = [sharer]
+                else:
+                    sharees[sharee].append(sharer)
+            for sharee in sharees:
+                print(sharee + "\t" + ",".join(sharees[sharee]))
+
+    except Exception as e:
+        logger.error("{}".format(e))
+        logger.error('-' * 60)
+        logger.error(traceback.format_exc())
+        logger.error('-' * 60)
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

@@ -43,6 +43,7 @@ scripts_pkgs:
     - "python-subprocess32"
 
 scripts:
+   - { name: "findDeadUsers.py", path: "/root", mode: "0550" }
    - { name: "manageUserDirs.py", path: "/root", mode: "0550" }
    - { name: "manageUserDirs.yml", path: "/root", mode: "0550" }
    - { name: "manageUserDirs.evacuate.yml", path: "/root", mode: "0550" }
