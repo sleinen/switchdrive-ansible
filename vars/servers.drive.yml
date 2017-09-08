@@ -75,7 +75,7 @@ os_server:
   #db6:        { ip: "{{ hostvars[groups['mariadb'][5]].inventory_hostname }}",   flavor: "drive-100-245-46-1.2-ssd", image: "{{os_image['xenial']}}", root_size: "80", security_groups: "default",          hints: { group: "{{ os_server_group['mariadb'] }}" } }
 
   nfs6:       { ip: "{{ hostvars[groups['nfs'][5]].inventory_hostname }}",       flavor: "drive-40-4-4",             image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: {} }
-  nfs7:       { ip: "{{ hostvars[groups['nfs'][5]].inventory_hostname }}",       flavor: "drive-40-4-4",             image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: {} }
+  nfs7:       { ip: "{{ hostvars[groups['nfs'][6]].inventory_hostname }}",       flavor: "drive-40-4-4",             image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: {} }
 
 # ceph data volumes; do not add root volumes and ssd-ephemeral volumes like e.g. the one for graphite.
 os_volumes:
@@ -139,7 +139,7 @@ os_volumes:
     - { name: "127", name_prefix: "data", state: "mounted", device: "/dev/vdd", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "128"  }
     - { name: "128", name_prefix: "data", state: "mounted", device: "/dev/vde", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "129"  }
     - { name: "129", name_prefix: "data", state: "mounted", device: "/dev/vdf", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "130"  }
-    - { name: "130", name_prefix: "data", state: "mounted", device: "/dev/vdg", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "."  }
+    - { name: "130", name_prefix: "data", state: "mounted", device: "/dev/vdg", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "231"  }
     - { name: "155", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "156"  }
     - { name: "156", name_prefix: "data", state: "mounted", device: "/dev/vdi", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "157"  }
     - { name: "157", name_prefix: "data", state: "mounted", device: "/dev/vdj", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "158"  }
@@ -168,7 +168,7 @@ os_volumes:
     - { name: "219", name_prefix: "data", state: "mounted", device: "/dev/vdt", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "220"  }
     - { name: "220", name_prefix: "data", state: "mounted", device: "/dev/vdu", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "301"  }
     - { name: "301", name_prefix: "data", state: "mounted", device: "/dev/vdv", size: "5120", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "302"  }
-    - { name: "302", name_prefix: "data", state: "mounted", device: "/dev/vdw", size: "5120", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "."  }
+    - { name: "302", name_prefix: "data", state: "mounted", device: "/dev/vdw", size: "5120", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "221"  }
   nfs7:
     - { name: "221", name_prefix: "data", state: "mounted", device: "/dev/vdb", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "222"  }
     - { name: "222", name_prefix: "data", state: "mounted", device: "/dev/vdc", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "223"  }
@@ -179,7 +179,7 @@ os_volumes:
     - { name: "227", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "228"  }
     - { name: "228", name_prefix: "data", state: "mounted", device: "/dev/vdi", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "229"  }
     - { name: "229", name_prefix: "data", state: "mounted", device: "/dev/vdj", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "230"  }
-    - { name: "230", name_prefix: "data", state: "mounted", device: "/dev/vdk", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "231"  }
+    - { name: "230", name_prefix: "data", state: "mounted", device: "/dev/vdk", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "."  }
     - { name: "231", name_prefix: "data", state: "mounted", device: "/dev/vdl", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "232"  }
     - { name: "232", name_prefix: "data", state: "mounted", device: "/dev/vdm", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "233"  }
     - { name: "233", name_prefix: "data", state: "mounted", device: "/dev/vdn", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "234"  }

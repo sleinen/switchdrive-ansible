@@ -72,6 +72,9 @@
 [cmd]
 localhost ansible_connection=local
 
+[engines]
+localhost
+
 [redis]
 # the first one is active. Just run `ansible-playbook -i inventories/drive playbooks/(web|sync|dev|mgmt)servers.yml -t ocphp_fpm`
 10.0.23.241
@@ -145,6 +148,7 @@ nfs3_ip=10.0.23.73
 nfs4_ip=10.0.23.74
 nfs5_ip=10.0.23.75
 nfs6_ip=10.0.23.76
+nfs7_ip=10.0.23.77
 volumes_inventory_name=production
 
 # owncloud
