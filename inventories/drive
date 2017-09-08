@@ -72,8 +72,9 @@
 [cmd]
 localhost ansible_connection=local
 
-[engines]
-localhost
+# No longer needed everyting works through mgmt
+#[engines]
+#localhost
 
 [redis]
 # the first one is active. Just run `ansible-playbook -i inventories/drive playbooks/(web|sync|dev|mgmt)servers.yml -t ocphp_fpm`

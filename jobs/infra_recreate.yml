@@ -1,7 +1,7 @@
 ---
 
 - hosts:
-    - engines
+    - mgmt
   vars:
     os_state: absent
     os_vm_state: absent
@@ -17,7 +17,7 @@
   gather_facts: no
 
 - hosts:
-    - engines
+    - mgmt
   vars:
     os_state: present
     os_vm_state: present
