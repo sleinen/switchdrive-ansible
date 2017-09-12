@@ -534,9 +534,9 @@ class MoveJob(Base):
 
                     etag_before = self.db.getEtag(user)
                     self.logger.debug("Etag before: " + str(etag_before))
-                    command = "/usr/bin/ssh " + source_server + " /usr/bin/rsync -axS --delete --stats '" + source_user_home_dir + "/' "
+                    command = "/usr/bin/ssh " + source_server + " /usr/bin/rsync -axS --delete --stats '" + source_user_home_dir + "/' " + "'"
                     if target_server != source_server:
-                        command = command + "'" + target_server + ":"
+                        command = command + target_server + ":"
                     command = command + target_user_home_dir + "'"
                     self._execute(command)
 
