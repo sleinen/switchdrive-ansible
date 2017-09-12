@@ -363,18 +363,22 @@ class Users(Base):
                     try:
                         user_quota = ldap.entries[0]['owncloudquota']
                         user_quota = int(str(user_quota).rstrip('G'))
+                        if (user_quota >= int(min_quota) and user_quota <= int(max_quota)):
+                            if (self.config.getOCDataDir() == root_dir):  # we are on /mnt/data
+                                users.append(item)
+                            else:
+                                # verify the link on /mnt/data is correct
+                                user_dir = os.path.join(root_dir, item)
+                                link = os.path.join(self.config.getOCDataDir(), item)
+                                if os.path.islink(link) and os.path.realpath(link) == user_dir:
+                                    users.append(item)
+                                else:
+                                    self.logger.error(
+                                        "Found user with corrupted home dir setup (check links): " + user_dir)
                     except Exception as e:
                         self.logger.error("Could not get quota for user {}".format(item))
                         self.logger.error("{}".format(e))
                         self.logger.error(traceback.format_exc())
-                    if (user_quota >= int(min_quota) and user_quota <= int(max_quota)):
-                        # verify the link on /mnt/data is correct
-                        user_dir = os.path.join(root_dir, item)
-                        link = os.path.join(self.config.getOCDataDir(), item)
-                        if (os.path.islink(link) and os.path.realpath(link) == user_dir):
-                            users.append(item)
-                        else:
-                            self.logger.error("Found user with corrupted home dir setup (check links): " + user_dir)
 
         return users
 
@@ -444,10 +448,15 @@ class MoveJob(Base):
         target_user_home_dir = str(Path(target_root_dir).joinpath(user))
         source_user_home_dir = str(Path(source_root_dir).joinpath(user))
 
-        self._execute("/bin/mkdir -p " + moved_dir)
-        self._execute("/bin/rm " + link)
-        self._execute("/bin/ln -s " + target_user_home_dir + " " + link)
-        self._execute("/bin/mv " + source_user_home_dir + " " + str(Path(moved_dir)))
+        if source_root_dir == self.config.getOCDataDir():
+            self._execute("/bin/mkdir -p " + moved_dir)
+            self._execute("/bin/mv " + source_user_home_dir + " " + str(Path(moved_dir)))
+            self._execute("/bin/ln -s " + target_user_home_dir + " " + link)
+        else:
+            self._execute("/bin/mkdir -p " + moved_dir)
+            self._execute("/bin/rm " + link)
+            self._execute("/bin/ln -s " + target_user_home_dir + " " + link)
+            self._execute("/bin/mv " + source_user_home_dir + " " + str(Path(moved_dir)))
 
     def _execute(self, command):
         try:
@@ -572,7 +581,7 @@ class MoveJob(Base):
             moved_user_dir = str(Path(moved_dir).joinpath(user))
             source_user_home_dir = str(Path(source_root_dir).joinpath(user))
             try:
-                if os.path.isdir(source_user_home_dir):
+                if os.path.isdir(source_user_home_dir) and (source_root_dir != self.config.getOCDataDir() or not os.path.islink(source_user_home_dir)):
                     self.logger.error("The old home directory of a user (" + source_user_home_dir + ") had not been moved out of the way. Something went wrong. Please check.")
                     ok = False
                 if os.path.isdir(moved_user_dir):
