@@ -349,7 +349,10 @@ class Users(Base):
         for item in os.listdir(root_dir):
             candidate = os.path.join(root_dir, item)
             if os.path.isdir(candidate) and not os.path.islink(candidate):
-                dir_list.append(item)
+                if candidate.find(' ') > 0:
+                    self.logger.warning("Found user with space in UID: '" + candidate + "'; Ignoring....")
+                else:
+                    dir_list.append(item)
 
         if self.config.isOfflineTest():
             return dir_list
