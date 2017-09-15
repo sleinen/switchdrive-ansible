@@ -7,21 +7,21 @@
     state: "{{ os_volume_state }}"
     size: "{{ item.size }}"
     display_name: "{{ site }}-{{ item.name_prefix }}-{{ item.name }}"
-  with_items: "{{ os_volumes[server] }}"
-  when: os_action == "create" and os_volumes[server] is defined
+  with_items: "{{ os_volumes[server_loop_var] }}"
+  when: os_action == "create" and os_volumes[server_loop_var] is defined
   tags:
     - os_data
 
-- name: "{{ os_action }} data volume attachement to {{ server }}"
+- name: "{{ os_action }} data volume attachement to {{ server_loop_var }}"
   os_server_volume:
     auth: "{{ os_auth }}"
     region_name: "{{ os_region }}"
     state: "{{ os_volume_state }}"
-    server: "{{ site }}-{{ server }}"
+    server: "{{ site }}-{{ server_loop_var }}"
     volume: "{{ site }}-{{ item.name_prefix }}-{{ item.name }}"
     device: "{{ item.device }}"
-  with_items: "{{ os_volumes[server] }}"
-  when: os_volumes[server] is defined
+  with_items: "{{ os_volumes[server_loop_var] }}"
+  when: os_volumes[server_loop_var] is defined
   tags:
     - os_data
     - os_attach

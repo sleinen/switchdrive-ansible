@@ -25,7 +25,7 @@
   when: os_action == "create"
 - include: server.yml
   when: os_action == "create"
-- include: data_volume.yml
+- include: data_volumes.yml
   when: os_action == "create"
 - include: vip.yml
   when: os_action == "create"

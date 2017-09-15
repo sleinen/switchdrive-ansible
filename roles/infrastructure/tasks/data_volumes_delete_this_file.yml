@@ -1,9 +1,0 @@
----
-
-- include: "{{ os_action }} a data volumes"
-  with_items: "{{ server_list }}"
-  loop_control:
-    loop_var: server
-  tags:
-    - os_data
-    - os_attach
