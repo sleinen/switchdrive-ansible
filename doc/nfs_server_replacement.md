@@ -88,7 +88,7 @@
 - rebuild nfs1,2,6:
 
 
-    ansible-playbook -i inventories/drive jobs/infra_create.yml -e server=nfs1,nfs2,nfs6 -t os_server_all,os_data
+    ansible-playbook -i inventories/drive jobs/infra_create.yml -e server=nfs1,nfs2,nfs6 -t os_server_all,os_data,os_attach
 
 - patch engines (max_files limit on hypervisors with the newly created servers nfs1,2)
   - get hypervisor name
@@ -128,6 +128,11 @@
 
     ansible-playbook -i inventories/drive playbooks/nfsservers.yml -t mount,export,ocdata
 
+
+- mount nfs volumes on all app servers:
+
+
+    ansible-playbook -i inventories/drive playbooks/{web,sync,dev,mgmt}servers.yml -t mount
 
 - check all is ok 
 
