@@ -21,5 +21,5 @@ nfs_volumes:
     volumes: "{{os_volumes.nfs5}}"
   - ip: "{{nfs6_ip}}"
     volumes: "{{os_volumes.nfs6}}"
-  - ip: "{{nfs7_ip}}"
-    volumes: "{{os_volumes.nfs7}}"
+  #- ip: "{{nfs7_ip}}"
+  #  volumes: "{{os_volumes.nfs7}}"
