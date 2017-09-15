@@ -1,5 +1,5 @@
 ---
-db_file: "/root/manageUserDirs.db.evacuate.yml"
+db_file: "/root/manageUserDirs.db.evacuate6.yml"
 
 # sizes are in GiB
 disks:
@@ -11,16 +11,12 @@ disks:
     - min_available: 2048
       batch_size: 1000
       disks:
-        - data
-    - min_available: 2048
-      batch_size: 1000
-      disks: []
-        #- 131::136
+        - 118
   target:
     - quota: 0
       min_available: 1024
       disks:
-        - 221::240
+        - 230
     - quota: 300
       min_available: 1024
       disks:

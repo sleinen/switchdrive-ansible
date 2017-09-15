@@ -47,6 +47,12 @@ scripts:
    - { name: "manageUserDirs.py", path: "/root", mode: "0550" }
    - { name: "manageUserDirs.yml", path: "/root", mode: "0550" }
    - { name: "manageUserDirs.evacuate.yml", path: "/root", mode: "0550" }
+   - { name: "manageUserDirs.evacuate1.yml", path: "/root", mode: "0550" }
+   - { name: "manageUserDirs.evacuate2.yml", path: "/root", mode: "0550" }
+   - { name: "manageUserDirs.evacuate3.yml", path: "/root", mode: "0550" }
+   - { name: "manageUserDirs.evacuate4.yml", path: "/root", mode: "0550" }
+   - { name: "manageUserDirs.evacuate5.yml", path: "/root", mode: "0550" }
+   - { name: "manageUserDirs.evacuate6.yml", path: "/root", mode: "0550" }
    - { name: "manageUserDirs.inject.yml", path: "/root", mode: "0550" }
    - { name: "manageUserDirs.logging.conf", path: "/root", mode: "0550" }
    - { name: "manageSnapshots.py", path: "/home/ubuntu/bin", mode: "0550", owner: ubuntu }
