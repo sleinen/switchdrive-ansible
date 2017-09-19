@@ -1,0 +1,56 @@
+---
+db_file: "/root/manageUserDirs.db.evacuate12.yml"
+
+# sizes are in GiB
+disks:
+  mount_point: "/mnt"
+  oc_data_dir: "/mnt/data"
+  moved_user_subdir: "_moved_"
+  max_user_quota: 1000 # ignore any users with a higher quota
+  source:
+    - min_available: 2048
+      batch_size: 1000
+      disks:
+        - 148
+  target:
+    - quota: 0
+      min_available: 1024
+      disks:
+        - 236
+    - quota: 300
+      min_available: 1024
+      disks:
+        - 301
+        - 302
+
+
+timezone: "CET"
+sleep_time: 3600
+
+
+openstack:
+  auth:
+    auth_url: "{{snapshot_auth_url}}"
+    username: "{{snapshot_username}}"
+    password: "{{snapshot_password}}"
+    project_name: "{{snapshot_tenant_id}}"
+    user_domain_name: "default"
+    project_domain_name: "default"
+  region: "ZH"
+  volume_base_name: "drive-data-"
+
+ldap:
+  server: "{{ hostvars[groups['ldap'][0]].inventory_hostname }}"
+  password: "{{ldap_password}}"
+  base: "dc=cloud,dc=switch,dc=ch"
+  dn: "cn=admin,dc=cloud,dc=switch,dc=ch"
+  ssl: False
+  port: 389
+
+mysql:
+  host: 'localhost'
+  user: '{{mariadb_user}}'
+  password: '{{mariadb_passwd}}'
+  db: '{{mariadb_database}}'
+  charset: 'utf8'
+
