@@ -6,7 +6,7 @@ snapshot_volumes:
 ocdata_links:
    - { name: ".ocdata1", link: "data" }
    - { name: ".ocdata2", link: "231" }
-   - { name: ".ocdata3", link: "125" }
+   - { name: ".ocdata3", link: "119" }
 
 nfs_volumes:
   - ip: "{{nfs1_ip}}"

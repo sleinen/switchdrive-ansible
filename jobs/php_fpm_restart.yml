@@ -5,6 +5,7 @@
     - sync
     - dev
     - mgmt
+  serial: 1
   become: yes
   tasks:
     - name: restart ocphp_fpm
