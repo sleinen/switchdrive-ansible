@@ -21,7 +21,7 @@ docker_pull: true
 owncloud_fork_name: oc
 owncloud_major_version: "9.0"
 owncloud_version: "{{owncloud_major_version}}.10"
-owncloud_docker_image_version: 8
+owncloud_docker_image_version: 9
 
 #owncloud_fork_name: oc
 #owncloud_major_version: "8.2"
