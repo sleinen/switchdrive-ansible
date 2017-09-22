@@ -16,10 +16,20 @@ disks:
     - min_available: 200
       batch_size: 40
       disks:
-        - 107::130
-        - 137::160
+        # nfs1
         - 201::220
-        - 221::230
+        # nfs2
+        - 221::240
+        # nfs3
+        - 241::260
+        # nfs4
+        #- 261::280
+        # nfs5
+        - 125::130
+        - 155::160
+        # nfs6
+        - 107::112
+        - 137::142
     - min_available: 1024
       batch_size: 60
       disks:
@@ -28,7 +38,14 @@ disks:
     - quota: 0
       min_available: 400
       disks:
+        # nfs1
         - 201::220
+        # nfs2
+        - 221::240
+        # nfs3
+        #- 241::260
+        # nfs4
+        #- 261::280
     - quota: 300
       min_available: 1024
       disks:
