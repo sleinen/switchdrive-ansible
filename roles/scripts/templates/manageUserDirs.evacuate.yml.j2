@@ -9,18 +9,19 @@ disks:
   max_user_quota: 1000 # ignore any users with a higher quota
   source:
     - min_available: 2048
-      batch_size: 1000
+      batch_size: 40
       disks:
-        - data
-    - min_available: 2048
-      batch_size: 1000
-      disks: []
-        #- 131::136
+        - 107
+        - 108
+        - 109
+        - 110
   target:
     - quota: 0
-      min_available: 1024
+      min_available: 400
       disks:
-        - 221::240
+        - 201::210
+        - 212::240
+        - 211
     - quota: 300
       min_available: 1024
       disks:
