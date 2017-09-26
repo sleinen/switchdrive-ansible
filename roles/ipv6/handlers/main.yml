@@ -1,0 +1,7 @@
+---
+
+- name: "reset network_interface"
+  shell: "ifdown {{ipv6_network_interface_name}}; ifup {{ipv6_network_interface_name}}"
+
+- name: "start network_interface"
+  command: "ifup {{ipv6_network_interface_name}}"

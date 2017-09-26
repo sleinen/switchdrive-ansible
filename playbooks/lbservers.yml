@@ -25,7 +25,9 @@
     node_type: ha
   vars_files:
     - ../vars/users.yml
+    - ../vars/servers.{{ site }}.yml
   roles:
+    - ipv6
     - common
     - nagios
     - docker

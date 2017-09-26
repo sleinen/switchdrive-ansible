@@ -1,0 +1,10 @@
+---
+
+- name: "setup {{ipv6_network_interface_name}}"
+  template:
+    src: "interface.cfg.j2"
+    dest: "/etc/network/interfaces.d/{{ipv6_network_interface_name}}.cfg"
+  notify: reset network_interface
+  tags:
+    - ipv6
+

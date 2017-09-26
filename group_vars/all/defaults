@@ -87,3 +87,5 @@ php_fpm_volumes:
   - "/var/run/php:/var/run/php"
   - "/run/shm:/tmp"
   - "{{owncloud_webroot}}:{{owncloud_webroot}}"
+
+ipv6_network_interface_name: ens3

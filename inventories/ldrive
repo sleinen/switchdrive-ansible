@@ -9,6 +9,7 @@
 [sync]
 
 [mgmt]
+10.0.23.10 admin_users={{mgmt_users}}
 
 [lb]
 
@@ -34,6 +35,7 @@
 
 [test]
 10.0.24.181 ansible_ssh_user=ubuntu
+10.0.24.182 ansible_ssh_user=ubuntu
 
 [production:children]
 db
@@ -54,16 +56,16 @@ mgmt
 jumphost
 
 [production:vars]
+site=ldrive
+internal_domain={{site}}
+
 jumphost_internal=10.0.24.5
 internal_domain=ldrive
 reverse_dns_domain=24.0.10.in-addr.arpa
-backbone_ipv4_prefix=10.2.49
-backbone_ipv4_network=10.2.0.0/16
-backbone_ipv4_gateway=10.2.49.1
-backbone_ipv6_prefix=2001:620:5ca1:231:
+ipv6_prefix=2001:620:5ca1:2e8:
 
-main_site=False
 remote_backup_host=[2001:620:5ca1:131::9]
+#main_site=False
 service_name=drive.switch.ch
 
 nfs1_ip=10.0.23.7
@@ -78,6 +80,7 @@ notification_mail=drive-operations@switch.ch
 # Set the list of users that have access to these servers
 admin_users={{ production_users }}
 
+# misc
 graphite_host_floating_ip=grafana.drive.switch.ch
 
 volumes_inventory_name=production

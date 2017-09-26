@@ -125,10 +125,8 @@ service_name=drive.switch.ch
 # network
 jumphost_internal=10.0.23.5
 reverse_dns_domain=23.0.10.in-addr.arpa
-backbone_ipv4_prefix=10.1.49
-backbone_ipv4_network=10.1.0.0/16
-backbone_ipv4_gateway=10.1.49.1
-backbone_ipv6_prefix=2001:620:5ca1:131:
+ipv6_prefix=2001:620:5ca1:1ee:
+
 
 # LDAP
 ldap_ip=10.0.23.17

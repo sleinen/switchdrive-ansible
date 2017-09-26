@@ -1,0 +1,66 @@
+---
+
+#####################
+# networks
+os_network_name: "ldrive-drive"
+
+#####################
+# networks
+os_security_group:
+  - name: "ssh"
+    description: "ssh access"
+    rules:
+      - { protocol: "tcp", port_range_min: "22", port_range_max: "22", remote_ip_prefix: "0.0.0.0/0", state: "present" }
+
+#####################
+# server groups
+os_server_group:
+  list:
+    - { name: "load_balancers", policies: ['anti-affinity'] }
+    - { name: "mariadb",        policies: ['anti-affinity'] }
+    - { name: "ldap",           policies: ['anti-affinity'] }
+  # look up id after they were created: `openstack server group list`
+  load_balancers: "xx"
+  mariadb:        "xx"
+  ldap:           "xx"
+
+#####################
+# servers
+# create servers with ``
+
+os_server:
+  jumphost1:  { ip: "{{ jumphost_internal }}",                                       flavor: "c1.small",               image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,ssh",            hints: {} }
+  test2:      { ip: "{{ hostvars[groups['test'][1]].inventory_hostname}}",           flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "20", security_groups: "default,ssh",            hints: { } }
+
+
+os_volumes:
+  nfs1: []
+
+
+
+#####################
+# vips
+
+# use `openstack port list` to find ports
+# verify settings with: `openstack port show <port>`
+
+os_vip:
+  ips:
+    - { name: "lb_vip1", ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }
+    - { name: "lb_vip2", ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" }
+  ports:
+    - name: '{{ site }}-lb1-port_{{ os_network_name }}'
+      ips:
+        - { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }
+        - { ip_address: "{{ ipv6_prefix }}:{{ hostvars[groups['lb_vip'][0]].inventory_hostname | regex_replace('.*\\.(.*)$', '\\1') }}" }
+
+        - { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" }
+        - { ip_address: "{{ ipv6_prefix }}:{{ hostvars[groups['lb_vip'][1]].inventory_hostname | regex_replace('.*\\.(.*)$', '\\1') }}" }
+    - name: '{{ site }}-lb2-port_{{ os_network_name }}'
+      ips:
+        - { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }
+        - { ip_address: "{{ ipv6_prefix }}:{{ hostvars[groups['lb_vip'][0]].inventory_hostname | regex_replace('.*\\.(.*)$', '\\1') }}" }
+
+        - { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" }
+        - { ip_address: "{{ ipv6_prefix }}:{{ hostvars[groups['lb_vip'][1]].inventory_hostname | regex_replace('.*\\.(.*)$', '\\1') }}" }
+

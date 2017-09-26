@@ -11,7 +11,7 @@
   tags:
     - keepalived
 
-- name: install keepalived config
+- name: "install keepalived config for {{ansible_hostname}}"
   template:
     src: "keepalived.conf"
     dest: "/etc/keepalived/keepalived.conf"

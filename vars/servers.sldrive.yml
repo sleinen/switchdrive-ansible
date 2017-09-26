@@ -97,6 +97,25 @@ os_vip:
     - { name: "lb_vip1", ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }
     - { name: "lb_vip2", ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" }
   ports:
-    - { name: '{{ site }}-lb1-port_{{ os_network_name }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
-    - { name: '{{ site }}-lb2-port_{{ os_network_name }}', ips: [ { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }, { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" } ] }
+    - name: '{{ site }}-lb1-port_{{ os_network_name }}'
+      ips:
+        - { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }
+        - { ip_address: "{{ ipv6_prefix }}:{{ hostvars[groups['lb_vip'][0]].inventory_hostname | regex_replace('.*\\.(.*)$', '\\1') }}" }
 
+        - { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" }
+        - { ip_address: "{{ ipv6_prefix }}:{{ hostvars[groups['lb_vip'][1]].inventory_hostname | regex_replace('.*\\.(.*)$', '\\1') }}" }
+    - name: '{{ site }}-lb2-port_{{ os_network_name }}'
+      ips:
+        - { ip_address: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}" }
+        - { ip_address: "{{ ipv6_prefix }}:{{ hostvars[groups['lb_vip'][0]].inventory_hostname | regex_replace('.*\\.(.*)$', '\\1') }}" }
+
+        - { ip_address: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}" }
+        - { ip_address: "{{ ipv6_prefix }}:{{ hostvars[groups['lb_vip'][1]].inventory_hostname | regex_replace('.*\\.(.*)$', '\\1') }}" }
+
+keepalived:
+  sldrive-lb1:
+    - { name: 'vip1_1', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 10, ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", track_script: "chk_haproxy" }
+    - { name: 'vip1_2', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 11, ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", track_script: "chk_haproxy" }
+  sldrive-lb2:
+    - { name: 'vip2_1', interface: 'ens3', state: 'BACKUP', priority:  50, router_id: 10, ip: "{{ hostvars[groups['lb_vip'][0]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", track_script: "chk_haproxy" }
+    - { name: 'vip2_2', interface: 'ens3', state: 'MASTER', priority: 150, router_id: 11, ip: "{{ hostvars[groups['lb_vip'][1]].inventory_hostname }}", private_ip: "{{ hostvars[groups['lb'][1]].inventory_hostname }}", peer_ip: "{{ hostvars[groups['lb'][0]].inventory_hostname }}", track_script: "chk_haproxy" }

@@ -99,10 +99,7 @@ service_name=drive-backup.switch.ch
 # network
 jumphost_internal=10.0.28.5
 reverse_dns_domain=28.0.10.in-addr.arpa
-backbone_ipv4_prefix=10.2.49
-backbone_ipv4_network=10.2.0.0/16
-backbone_ipv4_gateway=10.2.49.1
-backbone_ipv6_prefix=2001:620:5ca1:231:
+
 
 # LDAP
 #ldap_ip=10.0.28.51

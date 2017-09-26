@@ -44,23 +44,23 @@ defaults
 
 
 frontend stats
-    bind 0.0.0.0:8443 ssl crt /etc/haproxy/ssl/{{ service_name }}.pem
+    bind :::8443 v4v6 ssl crt /etc/haproxy/ssl/{{ service_name }}.pem
     stats                   enable
     stats                   auth {{ HAPROXY_USER }}:{{ HAPROXY_PASSWORD }}
 
 frontend internstats
-    bind 0.0.0.0:8080
+    bind :::8080 v4v6
     stats                   enable
     stats                   auth {{ HAPROXY_USER }}:{{ HAPROXY_PASSWORD }}
 
 frontend http
-    bind 0.0.0.0:80
+    bind :::80 v4v6
     acl letsencrypt-acl path_beg /.well-known/acme-challenge/
     http-request redirect scheme https if ! letsencrypt-acl ! { ssl_fc }
     use_backend letsencrypt
 
 frontend ssl
-    bind 0.0.0.0:443 ssl crt /etc/haproxy/ssl/{{service_name}}.pem
+    bind :::443 v4v6 ssl crt /etc/haproxy/ssl/{{service_name}}.pem
     mode http
     # option httpclose
     option forwardfor
