@@ -13,7 +13,7 @@ ssd:
   sldrive:
     major_version: "9.0"
     minor_version: "10"
-    image_version: 9
+    image_version: 10
     version_in_config: '9.0.10.2'
     db_host: localhost
   nzdrive:

@@ -76,6 +76,12 @@ RUN cd /var/www/owncloud && \
     patch -p1 < /appconfig-use-fetchall-closeCursor-and-unset.patch && \
     rm /*.patch
 
+# corruptionfix
+COPY patches/corruptionfix/*.patch /
+RUN cd /var/www/owncloud && \
+    patch -p1 < /29045.patch && \
+    rm /*.patch
+
 ###########
 # config
 
