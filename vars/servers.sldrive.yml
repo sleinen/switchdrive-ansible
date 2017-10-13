@@ -80,7 +80,9 @@ os_volumes:
     - { name: "206", name_prefix: "data", state: "mounted", device: "/dev/vdg", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "207"  }
     - { name: "207", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "208"  }
     - { name: "208", name_prefix: "data", state: "mounted", device: "/dev/vdi", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "."  }
-
+    - { name: "210", name_prefix: "data", state: "mounted", device: "/dev/vdj", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "211"  }
+    - { name: "211", name_prefix: "data", state: "mounted", device: "/dev/vdk", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "212"  }
+    - { name: "212", name_prefix: "data", state: "mounted", device: "/dev/vdl", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "105"  }
   #nfs3: []
 
 
