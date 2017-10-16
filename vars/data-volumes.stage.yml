@@ -40,7 +40,8 @@ volumes_nfs2:
      - { name: "208", src: "LABEL=208", state: "mounted", ocdata_link: "." }
      - { name: "210", src: "LABEL=210", state: "mounted", ocdata_link: "211" }
      - { name: "211", src: "LABEL=211", state: "mounted", ocdata_link: "212" }
-     - { name: "212", src: "LABEL=212", state: "mounted", ocdata_link: "105" }
+     - { name: "212", src: "LABEL=212", state: "mounted", ocdata_link: "213" }
+     - { name: "213", src: "LABEL=213", state: "mounted", ocdata_link: "105" }
 
 nfs_volumes:
   - ip: "{{nfs1_ip}}"
