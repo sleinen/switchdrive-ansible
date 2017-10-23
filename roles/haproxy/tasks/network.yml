@@ -3,7 +3,25 @@
 - name: install ens3 cfg
   template: src={{ item }}.j2 dest=/etc/network/interfaces.d/10-{{ item }} mode=0550
   with_items:
+    - lo.cfg
     - ens3.cfg
+  tags:
+    - config
+    - netconfig
+
+- name: "disable cloud init network cfg"
+  copy:
+    content: "network: {config: disabled}"
+    dest: "/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg"
+    mode: "0550"
+  tags:
+    - config
+    - netconfig
+
+- name: "disable cloud init network cfg"
+  file:
+    path: "/etc/network/interfaces.d/50-cloud-init.cfg"
+    state: "absent"
   tags:
     - config
     - netconfig
