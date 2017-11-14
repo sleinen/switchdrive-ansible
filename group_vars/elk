@@ -11,7 +11,7 @@ elasticsearch_license: "{{vault_elasticsearch_license}}"
 # curator config (unit = days)
 elasticsearch_keep_data:
     audit: 180
-    logfiles: 40
+    logfiles: 30
 
 logstash_beats_port: 5044
 logstash:
