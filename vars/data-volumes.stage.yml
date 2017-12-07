@@ -18,9 +18,9 @@ volumes_nfs1:
      - { name: "103", src: "LABEL=103", state: "mounted", ocdata_link: "104" }
      - { name: "104", src: "LABEL=104", state: "mounted", ocdata_link: "." }
      - { name: "105", src: "LABEL=105", state: "mounted", ocdata_link: "106" }
-     - { name: "106", src: "LABEL=106", state: "mounted", ocdata_link: "107" }
-     - { name: "107", src: "LABEL=107", state: "mounted", ocdata_link: "108" }
-     - { name: "108", src: "LABEL=108", state: "mounted", ocdata_link: "." }
+     - { name: "106", src: "LABEL=106", state: "mounted", ocdata_link: "." }
+     #- { name: "107", src: "LABEL=107", state: "absent", ocdata_link: "." }
+     #- { name: "108", src: "LABEL=108", state: "absent", ocdata_link: "." }
 
 ocdata_links: 
    - { name: ".ocdata1", link: "data" }
@@ -36,8 +36,8 @@ volumes_nfs2:
      - { name: "204", src: "LABEL=204", state: "mounted", ocdata_link: "205" }
      - { name: "205", src: "LABEL=205", state: "mounted", ocdata_link: "206" }
      - { name: "206", src: "LABEL=206", state: "mounted", ocdata_link: "207" }
-     - { name: "207", src: "LABEL=207", state: "mounted", ocdata_link: "208" }
-     - { name: "208", src: "LABEL=208", state: "mounted", ocdata_link: "." }
+     - { name: "207", src: "LABEL=207", state: "mounted", ocdata_link: "." }
+     #- { name: "208", src: "LABEL=208", state: "absent", ocdata_link: "." }
      - { name: "210", src: "LABEL=210", state: "mounted", ocdata_link: "211" }
      - { name: "211", src: "LABEL=211", state: "mounted", ocdata_link: "105" }
      #- { name: "212", src: "LABEL=212", state: "absent", ocdata_link: "213" }
