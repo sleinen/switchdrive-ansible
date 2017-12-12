@@ -1,8 +1,8 @@
 filebeat:
   prospectors:
     - paths:
-        - /run/shm/owncloud.log
-        - /run/shm/*.owncloud.log
+        - /var/log/owncloud/owncloud.log
+        - /var/log/owncloud/*.owncloud.log
       input_type: log
       fields:
         logtype: owncloud

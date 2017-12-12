@@ -9,6 +9,11 @@
   tags:
     - ocphp_fpm
 
+- name: Create owncloud log directory
+  file: path="{{owncloud_logdir}}" state=directory group=www-data owner=www-data
+  tags:
+    - ocphp_fpm
+
 - include: install_php_fpm_config.yml
   with_items: "{{shard_mapping[service_name]}}"
   loop_control:

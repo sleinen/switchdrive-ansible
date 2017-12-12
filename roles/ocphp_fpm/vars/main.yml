@@ -1,7 +1,8 @@
 ---
 
 owncloud_logfile_name: "owncloud.log"
-owncloud_logdir: "/run/shm/"
+#owncloud_logdir: "/run/shm/"
+owncloud_logdir: "/var/log/owncloud"
 owncloud_logfile: "{{owncloud_logdir}}/{{owncloud_logfile_name}}"
 
 license_key: "{{vault_license_key}}"

@@ -1,4 +1,4 @@
-/run/shm/*owncloud.log {
+/var/log/owncloud/*owncloud.log {
   rotate 1
   daily
   size 10M
