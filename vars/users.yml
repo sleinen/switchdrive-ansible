@@ -58,14 +58,14 @@ user:
     comment: "Helena von Malmborg"
     uid: 974
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC8iw1av0GLxToiCr9L3KwKRrK/PNn566DpM/yvtVVRyYn7bvQCpr34GgYj6ugrXRLrRX2HzSj5c5oiMjIguG7c6tcA5plkFVA1R1esGygIix0fnVqfl3Y7w/lwhOja9p1FPL6MoisD1hoZqWInGg0cAHDXkchV04jv5IGVwG69kopcqVSPO0EKY1X9A3BwnVzGa+KJszuGenLohCmF31aa1ig3PSHAZuWvDo6hffiFXvDs9/pJWVt5K4UDKnGF/vnhEKkrEl2nCazyRnUFRPF6DH8tOcFKDpzA/l/myu3Otx31A5V+NCXFIrxSh8OFmQAY5WCb15hQjoF8TULrkUoU04YYnSTEKy/fu2FMMPAQeIJ/3xATHIcZNK0Jz+JAgGBT5jDqJ+TP73YcO4fkpzrrfCrO3ZXUNIVOoQkWRp7Crgx6+LpZKAVr+jGYodOjOlGCjUHKOXHnH0xhsS4u6IJMmSDeDv4rcTnRgB7O4SG/eWK/99Dbi0oeI+GbFhm+Rum2Lxj6G9NZJxmet4cHNFKgXDxlo2pfex4U1rlx5HlG/gYI3XQfzaiA9KTyDBGg4ZZGX8VTi/hR/tJROJLwDw6GnHx9wHVyHXf6gLLLYziTlItJHsv3Lz/y5vT4t71zBnaZv/kHrDswQCnbrLQUJxOxORQzjAv4AW5VVY0FENlfHw== malmborg@machvm.switch.ch"
-  wuethric:
-    comment: "Samuel Wuethrich"
-    uid: 1100
-    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC0+feO5A67tAcfjUqgtE6ol1hO1Kl9OI5mc9D7vVfPw4u4amg6y0vf2/eXdyeky8gSJhPf4e8GDmH2w84eQtB6RVE1d69xO50OmrBvY4CZAWu9VZFq/hyeQpxWpUo25x8PvdOh7glZ8JW8gQhtBJ018JNryxyVcGLk645Dc6rG/WJCwE7sxPBHVDvODeCEFVeX8rE9N0SojtrLh4BlxRuyNPDYE/cxSzpul809YyBzOaudGgaH7WYKGtnAjONRnRzIUeANq9hVeX9lIaZlEM4xqUpfZpaw469LAA5/YyfOCG807mo7ru81KyKpVIdtVYVuPnXAKF4lIX9gdYq/Vs8DA8omU/hyxUrAjkXZpjrT/GEtn57ENOnJO+Isv+u8GgbYBeuK/lgBmnYx9eJiVisMbUnB1ZN3RJksnVEdchONA6TneqZ4mmlcTN8Jsc5WSSFQQZmXJLkR0Usr4BTrp+xuMC4LfUgCiwZkgCz9kQiaEbAIOd9edSzZx7g3LPmiU4eXV/Ht/g97cG7oYEjKf7bPtoES+jyZ9Wazj6zmqVpTwTUpijVaI1uKx29/Q4JTnQWHPOeIV8N76k3DgkhgCokaQvEyK2zD10mOQWJ8M0UMGCcbBzddnoEBHdg6/PWvrV6/brlAPtMk1bKKeA15wn6EX8Ag9uEoki3HjyENGknTaQ== wuethric@Samuel-s-Computer.local"
   hofmann:
     comment: "Marcel Hofmann"
     uid: 1014
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCkhWSBLC0ZQ7J9rZY4UgUeoEoGrZuqvSY8Z74sQg5mHkjdjxXuqlZv2e1DWq0WtYGx4J84ZfgS26RDlYqpk/q9gKD7l5To4cqvnf+YC05+mEXTjrtLEltj5rfNVkBBpHydPCBDUrW9DoCbloQPSq2gRXvif8ezk2TNKYsYbKVpyNTEMT4epFKD/AW/ufy5R2sNLxZzpaRkHehs6sbR1E17/wl1UM0hZZn6x+/IupRc4zDd9TXo8/UhZqWEGp1/s9udsVZ0n6EF91/3+qdORKGpNG5qK861C5/oftf8wifaihdjt5QLFbEfzQ08Yydob8QTKlKiFPHzQbp1MhHiqCXRQZ5r/qnK5i87INHK4BYeDcZXuamBiBCzRfRMyG39eWks/OxPIJOvE9PXs/Zt0zBP4avuQ08nBT5WNqoonoOvVemHx4dvIIQOiiKtzM8ip0iWq8fzoc85Oi+tdc7JB0wGji5OLGnipAxnv+haP4kxIC+Peo1P5qDdkBUavUGETsMcjKC7YrKCKDl+28HujUrN+hlqDO69zjUONnkf+WX41DUsAmR/EjSfRxrM715PnC3113Wu3fyzakuRAME8RI5og7d0i4GaDkWyFbBjr/pKjtY/6jOWN5Q1iMy20diplU2V+Bf9lx6rkHleTcvwcWf6QsSEnr0M5kDF2czGHfqE/Q== hofmann@vpn-ho-c-7.switch.ch"
+  nicola:
+    comment: "Nicola Wirczakowski"
+    uid: 931
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDCCJzIxWUdltjwqM32P6ha+fjyL7Fy66B/mtGdr23IPHRlVUysQduIhMdjtTDZsq6AHPeyOg8xuqDEa2BzPfyCRNTbloC5TiEe3qZajrPmZS9cLU1gAk/Ck9Q7c2YR0qEYJj5d+U0rgODvBRILsYq59j+BV7eHxXS9Y24JLZQ4G5qV0U7KlrbzY8WiJzHF8zwX3IJ1Lx7VQGUDnAtTWCjsBFBt41yjtARqbcbHgr9GtcFzw6fkmXm/cHezm8qArZi9SNaSVcPt/+iQaBf0Wyv9vm1VfBlgAJmPb8QyYMtMJfXZloKsAO41eHyV68s/WN3zMPIEBVhKGz0FA0FB9zlSZrAguZhJEEOvrpY8t8G8XFb7tacLRYyy6v6AEKKGw9XZ/NBri35Ca2PZY7Zp2XAYFrfRNcd4v/AtXhxxXQ/JRPMlOWVlPYpkZAMPvwzDgYdYvV1Tpedb9T6WLRv0RTzlX9FLE1M/tOlRR7BW9Zi+ejhVz6Xfa0f2ETQ6TGdC+XECoTahaJ3h32pvJQqTdYSMOzInT8bdqk/Ts5K3RgVupmJTkGg+n7CcePQHMm0ucYUsBlIISUt6de58yqSKeJeDKAOaEth4jPMTyy0fHYbIitHwdTNme0O5XdVPfCnrDLdZ8KBuy15PeX394Fh5rmR3R2udcyc3/uSOabBQJ5pesw== nicola.wirczakowski@switch.ch"
 
   # cloud-id cron users
   cloud-id:
@@ -74,6 +74,10 @@ user:
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCf5/ElSR8K8uLZjV0L6/hkFQPDBhvYDYV13yT9UG/zrkj1pfxcY+DoxG4P0epPvpkWGbkqbUSw3/rfuyAZ4e+HnNYBhKcE2LW+k8zldCWG4h7Egb69MEzdJxdb4MleRPXvAfhAf1HM4DVedqynR7uk8iRGP3d3Cs73lkuhN/S634x7Fux/QqIZ1FZjlCce59r+/7+LCBKVRhj4QCb2izt23/iN3LTJ/5vznq+9YSNViSWJAMcgeTb4rwZiYtlpsb+sdcrp71p/pS1+Giw1xc++8t9cEjHhVC/CZgGyUmBqI5GDwPMN+p/PJK5TIw0Qnb2OFNlX2MuFCereFeIQ77Jn ubuntu@cloud-id"
 
   # removed
+  wuethric:
+    comment: "Samuel Wuethrich"
+    uid: 1100
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC0+feO5A67tAcfjUqgtE6ol1hO1Kl9OI5mc9D7vVfPw4u4amg6y0vf2/eXdyeky8gSJhPf4e8GDmH2w84eQtB6RVE1d69xO50OmrBvY4CZAWu9VZFq/hyeQpxWpUo25x8PvdOh7glZ8JW8gQhtBJ018JNryxyVcGLk645Dc6rG/WJCwE7sxPBHVDvODeCEFVeX8rE9N0SojtrLh4BlxRuyNPDYE/cxSzpul809YyBzOaudGgaH7WYKGtnAjONRnRzIUeANq9hVeX9lIaZlEM4xqUpfZpaw469LAA5/YyfOCG807mo7ru81KyKpVIdtVYVuPnXAKF4lIX9gdYq/Vs8DA8omU/hyxUrAjkXZpjrT/GEtn57ENOnJO+Isv+u8GgbYBeuK/lgBmnYx9eJiVisMbUnB1ZN3RJksnVEdchONA6TneqZ4mmlcTN8Jsc5WSSFQQZmXJLkR0Usr4BTrp+xuMC4LfUgCiwZkgCz9kQiaEbAIOd9edSzZx7g3LPmiU4eXV/Ht/g97cG7oYEjKf7bPtoES+jyZ9Wazj6zmqVpTwTUpijVaI1uKx29/Q4JTnQWHPOeIV8N76k3DgkhgCokaQvEyK2zD10mOQWJ8M0UMGCcbBzddnoEBHdg6/PWvrV6/brlAPtMk1bKKeA15wn6EX8Ag9uEoki3HjyENGknTaQ== wuethric@Samuel-s-Computer.local"
   kerins:
     comment: "Fergus Kerins"
     uid: 998
@@ -108,8 +112,8 @@ users_admin:
 users_mgmt:
   - wieting
   - malmborg
-  - wuethric
   - hofmann
+  - nicola
 
 users_dev:
   - tschopp
@@ -137,6 +141,7 @@ remove_users:
   - mueller2
   - fischer
   - fritschi
+  - wuethrich
 
 ubuntu_keys:
   - schnidri
