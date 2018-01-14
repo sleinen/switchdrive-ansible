@@ -75,7 +75,7 @@ LABEL=202 /mnt/202 xfs noatime 0 0
 ```
 
 The underlying block devices are "virtio-blk" devices such as
-`/dev/sdb`, `/dev/sdc` etc.  The `virtio-blk` driver in the NFS
+`/dev/vdb`, `/dev/vdc` etc.  The `virtio-blk` driver in the NFS
 server's kernel talks (via a virto protocol) to an emulated device
 provided by Qemu.  Inside Qemu, this device is mapped to Ceph
 operations on a RBD "image" (corresponding to the respective data
