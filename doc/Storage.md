@@ -86,8 +86,10 @@ threads holds an open TCP connection to the (primary) OSD that's
 responsible for some parts of the volume.
 
 While the Qemu process has many threads per volume to talk to the
-underlying RBD image, in the current system it contains only one
-thread per volume to actually handle requests from the VM.
+underlying RBD image, in the current system it contains [only one
+thread per
+volume](https://www.spinics.net/lists/ceph-users/msg41611.html) to
+actually handle requests from the VM.
 
 ## Multithreading
 
