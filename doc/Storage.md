@@ -39,7 +39,8 @@ RBD (Remote Block Device) is one of the possible ways to access a Ceph
 cluster.  It is based on the model of a _block device_ such as a hard
 disk, which can be seen as a large (usually Gigabytes, Terabytes or
 even larger) contiguous sequence of bytes that is usually read from or
-written to as _blocks_ of some size.
+written to as _blocks_ of some size, typically 512 or 4096 bytes or
+something in that range.
 
 Each block volume in RBD is represented by an _image_ of a given size.
 For storage, each image is split into fixed-size objects.  The default
