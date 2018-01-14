@@ -56,11 +56,11 @@ This is called _copy on write_.
 
 ### Accessing data volumes from an NFS server
 
-NFS servers are VMs running under Qemu.  Our NFS server implementation
-lives in the Linux kernel (on some other systems, NFS servers are
-userspace processes).  The NFS server accesses a local file system and
-exposes (exports) it via the NFS protocol.  In this section we talk
-about the "local" side, not the NFS side.
+NFS servers are VMs running under Qemu.  The NFS server implementation
+that we use lives in the Linux kernel (on some other systems, NFS
+servers are userspace processes).  The NFS server accesses a local
+file system and exposes (exports) it via the NFS protocol.  In this
+section we talk about the "local" side, not the NFS side.
 
 Each NFS server mounts some subset of data volumes as XFS file systems
 backed by block devices.  The corresponding `/etc/fstab` entries look
