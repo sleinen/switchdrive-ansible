@@ -13,7 +13,19 @@ in a large Ceph storage cluster.
 
 ### NFS
 
-TODO
+SWITCHdrive includes a number (currently four) NFS servers, each of
+which exports a number of data volumes (currently 20–23).  Each NFS
+client (currently four web, four sync, one management, and one other
+node) mount all (currently 83) file systems from the NFS servers,
+driven by entries in their `/etc/fstab` files.
+
+On the NFS clients, several options are specified for the NFS mounts
+of user data file systems, mostly to improve performance:
+`noatime,async,rsize=1048576,wsize=1048576`.
+
+The protocol used is NFS v4 over TCP.  There is a single TCP
+connection for each client/server combination, over which requests for
+all file systems are multiplexed.
 
 ### Rados
 
