@@ -114,3 +114,7 @@ affair that would replace the host "(Physical) Disk" in the diagrams.
 ## Multithreading
 
 TODO
+
+## Caching
+
+TODO
