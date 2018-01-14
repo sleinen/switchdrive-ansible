@@ -86,16 +86,23 @@ LABEL=202 /mnt/202 xfs noatime 0 0
 [...]
 ```
 
+Inside the kernel of an NFS server, the VFS and XFS layers map file
+operations (derived from incoming NFS requests) to block operations on
+the block device.
+
 The underlying block devices are "virtio-blk" devices such as
 `/dev/vdb`, `/dev/vdc` etc.  The `virtio-blk` driver in the NFS
-server's kernel talks (via a virto protocol) to an emulated device
-provided by Qemu.  Inside Qemu, this device is mapped to Ceph
-operations on a RBD "image" (corresponding to the respective data
-volume) via the `librbd` library.  Because of how `librbd` is
-implemented, for each device (aka data volume/RBD image), there can
-and will be many threads inside the Qemu process.  Each of these
-threads holds an open TCP connection to the (primary) OSD that's
-responsible for some parts of the volume.
+server's kernel (see
+e.g. [here](https://www.linux-kvm.org/images/6/63/02x06a-VirtioBlk.pdf)
+for some internals on virtio-blk) talks (via a virto protocol) to an
+emulated device provided by Qemu.
+
+Inside Qemu, this device is mapped to Ceph operations on a RBD "image"
+(corresponding to the respective data volume) via the `librbd`
+library.  Because of how `librbd` is implemented, for each device (aka
+data volume/RBD image), there can and will be many threads inside the
+Qemu process.  Each of these threads holds an open TCP connection to
+the (primary) OSD that's responsible for some parts of the volume.
 
 While the Qemu process has many threads per volume to talk to the
 underlying RBD image, in the current system it contains [only one
