@@ -103,6 +103,14 @@ thread per
 volume](https://www.spinics.net/lists/ceph-users/msg41611.html) to
 actually handle requests from the VM.
 
+A nice description of the general process of serving block I/O
+requests from a "guest" (such as an NFS server) in KVM can be found on
+[KVM Architecture Overview—2015
+Edition](https://vmsplice.net/~stefan/qemu-kvm-architecture-2015.pdf)
+by [Stefan Hajnoczi](https://vmsplice.net/), pages 17 and following.
+Note that RBD/Ceph is missing from this picture—that's another complex
+affair that would replace the host "(Physical) Disk" in the diagrams.
+
 ## Multithreading
 
 TODO
