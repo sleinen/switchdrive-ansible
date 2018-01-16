@@ -16,7 +16,7 @@ L_check_nfsd /usr/lib/nagios/plugins/check_procs -c 1: -w 7:   -C nfsd -u root
 ##
 # L_check_nfsiod checks that one and only one nfsiod process is up and running. Any other value triggers a CRITICAL value.
 ##
-L_check_nfsiod /usr/lib/nagios/plugins/check_procs -C nfsiod -u root -c 1:1
+#L_check_nfsiod /usr/lib/nagios/plugins/check_procs -C nfsiod -u root -c 1:1
 
 ##
 # L_check_nfsd4_callbacks checks that one and only one nfsd4_callbacks process is up and running. Any other value triggers a CRITICAL value.
