@@ -1,9 +1,9 @@
 /var/log/owncloud/*owncloud.log {
-  rotate 1
-  daily
+  rotate 12
+  hourly
   size 10M
   nocreate
-  nocompress
+  compress
   missingok
   notifempty
   su www-data www-data

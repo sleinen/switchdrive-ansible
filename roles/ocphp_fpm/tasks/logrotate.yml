@@ -12,3 +12,11 @@
     - app
     - config
     - logrotate
+
+- name: make sure that logrotate is configured to run hourly
+  shell: 
+    dpkg-divert --add --rename --divert /etc/cron.hourly/logrotate /etc/cron.daily/logrotate
+  tags:
+    - app
+    - config
+    - logrotate
