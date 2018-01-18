@@ -81,7 +81,7 @@ user:
   kerins:
     comment: "Fergus Kerins"
     uid: 998
-    key: "ssh-dss AAAAB3NzaC1kc3MAAACBAOv8z42K0pd95Y1VKBaAoB058homZiDmPdOVRIBgNWDJfKyfPHNPZm37KVkvUpN7XLUQVDb9N/f/QOh4J5/Y4m8cRgFqNORGj36A4EGwy580Qf1sV6ZePynvv1N38WysYT7Xt1nEHT66BaUQRorXxqGxmo7LmqjQF48/z3XZM4XtAAAAFQCbdpBySIpTZJekakVHJJdEo9/IPQAAAIEAtL8N2BtajWIvia+A0EiWxGq5aQfq15DOmM445kapy+Vm5rrQXzMbNuvlmpeOPYgrnqiFHSBghErMLFVi8JPNvSA3hU1CEenSsQsZe4iHpNiyjOBYWNSto2sdoKqzILD9LZT3oNqlniuLw4Xf2HgoeUzKbKM68xoK/zwcwwEDkOoAAACBAJYJnsrLYtqndjJmjkQHMkfgV6wbcmN3GCkVqMsz8QIie/N3nqlanpfS2yuR32mUCCuPSlO2X5A6lB1yNvaJpgW1xLOfrHsEyIWAJkGA+FJIGMBALhNoOicvT/1rvDjAPdAg81dS5kmTAT1b5Gw8SZUyOLNoRdcPmWeb73L2SAaI kerins@macfke.switch.ch"
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDN/hU+GxtXJhPOcBFoXraHi51BmpLUxaPD1E0UGtbyYhLGy2ylaJV47rWrurYr+yrIdlJvf9EIYjjcDoY5jSeWFxfXjxmmU0ZsRAHLCytkovZV4azLJ2VX8Q/OYLbSNzpVYb2PXi4Fv8uuIbNjLTL5jAoiwA9iyoerqLd+3RiX0PZi2aRPpqKlQ8E9IOjPYIljgIA5zSLnT/KN/J7UQvV67WVDTMwbgxyC3OSA68bj7ROUST4eu9xYBRLWePvlOYP46Qg/DYi/yYheKr+N7RGp45G2FHGe3ypGg6svnekawvzLZiqHQr7S9dZbXrZjvO6ibgLej+PHZ4FSz9TzVFTt kerins@macfke.switch.ch"
   helmle:
     comment: "Bernd Helmle von Credativ"
     uid: 5000
@@ -108,6 +108,7 @@ users_admin:
   - schmid2
   - vernon
   - buschor
+  - kerins
 
 users_mgmt:
   - wieting
@@ -135,7 +136,6 @@ remove_users:
   - schnidrig
   - rissman
   - helmle
-  - kerins
   - bleh
   - usai
   - mueller2
@@ -151,6 +151,7 @@ ubuntu_keys:
   - vernon
   - buschor
   - cloud-id
+  - kerins
 
 deleted_ubuntu_keys:
   - helmle
