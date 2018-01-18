@@ -4,6 +4,7 @@
   size 10M
   nocreate
   compress
+  delaycompress
   missingok
   notifempty
   su www-data www-data
