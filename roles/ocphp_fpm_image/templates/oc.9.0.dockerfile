@@ -69,18 +69,18 @@ COPY patches/masterpasswd/apps/user_ldap/user_ldap.php /var/www/owncloud/apps/us
 #storagefix
 COPY patches/storagefix/*.patch /
 RUN cd /var/www/owncloud && \
-    patch -p1 < /28284.patch && \
-    patch -p1 < /28320.patch && \
+  #  patch -p1 < /28284.patch && \  #included in 9.0.11
+  #  patch -p1 < /28320.patch && \  #included in 9.0.11
     patch -p1 < /28792.patch && \
     patch -p1 < /reconnect-after-assemble.patch && \
     patch -p1 < /appconfig-use-fetchall-closeCursor-and-unset.patch && \
     rm /*.patch
 
-# corruptionfix
-COPY patches/corruptionfix/*.patch /
-RUN cd /var/www/owncloud && \
-    patch -p1 < /29045.patch && \
-    rm /*.patch
+# corruptionfix  These can be removed as they're included in 9.0.11. incorporated in #29491
+#COPY patches/corruptionfix/*.patch /
+#RUN cd /var/www/owncloud && \
+    #patch -p1 < /29045.patch && \
+    #rm /*.patch
 
 ###########
 # config
