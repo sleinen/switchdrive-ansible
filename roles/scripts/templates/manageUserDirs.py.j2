@@ -502,10 +502,15 @@ class MoveJob(Base):
                     self.logger.info("Copying user " + user)
                     etag_before = self.db.getEtag(user)
                     self.logger.debug("Etag before: " + str(etag_before))
-                    command = "/usr/bin/ssh " + source_server + " /bin/tar -C '" + source_root_dir + "' -cf - '" + user + "' | "
+                    command = "/usr/bin/ssh " + source_server \
+                        + " /bin/tar -C '" + source_root_dir \
+                        + " -b 1024" \
+                        + "' -cf - '" + user + "' | "
                     if target_server != source_server:
                         command = command + "/usr/bin/ssh " + target_server + " "
-                    command = command + "/bin/tar -xf - -C '" + target_root_dir + "'"
+                    command = command + "/bin/tar -xf -" \
+                        + " -b 1024" \
+                        + " -C '" + target_root_dir + "'"
                     self._execute(command)
 
                     etag_after = self.db.getEtag(user)
