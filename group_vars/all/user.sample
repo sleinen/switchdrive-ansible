@@ -4,17 +4,21 @@
 # uncomment the following line and change the values:
 
 #vault_ansible_become_pass: 'mySuperSecretPassword'
-
+# This is your engines user and password
 #vault_os_username: 'myOSUsername'
 #vault_os_password: 'IWontTellYou'
-#vault_os_tenant: '
-#    drive: 'projectXYZ''
-#    sldrive: 'projectXY2'
-#    tldrive: 'projectXYZ3'
+# This are the engines projects/tenant names
+#vault_os_tenant:
+#    drive: 'SWITCHdrive'
+#    sldrive: 'SWITCHdriveStaging'
+#    nzdrive: 'SWITCHdriveNC'
+#    nldrive: 'SWITCHdriveNC'
+# These are the regions where the projects are 
 #vault_os_region:
 #    drive: 'ZH'
 #    sldrive: 'LS'
 #    tldrive: 'LS'
+# This is your key name in engines can be foudn under project-access and security - key pairs
 #vault_os_ssh_key: 
 #    drive: "myKeyName"
 #    sldrive: "myKeyName"
