@@ -47,6 +47,8 @@ os_server:
   redis1:     { ip: "{{ hostvars[groups['redis'][0]].inventory_hostname}}",          flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
   #redis2:     { ip: "{{ hostvars[groups['redis'][1]].inventory_hostname}}",          flavor: "drive-40-4-4",           image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default", hints: {} }
 
+  mgmt1:      { ip: "{{ hostvars[groups['mgmt'][0]].inventory_hostname }}",      flavor: "drive-40-4-4", image: "{{os_image['xenial']}}", root_size: "60", security_groups: "default",                      hints: {} }
+
   nfs1:       { ip: "{{ hostvars[groups['nfs'][0]].inventory_hostname }}",       flavor: "drive-40-4-4",             image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: {} }
   nfs2:       { ip: "{{ hostvars[groups['nfs'][1]].inventory_hostname }}",       flavor: "drive-40-4-4",             image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: {} }
   #nfs3:       { ip: "{{ hostvars[groups['nfs'][2]].inventory_hostname }}",       flavor: "drive-40-4-4",             image: "{{os_image['xenial']}}", root_size: "40", security_groups: "default",          hints: {} }
