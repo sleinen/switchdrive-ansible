@@ -503,9 +503,9 @@ class MoveJob(Base):
                     etag_before = self.db.getEtag(user)
                     self.logger.debug("Etag before: " + str(etag_before))
                     command = "/usr/bin/ssh " + source_server \
-                        + " /bin/tar -C '" + source_root_dir \
+                        + " /bin/tar -C '" + source_root_dir + "'" \
                         + " -b 1024" \
-                        + "' -cf - '" + user + "' | "
+                        + " -cf - '" + user + "' | "
                     if target_server != source_server:
                         command = command + "/usr/bin/ssh " + target_server + " "
                     command = command + "/bin/tar -xf -" \
