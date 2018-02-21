@@ -1,0 +1,13 @@
+---
+- hosts:
+   - lb
+   #- sync
+  #serial: 1
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: disable the  web Servers
+      shell: /root/ha_update di {{ item }}
+      with_items: "{{ groups['lbalservers'] }}"
+      args:
+        executable: /bin/bash
