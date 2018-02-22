@@ -32,12 +32,19 @@
 10.0.26.[101:102] active=True
 
 [mgmt]
+10.0.26.204 active=True
 
 [elk]
 10.0.26.151 vols="{{volumes_elk1}}" elasticsearch_heap_size="16g"
 
 [lb]
 10.0.26.[21:22]
+
+[lbalservers]
+web1
+web2
+syn1
+syn2
 
 [ldap]
 # the first one in the list has to be the provider!
