@@ -17,6 +17,6 @@ service_cert:
 
 docker_cert:
    drive.switch.ch: 
-        crt: "{{vault_service_drive_cert}}"
+        crt: "{{vault_service_docker_cert}}"
         key: "{{vault_service_docker_cert_key}}"
 

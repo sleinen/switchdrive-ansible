@@ -4,9 +4,9 @@
 ssd:
   drive:
     major_version: "9.0"
-    minor_version: "10"
-    image_version: 10
-    version_in_config: '9.0.10.2'
+    minor_version: "11"
+    image_version: 1
+    version_in_config: '9.0.11.2'
     db_host: localhost
     #db_host: 10.0.23.31
     #db_host: {{hostvars[groups["mariadb"][0]].inventory_hostname}}

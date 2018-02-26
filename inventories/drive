@@ -49,14 +49,14 @@
 10.0.23.[51:52]
 
 [lbalservers]
-web1.drive
-web2.drive
-web3.drive
-web4.drive
-syn1.drive
-syn2.drive
-syn3.drive
-syn4.drive
+web1
+web2
+web3
+web4
+sync1
+sync2
+sync3
+sync4
 
 [ldap]
 # the first one in the list has to be the provider!
