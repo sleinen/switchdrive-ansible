@@ -1,8 +1,56 @@
 diff --git a/apps/dav/lib/connector/sabre/file.php b/apps/dav/lib/connector/sabre/file.php
-index 59b3a6e..b7493bc 100644
+index 59b3a6e748..d0bac96c61 100644
 --- a/apps/dav/lib/connector/sabre/file.php
 +++ b/apps/dav/lib/connector/sabre/file.php
-@@ -435,6 +435,13 @@ class File extends Node implements IFile {
+@@ -85,6 +85,10 @@ class File extends Node implements IFile {
+ 	 * @return string|null
+ 	 */
+ 	public function put($data) {
++
++        $start_microtime = microtime(true);
++        $db_check_interval = 300;
++
+ 		try {
+ 			$exists = $this->fileView->file_exists($this->path);
+ 			if ($this->info && $exists && !$this->info->isUpdateable()) {
+@@ -158,12 +162,30 @@ class File extends Node implements IFile {
+ 		}
+ 
+ 		try {
+-			$view = \OC\Files\Filesystem::getView();
+-			if ($view) {
+-				$run = $this->emitPreHooks($exists);
+-			} else {
+-				$run = true;
+-			}
++			try {
++                if ((microtime(true) - $start_microtime) >= $interval*1e6) {
++                    $conn = \OC::$server->getDatabaseConnection();
++                    if ($conn->ping() === false) {
++                        if ( ! $conn->inTransaction() ) {
++                            throw new Exception('A long WebDAV upload caused the database connection to timeout during a transaction. Try increasing the database connection timeout.');
++                        }
++                        $conn->close();
++                        $conn->connect();
++                    }
++                }
++
++                $view = \OC\Files\Filesystem::getView();
++                if ($view) {
++                    $run = $this->emitPreHooks($exists);
++                } else {
++                    $run = true;
++                }
++            } catch (\Exception $e) {
++                if ($needsPartFile) {
++                    $partStorage->unlink($internalPartPath);
++                }
++                $this->convertToSabreException($e);
++            }
+ 
+ 			try {
+ 				$this->changeLock(ILockingProvider::LOCK_EXCLUSIVE);
+@@ -435,6 +457,13 @@ class File extends Node implements IFile {
  
  					$chunk_handler->file_assemble($partStorage, $partInternalPath, $this->fileView->getAbsolutePath($targetPath));
  
