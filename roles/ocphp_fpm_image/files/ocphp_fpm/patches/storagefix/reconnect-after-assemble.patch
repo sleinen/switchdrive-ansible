@@ -1,5 +1,5 @@
 diff --git a/apps/dav/lib/connector/sabre/file.php b/apps/dav/lib/connector/sabre/file.php
-index 59b3a6e748..d0bac96c61 100644
+index 59b3a6e748..b27f1cb66c 100644
 --- a/apps/dav/lib/connector/sabre/file.php
 +++ b/apps/dav/lib/connector/sabre/file.php
 @@ -85,6 +85,10 @@ class File extends Node implements IFile {
@@ -24,7 +24,7 @@ index 59b3a6e748..d0bac96c61 100644
 -				$run = true;
 -			}
 +			try {
-+                if ((microtime(true) - $start_microtime) >= $interval*1e6) {
++                if ((microtime(true) - $start_microtime) >= $db_check_interval*1e6) {
 +                    $conn = \OC::$server->getDatabaseConnection();
 +                    if ($conn->ping() === false) {
 +                        if ( ! $conn->inTransaction() ) {
