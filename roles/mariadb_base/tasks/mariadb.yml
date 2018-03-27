@@ -54,7 +54,8 @@
 - name: mariadb docker
   docker_container:
     name: mariadb
-    image: "mariadb:{{mariadb_version}}"
+    #image: "mariadb:{{mariadb_version}}"
+    image: "docker.drive.switch.ch:5000/mariadbtest:2"
     network_mode: host
     state: started
     pull: "{{ docker_pull }}"

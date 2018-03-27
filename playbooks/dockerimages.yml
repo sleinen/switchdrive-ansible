@@ -3,6 +3,8 @@
 - hosts: localhost
   vars:
     docker_registry: "docker.drive.switch.ch"
+  environment:
+    PYTHONPATH: "{{ lookup('env','PYTHONPATH') }}:/usr/local/lib/python2.7/dist-packages:/usr/local/lib/python2.7/site-packages"
   roles:
     - logspout_image
     - maxscale_image
@@ -12,6 +14,7 @@
     - ocapache_image
     - haproxy_image
     - curator_image
+    - mariadb_image
   become: true
   gather_facts: no
   environment:

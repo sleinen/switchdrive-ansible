@@ -3,7 +3,8 @@
 - name: prometheus docker
   docker_container:
     name: node-exporter
-    image: "prom/node-exporter:{{node_exporter_version}}"
+    #image: "prom/node-exporter:{{node_exporter_version}}"
+    image: "prom/node-exporter"
     network_mode: host
     restart_policy: "unless-stopped"
     state: started

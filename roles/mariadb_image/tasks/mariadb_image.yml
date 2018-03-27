@@ -1,0 +1,40 @@
+---
+
+- name: copy mariadb build instructions to remote host
+  synchronize:
+    src: mariadb
+    dest: /tmp
+    delete: yes
+  tags:
+    - mariadbDocker
+
+
+- name: copy mariadb configs to remote host
+  template:
+    src={{item.name}}
+    dest=/tmp/mariadb/{{item.name}}
+    mode={{item.mode}}
+  with_items:
+    - { name: Dockerfile, mode: "0644" }
+  tags:
+    - mariadbDocker
+
+
+- name: build mariadb
+  docker_image:
+    path: "/tmp/mariadb"
+    name: "mariadbtest"
+    tag: "1"
+    dockerfile: "Dockerfile"
+    state: "present"
+    force: "yes"
+    tls_hostname: "localhost"
+    pull: "{{ docker_pull }}"
+    nocache: "{{ no_docker_cache }}"
+  tags:
+    - mariadbDocker
+
+- name: push mariadb image
+  shell: docker push "mariadbtest:1"
+  tags:
+    - mariadbDocker

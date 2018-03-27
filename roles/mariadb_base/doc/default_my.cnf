@@ -52,7 +52,8 @@ skip-external-locking
 #
 max_connections     = 100
 connect_timeout     = 5
-wait_timeout        = 600
+#wait_timeout        = 600
+wait_timeout        = 1800 
 max_allowed_packet  = 16M
 thread_cache_size       = 128
 sort_buffer_size    = 4M

@@ -19,7 +19,8 @@ galera_cluster_name: SWITCHdrive
 data_mount_point: /mnt/data
 data_volume_fstype: xfs
 
-mariadb_version: 10.1.16
+#mariadb_version: 10.1.16
+mariadb_version: 10.1.31
 mariadb_mount_point: "{{data_mount_point}}/mariadb"
 mariadb_backup_dir: "{{data_mount_point}}/backup"
 
