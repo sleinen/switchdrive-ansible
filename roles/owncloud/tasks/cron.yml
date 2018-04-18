@@ -6,7 +6,7 @@
     name="php-cronjob-{{item.shard_name}}" 
     state=present 
     user=root 
-    job="docker exec --user www-data php_fpm_{{item.version}} php -f {{owncloud_webroot}}/{{item.shard_name}}/cron.php"
+    job="docker exec --user www-data php_fpm_{{item.version}} php -f {{owncloud_webroot}}/{{item.shard_name}}/cron.php >/dev/null 2>&1"
   with_items: 
      - "{{shard_config[service_name]}}"
   when: 
