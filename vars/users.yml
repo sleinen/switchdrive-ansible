@@ -23,10 +23,10 @@ user:
     uid: 1110
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQD6iCEu+Nj3RrDwYpM3rQZysouVPriE8a1SITXmN6T8S8+4qYJugzAHhmWs49Bj0iHmy4srPmeiu+h6n6nHFNLFHSIYrfsihutEnF4zA80mH19WyqkO+ZvWB3KkmLkx/H36lVVFJwZEGKPCzI+tRaxThEcKNEDoj/+rrtvoo9OQ5mJD14kWirRHLFm3lbxssDEfaFLqZGFQjCLklBcZQQXV3GgbOixZMhS5pNC3xQJh9UEbgCYht0hVD3FueY6JOc/nPXg+ETBhDkMXkJPKfKz5U+r2Vf9lJ9J91uYcHeoAdhaPs1aO+zVFa+wJ91cCRF300FVZNCiqszaGDSVa6KcF proto@macfp.switch.ch"
   # InIt
-  vernon:
-    comment: "Greg Vernon"
-    uid: 1004
-    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQD4lit9V8bxuKXLslSf05tVE6iJIJ9egT29EUq8vI7zNZ8W/GdbdnHLyzrt6299uGIBSg/FC7A2NGzxuL+zpcT97rn0+sQah4E5P+0YEDykOJKs8fw0HVHaen12zb/qtBF+r2D4fPHogixTH7voaw+fftgKB2eJATgWyyHzvbuCKYzR4mpAVO930EViqoCmJuUnP7HkBtYvc0qHo0I9c9M5+vPWVzjTRCDv6nD3Hu0dQLMxnnpcpcR3rkWaHSPMqapYTFBT9qphtUnr33KnunO+W00jGU8AsJuPzbNFs43v77Ca8hjubI8yT2oJ2+3VNFl59+vrKqjH2VwIBqeVHV6XNnEecs7qyCXvo/jgr9MiK71aBdUgbKxjJaPTkNL0j0AjlNUY6/dXCok+t5XdMkdM/40FGJNy57DMFySbc7BonCZvNzrDqvAqD5ewgptnQyfahLQUkczFymlovXRTUuzuYEqXyB6P+2FwC/RNJI5CBGghR8AI38RTcxjoLlVwFpkhALqXR+D7BMry93xoCJ/9qRHIurLbOELb2/qhpQwkKzLF9cttMo+tINtxC1A0eJqWICDFdJ088NPu6tjKmy5hGTYQ5NKLK7Gm0/DhnXlNdQoFTtSIqF+hv4hLldY5fm9X+B+6BDKA68+2Zl1soi3yqdz34gKtVU2nA6uxBBWCPw== vernon@macgv.switch.ch"
+  kerins:
+    comment: "Fergus Kerins"
+    uid: 998
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDN/hU+GxtXJhPOcBFoXraHi51BmpLUxaPD1E0UGtbyYhLGy2ylaJV47rWrurYr+yrIdlJvf9EIYjjcDoY5jSeWFxfXjxmmU0ZsRAHLCytkovZV4azLJ2VX8Q/OYLbSNzpVYb2PXi4Fv8uuIbNjLTL5jAoiwA9iyoerqLd+3RiX0PZi2aRPpqKlQ8E9IOjPYIljgIA5zSLnT/KN/J7UQvV67WVDTMwbgxyC3OSA68bj7ROUST4eu9xYBRLWePvlOYP46Qg/DYi/yYheKr+N7RGp45G2FHGe3ypGg6svnekawvzLZiqHQr7S9dZbXrZjvO6ibgLej+PHZ4FSz9TzVFTt kerins@macfke.switch.ch"
   buschor:
     comment: "Thomas Buschor"
     uid: 951
@@ -74,6 +74,10 @@ user:
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCf5/ElSR8K8uLZjV0L6/hkFQPDBhvYDYV13yT9UG/zrkj1pfxcY+DoxG4P0epPvpkWGbkqbUSw3/rfuyAZ4e+HnNYBhKcE2LW+k8zldCWG4h7Egb69MEzdJxdb4MleRPXvAfhAf1HM4DVedqynR7uk8iRGP3d3Cs73lkuhN/S634x7Fux/QqIZ1FZjlCce59r+/7+LCBKVRhj4QCb2izt23/iN3LTJ/5vznq+9YSNViSWJAMcgeTb4rwZiYtlpsb+sdcrp71p/pS1+Giw1xc++8t9cEjHhVC/CZgGyUmBqI5GDwPMN+p/PJK5TIw0Qnb2OFNlX2MuFCereFeIQ77Jn ubuntu@cloud-id"
 
   # removed
+  vernon:
+    comment: "Greg Vernon"
+    uid: 1004
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQD4lit9V8bxuKXLslSf05tVE6iJIJ9egT29EUq8vI7zNZ8W/GdbdnHLyzrt6299uGIBSg/FC7A2NGzxuL+zpcT97rn0+sQah4E5P+0YEDykOJKs8fw0HVHaen12zb/qtBF+r2D4fPHogixTH7voaw+fftgKB2eJATgWyyHzvbuCKYzR4mpAVO930EViqoCmJuUnP7HkBtYvc0qHo0I9c9M5+vPWVzjTRCDv6nD3Hu0dQLMxnnpcpcR3rkWaHSPMqapYTFBT9qphtUnr33KnunO+W00jGU8AsJuPzbNFs43v77Ca8hjubI8yT2oJ2+3VNFl59+vrKqjH2VwIBqeVHV6XNnEecs7qyCXvo/jgr9MiK71aBdUgbKxjJaPTkNL0j0AjlNUY6/dXCok+t5XdMkdM/40FGJNy57DMFySbc7BonCZvNzrDqvAqD5ewgptnQyfahLQUkczFymlovXRTUuzuYEqXyB6P+2FwC/RNJI5CBGghR8AI38RTcxjoLlVwFpkhALqXR+D7BMry93xoCJ/9qRHIurLbOELb2/qhpQwkKzLF9cttMo+tINtxC1A0eJqWICDFdJ088NPu6tjKmy5hGTYQ5NKLK7Gm0/DhnXlNdQoFTtSIqF+hv4hLldY5fm9X+B+6BDKA68+2Zl1soi3yqdz34gKtVU2nA6uxBBWCPw== vernon@macgv.switch.ch"
   wuethric:
     comment: "Samuel Wuethrich"
     uid: 1100
@@ -106,7 +110,6 @@ users_admin:
   - herzog
   - furter
   - schmid2
-  - vernon
   - buschor
   - kerins
 
@@ -134,6 +137,7 @@ staging_users:
 
 remove_users:
   - schnidrig
+  - vernon
   - rissman
   - helmle
   - bleh
@@ -148,7 +152,6 @@ ubuntu_keys:
   - leinen
   - furter
   - schmid2
-  - vernon
   - buschor
   - cloud-id
   - kerins
@@ -157,3 +160,4 @@ deleted_ubuntu_keys:
   - helmle
   - usai
   - fischer
+  - vernon
