@@ -24,6 +24,7 @@ from ruamel.yaml import YAML
 
 import logging, logging.config
 import inspect
+import operator
 
 #import logging_tree
 
@@ -308,7 +309,16 @@ class Disks(Base):
             items = []
             min_available = set['min_available']
             found = False
-            for disk in set['disks']:
+            # I want to sort the disk to improve the spread so I sort the dict of available space and reverse it
+            sorted_x = sorted(self.available.items(), key=operator.itemgetter(1), reverse=True)
+            lstofdisks = []
+            for x, y in sorted_x:
+                if x == 'data':
+                    continue
+                else:
+                    lstofdisks.append(x)
+            for disk in lstofdisks:
+            #for disk in set['disks']:
                 if self.available[disk] > min_available:
                     self.target.append({'min_quota': set['quota'], 'max_quota': max_quota, 'disk_number': disk})
                     found = True
