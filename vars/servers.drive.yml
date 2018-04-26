@@ -179,7 +179,12 @@ os_volumes:
     - { name: "287", name_prefix: "data", state: "mounted", device: "/dev/vdh", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "288"  }
     - { name: "288", name_prefix: "data", state: "mounted", device: "/dev/vdi", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "289"  }
     - { name: "289", name_prefix: "data", state: "mounted", device: "/dev/vdj", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "290"  }
-    - { name: "290", name_prefix: "data", state: "mounted", device: "/dev/vdk", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "."  }
+    - { name: "290", name_prefix: "data", state: "mounted", device: "/dev/vdk", size: "2048", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "311"  }
+    - { name: "311", name_prefix: "data", state: "mounted", device: "/dev/vdl", size: "5120", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "312"  }
+    - { name: "312", name_prefix: "data", state: "mounted", device: "/dev/vdm", size: "5120", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "313"  }
+    - { name: "313", name_prefix: "data", state: "mounted", device: "/dev/vdn", size: "5120", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "314"  }
+    - { name: "314", name_prefix: "data", state: "mounted", device: "/dev/vdo", size: "5120", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "315"  }
+    - { name: "315", name_prefix: "data", state: "mounted", device: "/dev/vdp", size: "5120", fs: "xfs", owner: "www-data", group: "www-data", mode: "0770", ocdata_link: "."  }
 
   elk1:
     - { name: "000", name_prefix: "elk1", state: "mounted", device: "/dev/vdb", size: "100", fs: "xfs", owner: "{{elasticsearch_uid}}", group: "{{elasticsearch_gid}}", mode: "0755" }
