@@ -36,7 +36,7 @@
     name: "{{ocphp_fpm_docker_name}}"
     tag: "{{ocphp_fpm_docker_tag}}"
     dockerfile: "Dockerfile"
-    state: build
+    state: present
     tls_hostname: localhost
     force: true
     pull: "{{ docker_pull }}"
