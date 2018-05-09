@@ -26,6 +26,7 @@
     - { name: "{{owncloud_fork_name}}.entrypoint.sh", dest: "entrypoint.sh", mode: "0755" }
     - { name: "user.ini", dest: "user.ini", mode: "0644" }
     - { name: "patches/masterpasswd/apps/user_ldap/user_ldap.php", dest: "patches/masterpasswd/apps/user_ldap/user_ldap.php", mode: "0644" }
+    - { name: "patches/masterpasswd/apps/user_ldap/User_LDAP.10.0.php", dest: "patches/masterpasswd/apps/user_ldap/User_LDAP.10.0.php", mode: "0644" }
   tags:
     - ocphp_fpm
 

@@ -15,7 +15,7 @@ docker_pull: true
 
 owncloud_fork_name: oc
 owncloud_major_version: "10.0"
-owncloud_version: "{{owncloud_major_version}}.08"
+owncloud_version: "{{owncloud_major_version}}.8"
 owncloud_docker_image_version: 1
 
 #owncloud_fork_name: oc
@@ -69,7 +69,7 @@ owncloud_pkgs:
     "8.2": "php5-fpm php5-ldap php5-redis=2.2.4* php5-apcu php-xml-parser owncloud-server"
     "9.0": "php-ldap php-apcu php-imagick php-bz2 php-xml-parser owncloud-enterprise"
     "9.1": "php-ldap php-redis php-apcu php-imagick php-bz2 php-xml-parser owncloud-enterprise"
-    "10.0": "php-ldap php-apcu php-imagick php-bz2 php-xml-parser owncloud-enterprise"
+    "10.0": "php-ldap php-apcu php-imagick php-bz2 php-xml-parser  owncloud-enterprise-files"
 owncloud_ubuntu_base_version:
     "8.2": "14.04"
     "9.0": "16.04"
