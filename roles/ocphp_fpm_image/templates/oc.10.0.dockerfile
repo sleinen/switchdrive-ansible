@@ -6,9 +6,30 @@ MAINTAINER Fergus Kerins
 # php-fpm
 
 RUN apt-get update && apt-get install -y \
-       php-fpm \
-       php-xdebug \
-       php-dev \
+       php7.0-fpm \
+       #"php(5-|-)fpm" \
+       openssl \
+       php-imagick \
+       php7.0-common \
+       php7.0-curl \
+       php7.0-gd \
+       php7.0-imap \
+       php7.0-intl \
+       php7.0-json \
+       php7.0-ldap \
+       php7.0-mbstring \
+       php7.0-mcrypt \
+       php7.0-mysql \
+       php7.0-pgsql \
+       php-smbclient \
+       php-ssh2 \
+       php7.0-sqlite3 \
+       php7.0-xml \
+       php7.0-zip \
+       php-apcu \
+       php7.0-dev \
+       php-pear \
+       php-bz2 \
     && rm /etc/php/7.0/fpm/pool.d/www.conf || true \
     && rm /etc/php5/fpm/pool.d/www.conf || true \
     && rm -rf /var/lib/apt/lists/*
@@ -71,6 +92,7 @@ COPY patches/masterpasswd/apps/user_ldap/User_LDAP.10.0.php /var/www/owncloud/ap
 # config
 
 COPY user.ini /var/www/owncloud/.user.ini
+
 
 ###########
 # fix permissions

@@ -13,16 +13,15 @@ $CONFIG = array (
   'dbuser' => 'owncloud',
   #'dbhost' => '{{hostvars[groups["mariadb"][0]].inventory_hostname}}',
   'dbhost' => 'localhost',
-  #'dbhost' => '{{shards.db_host}}',
   'dbpassword' => '{{mariadb_passwd}}',
   'dbdriveroptions' => [
-   PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
+   #PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
   ],
 
   'version' => '{{shards.version_in_config}}',
   'installed' => {{shards.installed}},
   'ldapIgnoreNamingRules' => false,
-# Changing the config from 0 -1 debug to info on the advise of oc
+# Changing the log level to 1 as suggested by owncloud
   'log_type' => 'owncloud',
   'loglevel' => '1',
   'log_query' => false,
@@ -31,7 +30,7 @@ $CONFIG = array (
   'logfile' => '/var/log/owncloud/{{shards.shard_name}}.{{owncloud_logfile_name}}',
   'logdateformat' => 'U.u',
   'logtimezone' => 'Europe/Berlin',
-  'log_rotate_size' => false,
+  'log_rotate_size' => 104857600,
 
   'mail_domain' => 'switch.ch',
   'mail_smtpdebug' => false,
@@ -45,7 +44,7 @@ $CONFIG = array (
   'license-key' => '{{license_key}}',
   'appstoreenabled' => false,
   'enable_previews' => true,
-  'asset-pipeline.enabled' => true,
+  'asset-pipeline.enabled' => false,
   'filesystem_check_changes' => 0,
     'trusted_domains' =>
       array (
@@ -85,7 +84,6 @@ $CONFIG = array (
     6 => 'OC\\Preview\\MarkDown',
   ),
   'enable_certificate_management' => true,
-  'versions_retention_obligation' => 'auto',
   'trashbin_retention_obligation' => '90, 90',
   'blacklisted_files' => array(
     '.htaccess',

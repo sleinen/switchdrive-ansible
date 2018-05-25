@@ -23,10 +23,10 @@
                 SetEnv HTTP_HOME {{owncloud_webroot}}/root
         </Directory>
         <IfModule mod_fastcgi.c>
-                AddType application/x-httpd-fastphp5 .php
-                Action application/x-httpd-fastphp5 /php5-owncloud-fcgi
-                Alias /php5-owncloud-fcgi /usr/lib/cgi-bin/php5-owncloud-fcgi
-                FastCgiExternalServer /usr/lib/cgi-bin/php5-owncloud-fcgi -socket {{owncloud_webroot}}/root.php-fpm.sock -pass-header Authorization -idle-timeout 300
+                AddType application/x-httpd-fastphp7 .php
+                Action application/x-httpd-fastphp7 /php7-owncloud-fcgi
+                Alias /php7-owncloud-fcgi /usr/lib/cgi-bin/php7-owncloud-fcgi
+                FastCgiExternalServer /usr/lib/cgi-bin/php7-owncloud-fcgi -socket {{owncloud_webroot}}/root.php-fpm.sock -pass-header Authorization -idle-timeout 300
                 <Directory /usr/lib/cgi-bin>
                     Require all granted
                 </Directory>

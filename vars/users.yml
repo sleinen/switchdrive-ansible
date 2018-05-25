@@ -82,10 +82,6 @@ user:
     comment: "Samuel Wuethrich"
     uid: 1100
     key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC0+feO5A67tAcfjUqgtE6ol1hO1Kl9OI5mc9D7vVfPw4u4amg6y0vf2/eXdyeky8gSJhPf4e8GDmH2w84eQtB6RVE1d69xO50OmrBvY4CZAWu9VZFq/hyeQpxWpUo25x8PvdOh7glZ8JW8gQhtBJ018JNryxyVcGLk645Dc6rG/WJCwE7sxPBHVDvODeCEFVeX8rE9N0SojtrLh4BlxRuyNPDYE/cxSzpul809YyBzOaudGgaH7WYKGtnAjONRnRzIUeANq9hVeX9lIaZlEM4xqUpfZpaw469LAA5/YyfOCG807mo7ru81KyKpVIdtVYVuPnXAKF4lIX9gdYq/Vs8DA8omU/hyxUrAjkXZpjrT/GEtn57ENOnJO+Isv+u8GgbYBeuK/lgBmnYx9eJiVisMbUnB1ZN3RJksnVEdchONA6TneqZ4mmlcTN8Jsc5WSSFQQZmXJLkR0Usr4BTrp+xuMC4LfUgCiwZkgCz9kQiaEbAIOd9edSzZx7g3LPmiU4eXV/Ht/g97cG7oYEjKf7bPtoES+jyZ9Wazj6zmqVpTwTUpijVaI1uKx29/Q4JTnQWHPOeIV8N76k3DgkhgCokaQvEyK2zD10mOQWJ8M0UMGCcbBzddnoEBHdg6/PWvrV6/brlAPtMk1bKKeA15wn6EX8Ag9uEoki3HjyENGknTaQ== wuethric@Samuel-s-Computer.local"
-  kerins:
-    comment: "Fergus Kerins"
-    uid: 998
-    key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDN/hU+GxtXJhPOcBFoXraHi51BmpLUxaPD1E0UGtbyYhLGy2ylaJV47rWrurYr+yrIdlJvf9EIYjjcDoY5jSeWFxfXjxmmU0ZsRAHLCytkovZV4azLJ2VX8Q/OYLbSNzpVYb2PXi4Fv8uuIbNjLTL5jAoiwA9iyoerqLd+3RiX0PZi2aRPpqKlQ8E9IOjPYIljgIA5zSLnT/KN/J7UQvV67WVDTMwbgxyC3OSA68bj7ROUST4eu9xYBRLWePvlOYP46Qg/DYi/yYheKr+N7RGp45G2FHGe3ypGg6svnekawvzLZiqHQr7S9dZbXrZjvO6ibgLej+PHZ4FSz9TzVFTt kerins@macfke.switch.ch"
   helmle:
     comment: "Bernd Helmle von Credativ"
     uid: 5000
