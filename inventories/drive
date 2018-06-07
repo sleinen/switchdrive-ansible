@@ -31,7 +31,7 @@
 #10.0.23.[211:214] active=False
 
 [sync]
-10.0.23.[101:104] active=True
+10.0.23.[101:106] active=True
 #10.0.23.[105:110] active=False
 #10.0.23.[111:114] active=False
 
@@ -57,6 +57,8 @@ sync1
 sync2
 sync3
 sync4
+sync5
+sync6
 
 [ldap]
 # the first one in the list has to be the provider!

@@ -1,5 +1,4 @@
 ---
-
 - name: "{{ os_action }} a root volume"
   os_volume:
     auth: "{{ os_auth }}"

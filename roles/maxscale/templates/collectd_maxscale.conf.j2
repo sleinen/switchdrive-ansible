@@ -92,7 +92,7 @@ LoadPlugin dbi
     </Query>
     
     <Query numDistinctUserLogins1min >
-         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-60) ;"
+         Statement "select count(*) as num_logins from oc_accounts where cast(last_login as int) > (UNIX_TIMESTAMP(now())-60) ;"
          <Result>
              Type gauge
              InstancePrefix "numDistinctUserLogins1min"
@@ -101,7 +101,7 @@ LoadPlugin dbi
     </Query>
     
     <Query numDistinctUserLogins1h >
-         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-3600) ;"
+         Statement "select count(*) as num_logins from oc_accounts where cast(last_login as int) > (UNIX_TIMESTAMP(now())-3600) ;"
          <Result>
              Type gauge
              InstancePrefix "numDistinctUserLogins1h"
@@ -110,7 +110,7 @@ LoadPlugin dbi
     </Query>
     
     <Query numDistinctUserLogins1d >
-         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-86400) ;"
+         Statement "select count(*) as num_logins from oc_accounts where cast(last_login as int) > (UNIX_TIMESTAMP(now())-86400) ;"
          <Result>
              Type gauge
              InstancePrefix "numDistinctUserLogins1d"
@@ -119,7 +119,7 @@ LoadPlugin dbi
     </Query>
     
     <Query numDistinctUserLogins1w >
-         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-604800) ;"
+         Statement "select count(*) as num_logins from oc_accounts where cast(last_login as int) > (UNIX_TIMESTAMP(now())-604800) ;"
          <Result>
              Type gauge
              InstancePrefix "numDistinctUserLogins1w"
@@ -127,7 +127,7 @@ LoadPlugin dbi
          </Result>
     </Query>
     <Query numDistinctUserLogins1m >
-         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-2592000) ;"
+         Statement "select count(*) as num_logins from oc_accounts where cast(last_login as int) > (UNIX_TIMESTAMP(now())-2592000) ;"
          <Result>
              Type gauge
              InstancePrefix "numDistinctUserLogins1m"
@@ -135,7 +135,7 @@ LoadPlugin dbi
          </Result>
     </Query>
     <Query numDistinctUserLogins6m >
-         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-5184000) ;"
+         Statement "select count(*) as num_logins from oc_accounts where cast(last_login as int) > (UNIX_TIMESTAMP(now())-5184000) ;"
          <Result>
              Type gauge
              InstancePrefix "numDistinctUserLogins6m"
@@ -143,7 +143,7 @@ LoadPlugin dbi
          </Result>
     </Query>
     <Query numDistinctUserLogins1y >
-         Statement "select count(*) as num_logins from oc_preferences where appid = 'login' and configkey = 'lastLogin' and cast(configvalue as int) > (UNIX_TIMESTAMP(now())-31104000) ;"
+         Statement "select count(*) as num_logins from oc_accounts where cast(last_login as int) > (UNIX_TIMESTAMP(now())-31104000) ;"
          <Result>
              Type gauge
              InstancePrefix "numDistinctUserLogins1y"

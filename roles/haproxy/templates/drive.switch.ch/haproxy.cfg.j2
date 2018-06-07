@@ -248,10 +248,10 @@ backend sync
 
     # fullconn should be a bit less than number of server * maxconn
     # automatic calculation is wrong when using two proxy in dns round-robin mode.
-    fullconn 300
+    fullconn 750
     # maxconn depends on {php_config.max_php_processes}
     #default-server inter 3000 downinter 20000 fastinter 1000 rise 4 fall 10 on-error mark-down error-limit 5 minconn 10 maxconn 150
-    default-server inter 3000 downinter 20000 fastinter 1000 rise 4 fall 10 on-error mark-down error-limit 5 minconn 10 maxconn 100
+    default-server inter 3000 downinter 20000 fastinter 1000 rise 4 fall 10 on-error mark-down error-limit 5 minconn 10 maxconn 150
 
     {% for host in groups['sync'] %}
     {%- if hostvars[host].active -%}

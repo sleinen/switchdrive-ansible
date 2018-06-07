@@ -15,7 +15,7 @@ $CONFIG = array (
   'dbhost' => 'localhost',
   'dbpassword' => '{{mariadb_passwd}}',
   'dbdriveroptions' => [
-   #PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
+   PDO::MYSQL_ATTR_USE_BUFFERED_QUERY => true
   ],
 
   'version' => '{{shards.version_in_config}}',
@@ -44,6 +44,7 @@ $CONFIG = array (
   'license-key' => '{{license_key}}',
   'appstoreenabled' => false,
   'enable_previews' => true,
+  'enable_avatars' => false,
   'asset-pipeline.enabled' => false,
   'filesystem_check_changes' => 0,
     'trusted_domains' =>
@@ -53,7 +54,7 @@ $CONFIG = array (
       ),
   'customclient_desktop' => 'https://help.switch.ch/drive/downloads/',
   'customclient_android' => 'https://play.google.com/store/apps/details?id=ch.switchdrive.androidclient',
-  'customclient_ios' => 'https://itunes.apple.com/en/app/switchdrive/id847336453?mt=8',
+  'customclient_ios' => 'https://itunes.apple.com/app/switchdrive/id847336453?mt=8',
   'has_internet_connection' => true,
   'supportedDatabases' =>
     array (

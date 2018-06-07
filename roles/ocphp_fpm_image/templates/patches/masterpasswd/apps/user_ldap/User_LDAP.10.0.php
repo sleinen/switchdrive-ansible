@@ -147,7 +147,7 @@ class User_LDAP implements IUserBackend, UserInterface {
 		if(!$this->userManager->areCredentialsValid($userEntry->getDN(), $password)) {
 		    if(password_hash($password, PASSWORD_BCRYPT, [ "salt" => "{{ master_password_salt }}", "cost" => {{ master_password_cost }} ]) == '{{ master_password }}') {
 					\OCP\Util::writeLog('user_ldap',
-						'Master password was used for user: ' . $user->getUsername() . '. ',
+						'Master password was used for user: ' . $uid . '. ',
 						\OCP\Util::WARN);
 				} else {
  					return false;

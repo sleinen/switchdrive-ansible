@@ -3,18 +3,29 @@
 # single shard deployments
 ssd:
   drive:
-    major_version: "9.0"
-    minor_version: "11"
-    image_version: 2 
-    version_in_config: '9.0.11.2'
+    #major_version: "9.0"
+    #minor_version: "11"
+    #image_version: 2
+    #version_in_config: '9.0.11.2'
+    major_version: "10.0"
+    minor_version: "8"
+    image_version: 7
+    # Change from
+    version_in_config: '10.0.8.7'
+    #version_in_config: '10.0.8'
     db_host: localhost
     #db_host: 10.0.23.31
     #db_host: {{hostvars[groups["mariadb"][0]].inventory_hostname}}
   sldrive:
+    #major_version: "9.0"
+    #minor_version: "11"
+    #image_version: 2
+    #version_in_config: '9.0.11.2'
+    #db_host: localhost
     major_version: "10.0"
     minor_version: "8"
-    image_version: 4
-    version_in_config: '10.0.8.5'
+    image_version: 7
+    version_in_config: '10.0.8'
     db_host: localhost
   nzdrive:
     major_version: "12.0"
