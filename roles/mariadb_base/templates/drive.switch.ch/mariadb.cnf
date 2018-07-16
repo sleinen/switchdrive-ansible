@@ -123,7 +123,7 @@ thread_cache_size=1024
 
 # --- misc ---
 # 
-max_connections=1024
+max_connections=2048
 max_connect_errors=100
 
 # oc is writing avatar into db :-( (starting with OC 9.0)

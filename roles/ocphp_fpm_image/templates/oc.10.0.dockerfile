@@ -73,6 +73,11 @@ RUN curl -L https://{{git_hub_user}}:{{git_hub_passwd}}@github.com/switch-ch/swi
     && mv /var/www/owncloud/themes/switch-owncloud-theme-master/ /var/www/owncloud/themes/switch \
     && rm /tmp/themes.zip
 
+RUN curl -L https://{{git_hub_user}}:{{git_hub_passwd}}@github.com/switch-ch/switch-owncloud-theme/archive/master.zip > /tmp/themes.zip \
+      && unzip -d /tmp/themes /tmp/themes.zip \
+      && mkdir /var/www/owncloud/apps/switch-owncloud-theme \
+      && mv /tmp/themes/switch-owncloud-theme-master/app/* /var/www/owncloud/apps/switch-owncloud-theme/
+
 ###########
 # patches
 
@@ -87,6 +92,8 @@ COPY patches/username/v1.{{owncloud_major_version}}.php /var/www/owncloud/ocs/v1
 # master_password
 COPY patches/masterpasswd/apps/user_ldap/User_LDAP.10.0.php /var/www/owncloud/apps/user_ldap/lib/User_LDAP.php
 
+# Looping public share fixes
+COPY patches/looppublic/Propagator.php /var/www/owncloud/lib/private/Files/Cache/Propagator.php
 
 ###########
 # config

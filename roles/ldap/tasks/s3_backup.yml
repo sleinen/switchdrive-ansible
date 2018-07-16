@@ -32,3 +32,16 @@
   tags:
     - ldap_backup
     - cron
+
+- name: Clean up old back ups
+  cron:
+    cron_file: "ldap_backup clean up"
+    hour: "4"
+    minute: "25"
+    name: "Clean up backup ldap files"
+    state: "present"
+    user: "root"
+    job: "/var/backup/slapd/*.ldif -type f -mtime +90 -exec rm {} \;"
+  tags:
+    - ldap_backup
+    - cron

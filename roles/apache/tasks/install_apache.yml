@@ -23,7 +23,7 @@
     dest=/etc/apache2/apache2.conf
     regexp="^\s*LogFormat\s+.*\s+elk\s*"
     insertafter="^\s*LogFormat.*"
-    line='LogFormat "%a - %>u %t \\"%r\\" %>s %B \\"%{Referer}i\\" \\"%{User-Agent}i\\" %V %{ms}T %{begin:sec}t.%{begin:msec_frac}t [%{Cookie}i]" elk'
+    line='LogFormat "%a - %>u %t \\"%r\\" %>s %B \\"%{Referer}i\\" \\"%{User-Agent}i\\" %V %{ms}T %{begin:sec}t.%{begin:msec_frac}t [%{Cookie}i] \"%{X-Request-ID}i\"" elk'
   notify: restart apache2
   tags:
      - config
