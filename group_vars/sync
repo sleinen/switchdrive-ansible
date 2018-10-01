@@ -39,6 +39,7 @@ scripts:
    - { name: "mariadb", path: "/root", mode: "0550" }
    - { name: "mysqlcmd", path: "/root", mode: "0550" }
    - { name: "maxadmin", path: "/root", mode: "0550" }
+   - { name: "time-readlink", path: "/usr/local/bin", mode: "0755" }
 
 filebeat:
   configs:

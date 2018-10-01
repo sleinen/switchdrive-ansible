@@ -1,0 +1,88 @@
+#!/usr/bin/env python
+##
+## time-readlink
+##
+## Measure the times to traverse all links of "symlink chains".
+##
+## In the SWITCHdrive's ownCloud deployment, several NFS-mounted file
+## systems are used to store users' data.  In the past, the
+## unavailability of individual of these file systems has caused
+## severe issues.  Therefore we have introduced chains of symbolic
+## links that, taken together, traverse the entirety of these file
+## systems.  Our ownCloud installation somehow(?) checks the
+## accessibility of these chains and shuts down if something is
+## missing.
+##
+## We have observed that when some of the NFS file systems have high
+## I/O utilization, checking the symlink chains can take a long time.
+## This tool was written to better understand that issue.  Here's what
+## it does:
+##
+## For each of the symlink chains, it traverses all individual
+## symlinks using the readlink() system call, and measures the times
+## for doing so.  When the time to read a particular symlink exceeds
+## some THRESHOLD, the time is noticed and logged, along with the file
+## system and server on which the symlink was located.
+##
+## Date created: 2018-10-01
+## Author:       Simon Leinen  <simon.leinen@switch.ch>
+
+import os
+import timeit
+import re
+import time
+
+
+START = [
+{% for ocdata_link in ocdata_links: %}
+    '/mnt/data/{{ ocdata_link.name }}',
+{% endfor %}
+]
+
+THRESHOLD = 0.005
+
+next_file = None
+mount = dict()
+
+def get_mountpoints():
+    nfs_mount_re = re.compile('^(\S+)\s+(\S+)\s+nfs\s+.*$')
+    with open("/etc/fstab") as fstab:
+        for line in fstab:
+            m = nfs_mount_re.match(line)
+            if m:
+                mount[m.group(2)] = m.group(1)
+
+
+def find_mount(filename):
+    m = re.search('^(/[^/]+/[^/]+)/.*', filename)
+    if m and m.group(1) in mount:
+        return mount[m.group(1)]
+    return None
+
+
+def time_symlink_chain(start, rlt=dict()):
+    file = start
+
+    def descend():
+        global next_file
+        stime = time.time()
+        try:
+            next_file = os.readlink(file)
+            #print("{}: {} -> {}".format(start, file, next_file))
+        except Exception as c:
+            next_file = None
+
+    while file:
+        t = timeit.timeit(descend, number=1)
+        if t >= THRESHOLD:
+            rlt[file] = t
+        file = next_file
+
+    return rlt
+
+
+get_mountpoints()
+for start in START:
+    rl_time = time_symlink_chain(start, dict())
+    for key, value in sorted(rl_time.iteritems(), key=lambda x: x[1]):
+        print("{} - {}: {:9.6f} ({})".format(start, key, value, find_mount(key) or '-'))
