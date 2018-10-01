@@ -64,7 +64,7 @@ def time_symlink_chain(start, rlt=dict()):
     file = start
 
     def descend():
-        global next_file
+        global next_file, stime
         stime = time.time()
         try:
             next_file = os.readlink(file)
@@ -75,7 +75,7 @@ def time_symlink_chain(start, rlt=dict()):
     while file:
         t = timeit.timeit(descend, number=1)
         if t >= THRESHOLD:
-            rlt[file] = t
+            rlt[file] = { 'time': t, 'stime': stime }
         file = next_file
 
     return rlt
@@ -84,5 +84,7 @@ def time_symlink_chain(start, rlt=dict()):
 get_mountpoints()
 for start in START:
     rl_time = time_symlink_chain(start, dict())
-    for key, value in sorted(rl_time.iteritems(), key=lambda x: x[1]):
-        print("{} - {}: {:9.6f} ({})".format(start, key, value, find_mount(key) or '-'))
+    for key, value in sorted(rl_time.iteritems(), key=lambda x: x[1]['time']):
+        print("{}: {} - {}: {:9.6f} ({})".format(
+            datetime.datetime.fromtimestamp(value['stime']).strftime('%Y-%m-%d %H:%M:%S'),
+            start, key, value['time'], find_mount(key) or '-'))
